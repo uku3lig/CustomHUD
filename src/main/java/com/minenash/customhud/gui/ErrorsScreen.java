@@ -7,6 +7,7 @@ import com.minenash.customhud.errors.Errors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -19,6 +20,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -38,7 +40,7 @@ public class ErrorsScreen extends Screen {
     }
 
     public ErrorsScreen(Screen parent, Profile profile) {
-        super(Text.literal("Profile Errors"));
+        super(Text.literal((profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
         this.parent = parent;
         this.profile = profile;
     }
@@ -77,22 +79,20 @@ public class ErrorsScreen extends Screen {
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-
+        renderBackgroundTexture(context);
 
         y_offset = 0;
         this.listWidget.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 8, 16777215);
-        context.drawCenteredTextWithShadow(this.textRenderer, profile.name, this.width / 2, 24, 16777215);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
 
-        int x = this.width / 2; // + (profile == 1 ? -90 : profile == 2 ? 0 : 90);
-        context.fill(x - 30, 47, x + 30, 48, 0xFFFFFFFF);
+        for (var d : drawables)
+            d.render(context, mouseX, mouseY, delta);
     }
 
     class ErrorListWidget extends EntryListWidget<ErrorListWidget.ErrorEntry> {
 
         public ErrorListWidget(Profile profile) {
-            super(CLIENT, ErrorsScreen.this.width, ErrorsScreen.this.height, 52, ErrorsScreen.this.height - 36 + 4, 18);
+            super(CLIENT, ErrorsScreen.this.width, ErrorsScreen.this.height - 30 - 32, 30, /*ErrorsScreen.this.height - 36 + 4,*/ 18);
             this.addEntry( new ErrorEntryHeader() );
 
             if (profile == null) {
@@ -120,7 +120,7 @@ public class ErrorsScreen extends Screen {
 
         @Override
         protected ErrorEntry getEntryAtPosition(double x, double y) {
-            int m = MathHelper.floor(y - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
+            int m = MathHelper.floor(y - (double)this.getY()) - this.headerHeight + (int)this.getScrollAmount() - 4;
             int n = m / this.itemHeight;
 
             ErrorEntry entry = getSelectedOrNull();
@@ -142,7 +142,7 @@ public class ErrorsScreen extends Screen {
         }
 
         @Override
-        public void appendNarrations(NarrationMessageBuilder builder) {}
+        protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
 
         public class ErrorEntryHeader extends ErrorEntry {
 

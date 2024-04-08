@@ -5,6 +5,8 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.NewConfigScreen;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.math.MathHelper;
@@ -16,13 +18,11 @@ import java.util.stream.Collectors;
 
 public class ProfileLinesWidget extends ElementListWidget<LineEntry> {
 
-
-
     public final NewConfigScreen screen;
 
     public ProfileLinesWidget(NewConfigScreen screen, int startY, int endY) {
-        super(MinecraftClient.getInstance(), screen.width, endY - startY, startY, endY, 20);
-
+        super(MinecraftClient.getInstance(), screen.width, endY - startY, startY, 20);
+        setRenderBackground(false);
         this.screen = screen;
 
         for (Profile p : ProfileManager.getProfiles()) {
@@ -72,5 +72,9 @@ public class ProfileLinesWidget extends ElementListWidget<LineEntry> {
         return super.getScrollbarPositionX() + 48 + 16;
     }
 
-
+    @Override
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        setRenderBackground(client.world == null);
+        super.renderWidget(context, mouseX, mouseY, delta);
+    }
 }

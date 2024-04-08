@@ -34,7 +34,7 @@ public class TogglesScreen extends Screen {
     public KeyBinding selectedKeybind;
 
     public TogglesScreen(Screen parent, Profile profile) {
-        super(Text.literal("§nProfile Toggles"));
+        super(Text.literal("'" + profile.name + "' Profile Toggles"));
         this.parent = parent;
         this.profile = profile;
     }
@@ -68,8 +68,7 @@ public class TogglesScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         this.listWidget.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 8, 16777215);
-        context.drawCenteredTextWithShadow(this.textRenderer, profile.name, this.width / 2, 24, 16777215);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
 
 //        int x = this.width / 2;
 //        context.fill(x - 30, 47, x + 30, 48, 0xFFFFFFFF);
@@ -104,7 +103,7 @@ public class TogglesScreen extends Screen {
     class ToggleListWidget extends ElementListWidget<ToggleListWidget.TEntry> {
 
         public ToggleListWidget(Profile profile) {
-            super(CLIENT, TogglesScreen.this.width, TogglesScreen.this.height - 36 + 4 - 40, 40, TogglesScreen.this.height - 36 + 4, 18);
+            super(CLIENT, TogglesScreen.this.width, TogglesScreen.this.height - 36 + 4 - 30, 30, /*TogglesScreen.this.height - 36 + 4,*/ 18);
 
             boolean noEntries = profile == null || profile.toggles.values().isEmpty();
 
@@ -135,8 +134,6 @@ public class TogglesScreen extends Screen {
         protected int getScrollbarPositionX() {
             return super.getScrollbarPositionX() + 32;
         }
-
-        @Override public void appendNarrations(NarrationMessageBuilder builder) {}
 
         public abstract class TEntry extends ElementListWidget.Entry<TEntry> {
             public void update() {}
@@ -205,7 +202,7 @@ public class TogglesScreen extends Screen {
                     context.drawCenteredTextWithShadow(textRenderer, getLines(), x+15, y+4, 0xFFFFFFFF);
 
                 if (toggle.lines.size() > 2 && hovered && mX > x && mX < x+30)
-                    setTooltip(Text.literal(StringUtils.join(toggle.lines, ", ")));
+                    setTooltip(Tooltip.of(Text.literal(StringUtils.join(toggle.lines, ", "))));
 
                 keybind.setY(y);
                 keybind.setX(x+eWidth-80);

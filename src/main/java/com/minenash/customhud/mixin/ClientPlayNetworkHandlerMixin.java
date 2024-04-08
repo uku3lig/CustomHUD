@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;showShowPacketSizeAndPingCharts()Z"))
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowPacketSizeAndPingCharts()Z"))
     private boolean pingForMetricVariables(DebugHud hud) {
-        return hud.showShowPacketSizeAndPingCharts() || (ProfileManager.getActive() != null && ProfileManager.getActive().enabled.pingMetrics);
+        return hud.shouldShowPacketSizeAndPingCharts() || (ProfileManager.getActive() != null && ProfileManager.getActive().enabled.pingMetrics);
     }
 
 }

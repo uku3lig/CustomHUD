@@ -1,15 +1,20 @@
 package com.minenash.customhud.gui;
 
 import com.minenash.customhud.ConfigManager;
+import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.gui.profiles_widget.ProfileLineEntry;
 import com.minenash.customhud.gui.profiles_widget.ProfileLinesWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -32,9 +37,16 @@ public class NewConfigScreen extends Screen {
     }
 
     @Override
-    protected void init() {
-        profiles = new ProfileLinesWidget(this,30, height-20);
+    public void init() {
+        profiles = new ProfileLinesWidget(this,30, height-32);
         addSelectableChild(profiles);
+
+        this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Folder"),
+                button -> new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.toFile())).start())
+                .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+
+        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
+                .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
     }
 
     @Override

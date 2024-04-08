@@ -80,7 +80,7 @@ public class AttributeFunctions {
     public static final Function<PlayerListEntry,Number> PLAYER_ENTRY_LIST_SCORE = (player) -> {
         Scoreboard scoreboard = CLIENT.world.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST);
-        return scoreboard.getPlayerScore(player.getProfile().getName(), objective).getScore();
+        return scoreboard.getScore(ScoreHolder.fromProfile(player.getProfile()), objective).getScore();
     };
 
     // SUBTITLES TODO: ADD ALPHA COLOR
@@ -178,7 +178,7 @@ public class AttributeFunctions {
 
 
     // ATTRIBUTE MODIFIERS
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_NAME = (modifier) -> modifier.getName();
+    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_NAME = (modifier) -> modifier.name;
     public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_ID = (modifier) -> modifier.getId().toString();
     public static final Function<EntityAttributeModifier,Number> ATTRIBUTE_MODIFIER_VALUE = (modifier) -> modifier.getValue();
     public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION_NAME = (modifier) -> switch (modifier.getOperation()) {
@@ -200,8 +200,8 @@ public class AttributeFunctions {
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_BASE = (attr) -> CLIENT.player.getAttributeBaseValue(attr.attribute());
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE = (attr) -> CLIENT.player.getAttributeValue(attr.attribute());
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_NAME = (attr) -> {
-        String key = "attribute.name." + attr.modifier().getName();
-        return I18n.hasTranslation(key) ? I18n.translate(key) : attr.modifier().getName(); };
+        String key = "attribute.name." + attr.modifier().name;
+        return I18n.hasTranslation(key) ? I18n.translate(key) : attr.modifier().name; };
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().getId().toString();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_MODIFIER_VALUE = (attr) -> attr.modifier().getValue();
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION_NAME = (attr) -> switch (attr.modifier().getOperation()) {
@@ -252,17 +252,18 @@ public class AttributeFunctions {
 
 
     // SCOREBOARD OBJECTIVE SCORE
-    public static final Function<ScoreboardPlayerScore,String> OBJECTIVE_SCORE_HOLDER = (score) -> score.getPlayerName();
-    public static final Function<ScoreboardPlayerScore,Number> OBJECTIVE_SCORE_VALUE = (score) -> score.getScore();
+    public static final Function<ScoreboardEntry,String> OBJECTIVE_SCORE_HOLDER_OWNER = (score) -> score.owner();
+    public static final Function<ScoreboardEntry,String> OBJECTIVE_SCORE_HOLDER_DISPLAY = (score) -> score.display().getString();
+    public static final Function<ScoreboardEntry,Number> OBJECTIVE_SCORE_VALUE = (score) -> score.value();
 
 
     // SCOREBOARD SCORE
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,String> SCORES_OBJECTIVE_NAME = (entry) -> entry.getKey().getDisplayName().getString();
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,String> SCORES_OBJECTIVE_ID = (entry) -> entry.getKey().getName();
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,String> SCORES_OBJECTIVE = (entry) -> CLIENT.getServer() == null ? "unknown" : entry.getKey().getCriterion().getName();
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,Number> SCORES_VALUE = (entry) -> entry.getValue().getScore();
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,String> SCORES_OBJECTIVE_CRITIERIA = (entry) -> CLIENT.getServer() == null ? "unknown" : entry.getKey().getCriterion().getName();
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardPlayerScore>,String> SCORES_OBJECTIVE_DISPLAY_SLOT = (entry) -> {
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_NAME = (entry) -> entry.getKey().getDisplayName().getString();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_ID = (entry) -> entry.getKey().getName();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE = (entry) -> CLIENT.getServer() == null ? "unknown" : entry.getKey().getCriterion().getName();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,Number> SCORES_VALUE = (entry) -> entry.getValue().getScore();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_CRITIERIA = (entry) -> CLIENT.getServer() == null ? "unknown" : entry.getKey().getCriterion().getName();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_DISPLAY_SLOT = (entry) -> {
         Scoreboard scoreboard = AttributeHelpers.scoreboard();
         for (ScoreboardDisplaySlot slot : ScoreboardDisplaySlot.values())
             if (scoreboard.getObjectiveForSlot(slot) == entry.getKey())

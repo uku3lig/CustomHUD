@@ -30,7 +30,7 @@ public class SubtitleTracker implements SoundInstanceListener {
     }
 
     @Override
-    public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet) {
+    public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet, float range) {
         if (soundSet.getSubtitle() != null) {
             Text text = soundSet.getSubtitle();
             if (!this.entries.isEmpty()) {
@@ -41,7 +41,7 @@ public class SubtitleTracker implements SoundInstanceListener {
                     }
                 }
             }
-            this.entries.add(new SubtitlesHud.SubtitleEntry(text, new Vec3d(sound.getX(), sound.getY(), sound.getZ())));
+            this.entries.add(new SubtitlesHud.SubtitleEntry(text, range, new Vec3d(sound.getX(), sound.getY(), sound.getZ())));
         }
     }
 

@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.list;
 
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.SubtitleTracker;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -11,7 +12,6 @@ import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Nullables;
 import net.minecraft.world.GameMode;
@@ -52,7 +52,7 @@ public class ListSuppliers {
         HOTBAR_ITEMS = () -> CLIENT.player.getInventory().main.subList(0,9),
 
         SCOREBOARD_OBJECTIVES = () -> Arrays.asList(scoreboard().getObjectives().toArray()),
-        PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getPlayerObjectives(CLIENT.getGameProfile().getName()).entrySet().toArray()),
+        PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
 
         BOSSBARS = () -> bossbars(false),
         ALL_BOSSBARS = () -> bossbars(true);
@@ -75,12 +75,12 @@ public class ListSuppliers {
     };
 
 
-    public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES = (obj) -> scoreboard().getAllPlayerScores(obj).stream().sorted(ScoreboardPlayerScore.COMPARATOR).toList();
-    public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES_ONLINE = (obj) -> scoreboard().getAllPlayerScores(obj).stream()
-            .filter(score -> scoreboardPlayer(score.getPlayerName())) //TODO: Make Work with entities
-            .sorted(ScoreboardPlayerScore.COMPARATOR).toList();
+    public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES = (obj) -> scoreboard().getScoreboardEntries(obj).stream().sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
+    public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES_ONLINE = (obj) -> scoreboard().getScoreboardEntries(obj).stream()
+            .filter(score -> scoreboardPlayer(score.owner())) //TODO: Make Work with entities
+            .sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
 
-    public static final Function<String,List<?>> SCORES = (name) -> Arrays.asList(scoreboard().getPlayerObjectives(name).entrySet().toArray());
+    public static final Function<String,List<?>> SCORES = (name) -> Arrays.asList(scoreboard().getScores(name).scores.entrySet().toArray());
 
 
 

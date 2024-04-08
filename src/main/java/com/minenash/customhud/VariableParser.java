@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
@@ -379,7 +380,8 @@ public class VariableParser {
             return Flags.wrap(new NumberSupplierElement(() -> {
                 ScoreboardObjective obj = scoreboard().getNullableObjective(objective);
                 if (obj == null) return null;
-                return scoreboard().getPlayerScore(player, obj).getScore();
+                var score = scoreboard().getScore(ScoreHolder.fromName(player), obj);
+                return score == null ? 0 : score.getScore();
             }, flags), flags);
         }
 

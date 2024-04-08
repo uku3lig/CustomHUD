@@ -6,6 +6,7 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
 import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.errors.Errors;
+import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
 import com.minenash.customhud.mod_compat.BuiltInModCompat;
 import com.minenash.customhud.render.CustomHudRenderer;
@@ -67,7 +68,7 @@ public class CustomHud implements ModInitializer {
 
 	public static void delayedInitialize() {
 		readProfiles();
-		onProfileChangeOrUpdate();
+		updateCrosshairObjectShare();
 
 		ConfigManager.load();
 		ConfigManager.save();
@@ -133,7 +134,12 @@ public class CustomHud implements ModInitializer {
 			}
 		}
 
-		onProfileChangeOrUpdate();
+		if (kb_showErrors.wasPressed()) {
+			if (client.currentScreen == null)
+				CLIENT.setScreen(new ErrorsScreen(null));
+		}
+
+		updateCrosshairObjectShare();
 		CustomHud.justSaved = true;
 		saveDelay = 100;
 	}
@@ -183,24 +189,24 @@ public class CustomHud implements ModInitializer {
 						screen.changeProfile(profile);
 					if (CLIENT.currentScreen instanceof TogglesScreen screen)
 						screen.changeProfile(profile);
+					if (CLIENT.currentScreen instanceof NewConfigScreen screen)
+						screen.init();
 				}
 			}
 
 			LOGGER.info("Updated Profile " + fileName);
 			showToast(fileName);
 		}
-
-		onProfileChangeOrUpdate();
 		key.reset();
 	}
 
-	public static void onProfileChangeOrUpdate() {
+	public static void updateCrosshairObjectShare() {
 		FabricLoader.getInstance().getObjectShare().put("customhud:crosshair",
 				ProfileManager.getActive() == null ? "normal" : ProfileManager.getActive().crosshair.getName());
 	}
 
 	public static void showToast(String profileName) {
-		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.TUTORIAL_HINT,
+		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
 				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
 				Errors.hasErrors(profileName) ?
 						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")

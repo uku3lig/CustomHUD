@@ -186,7 +186,8 @@ public class Attributers {
     };
 
     public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sup, name, flags) -> switch (name) {
-        case "name", "holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER);
+        case "name", "holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
+        case "display_name", "display" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
         case "score", "value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
         default -> null;
     };

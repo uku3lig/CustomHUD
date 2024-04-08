@@ -117,7 +117,7 @@ public class AttributeHelpers {
                     NbtList nbtList = nbtCompound.getList(LORE_KEY, NbtElement.STRING_TYPE);
                     for (int j = 0; j < nbtList.size(); ++j) {
                         try {
-                            MutableText mutableText2 = Text.Serializer.fromJson(nbtList.getString(j));
+                            MutableText mutableText2 = Text.Serialization.fromJson(nbtList.getString(j));
                             if (mutableText2 == null) continue;
                             lines.add(mutableText2.getString());
                         }
