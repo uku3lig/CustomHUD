@@ -120,7 +120,11 @@ public class ExpressionParser {
                     i++;
                 }
                 builder.append('}');
-                tokens.add(new Token(TokenType.VARIABLE, VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSupplier)));
+                HudElement element = VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSupplier);
+                if (element == null)
+                    tokens.add(new Token(TokenType.BOOLEAN, false));
+                else
+                    tokens.add(new Token(TokenType.VARIABLE, element));
                 continue;
             }
             i++;

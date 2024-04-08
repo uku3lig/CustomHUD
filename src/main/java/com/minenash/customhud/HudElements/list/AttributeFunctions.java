@@ -37,6 +37,7 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 @SuppressWarnings("ALL")
 public class AttributeFunctions {
     private static final StatFormatter HMS = ticks -> {
+        if (ticks < 0) return "∞";
         int rawSeconds = ticks / 20;
         int seconds = rawSeconds % 60;
         int minutes = (rawSeconds / 60) % 60;
@@ -53,7 +54,9 @@ public class AttributeFunctions {
     public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> I18n.translate(status.getTranslationKey());
     public static final Function<StatusEffectInstance,String> STATUS_ID = (status) -> Registries.STATUS_EFFECT.getId(status.getEffectType()).toString();
     public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(HMS, StatusEffectInstance::getDuration);
+    public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status.getDuration() == -1;
     public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = StatusEffectInstance::getAmplifier;
+    public static final Function<StatusEffectInstance,Number> STATUS_LEVEL = (status) -> status.getAmplifier() + (status.getAmplifier() >= 0 ? 1 : 256);
     public static final Function<StatusEffectInstance,Boolean> STATUS_AMBIENT = StatusEffectInstance::isAmbient;
     public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_PARTICLES = StatusEffectInstance::shouldShowParticles;
     public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_ICON = StatusEffectInstance::shouldShowIcon;

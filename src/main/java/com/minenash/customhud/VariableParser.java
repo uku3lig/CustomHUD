@@ -841,7 +841,7 @@ public class VariableParser {
             case "item_max_durability", "item_max_dur" -> ITEM_MAX_DURABILITY;
             case "offhand_item_durability", "oitem_dur" -> OFFHAND_ITEM_DURABILITY;
             case "offhand_item_max_durability", "oitem_max_dur" -> OFFHAND_ITEM_MAX_DURABILITY;
-            case "hour12", "hour" -> { enabled.time = true; yield TIME_HOUR_12; }
+            case "hour12", "hour", "hours12", "hours" -> { enabled.time = true; yield TIME_HOUR_12; }
             case "lcps" -> { enabled.clicksPerSeconds = true; yield LCPS; }
             case "rcps" -> { enabled.clicksPerSeconds = true; yield RCPS; }
             default -> null;
@@ -943,9 +943,9 @@ public class VariableParser {
 
     private static SpecialSupplierElement.Entry getSpecialSupplierElements(String element, ComplexData.Enabled enabled) {
         return switch (element) {
-            case "hour24" -> { enabled.time = true; yield TIME_HOUR_24; }
-            case "minute" -> { enabled.time = true; yield TIME_MINUTES; }
-            case "second" -> { enabled.time = true; yield TIME_SECONDS; }
+            case "hour24", "hours25" -> { enabled.time = true; yield TIME_HOUR_24; }
+            case "minute", "minutes" -> { enabled.time = true; yield TIME_MINUTES; }
+            case "second", "seconds" -> { enabled.time = true; yield TIME_SECONDS; }
             case "target_block", "tb" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK;}
             case "target_block_id", "tbi" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_ID;}
             case "target_fluid", "tf" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID;}

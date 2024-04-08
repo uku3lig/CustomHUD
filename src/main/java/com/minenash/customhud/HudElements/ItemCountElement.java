@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;
 
 public class ItemCountElement implements HudElement {
@@ -18,7 +19,8 @@ public class ItemCountElement implements HudElement {
 
     @Override
     public Number getNumber() {
-        return MinecraftClient.getInstance().player.getInventory().count(item);
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        return player == null ? 0 : player.getInventory().count(item);
     }
 
     @Override

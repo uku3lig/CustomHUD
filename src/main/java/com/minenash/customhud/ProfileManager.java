@@ -126,4 +126,22 @@ public class ProfileManager {
         return p;
     }
 
+    public static void cycle() {
+        int index = profiles.indexOf(active);
+        for (int i = index+1; i < profiles.size(); i++) {
+            Profile p = profiles.get(i);
+            if (p.cycle) {
+                setActive(p);
+                return;
+            }
+        }
+        for (int i = 0; i <= index; i++) {
+            Profile p = profiles.get(i);
+            if (p.cycle) {
+                setActive(p);
+                return;
+            }
+        }
+    }
+
 }

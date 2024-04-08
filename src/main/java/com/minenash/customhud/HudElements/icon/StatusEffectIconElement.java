@@ -29,6 +29,7 @@ public class StatusEffectIconElement extends IconElement {
 
     @Override
     public void render(DrawContext context, int x, int y) {
+        context.getMatrices().push();
         StatusEffectInstance effect = effects.get(effectIndex);
         effectIndex++;
 
@@ -51,6 +52,7 @@ public class StatusEffectIconElement extends IconElement {
         context.drawSprite(effectOffset, effectOffset, 0, (int)(9*scale), (int)(9*scale), sprite);
         context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
+        context.getMatrices().pop();
 
     }
 

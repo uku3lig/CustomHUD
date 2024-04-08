@@ -32,7 +32,9 @@ public class Attributers {
         case "name" -> new Str(sup,STATUS_NAME);
         case "id" -> new Str(sup,STATUS_ID);
         case "duration", "dur" -> new Num(sup, STATUS_DURATION, flags);
+        case "infinite", "inf" -> new Bool(sup, STATUS_INFINITE);
         case "amplification", "amp" -> new Num(sup, STATUS_AMPLIFICATION, flags);
+        case "level", "lvl" -> new Num(sup, STATUS_LEVEL, flags);
         case "ambient" -> new Bool(sup,STATUS_AMBIENT);
         case "show_particles", "particles" -> new Bool(sup,STATUS_SHOW_PARTICLES);
         case "show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
