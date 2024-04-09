@@ -62,6 +62,7 @@ public class TogglesScreen extends Screen {
     @Override
     public void close() {
         CLIENT.setScreen(parent);
+        ConfigManager.save();
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

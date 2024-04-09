@@ -45,7 +45,7 @@ public class NewConfigScreen extends Screen {
                 button -> new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.toFile())).start())
                 .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
+        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
                 .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
     }
 

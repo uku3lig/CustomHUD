@@ -97,7 +97,7 @@ public class CustomHud implements ModInitializer {
 
 
 	private static ComplexData.Enabled previousEnabled = ComplexData.Enabled.DISABLED;
-	public static boolean justSaved = false;
+//	public static boolean justSaved = false;
 	private static int saveDelay = -1;
 	private static void onTick(MinecraftClient client) {
 		if (saveDelay > 0)
@@ -142,7 +142,7 @@ public class CustomHud implements ModInitializer {
 		}
 
 		updateCrosshairObjectShare();
-		CustomHud.justSaved = true;
+//		CustomHud.justSaved = true;
 		saveDelay = 100;
 	}
 
@@ -155,11 +155,11 @@ public class CustomHud implements ModInitializer {
 		if (key == null)
 			return;
 		for (WatchEvent<?> event : key.pollEvents()) {
-			if (CustomHud.justSaved) {
-				System.out.println("Just Saved, IGNORING:" + event.context());
-				CustomHud.justSaved = false;
-				continue;
-			}
+//			if (CustomHud.justSaved) {
+//				System.out.println("Just Saved, IGNORING:" + event.context());
+//				CustomHud.justSaved = false;
+//				continue;
+//			}
 			Path path = CustomHud.PROFILE_FOLDER.resolve((Path) event.context());
 			String fileName = path.getFileName().toString();
 			System.out.println("Filename: `" + fileName + "`");
