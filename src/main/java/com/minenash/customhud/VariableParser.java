@@ -36,6 +36,8 @@ import net.minecraft.util.Pair;
 import org.lwjgl.glfw.GLFW;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -298,6 +300,17 @@ public class VariableParser {
         if (part.startsWith("real_time:")) {
             try {
                 return new RealTimeElement(new SimpleDateFormat(part.substring(10)));
+            }
+            catch (IllegalArgumentException e) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.INVALID_TIME_FORMAT, e.getMessage());
+            }
+        }
+        if (part.equals("profile_last_modified")) {
+            return new LastUpdatedElement(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT));
+        }
+        if (part.startsWith("profile_last_modified:")) {
+            try {
+                return new LastUpdatedElement(DateTimeFormatter.ofPattern(part.substring(22)));
             }
             catch (IllegalArgumentException e) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.INVALID_TIME_FORMAT, e.getMessage());
@@ -625,6 +638,7 @@ public class VariableParser {
 
     private static Supplier<String> getStringSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "profile_name" -> PROFILE_NAME;
             case "version" -> VERSION;
             case "client_version" -> CLIENT_VERSION;
             case "modded_name" -> MODDED_NAME;
@@ -680,6 +694,7 @@ public class VariableParser {
 
     private static Supplier<Boolean> getBooleanSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "profile_in_cycle"-> PROFILE_IN_CYCLE;
             case "vsync" -> VSYNC;
             case "sp", "singleplayer" -> SINGLEPLAYER;
             case "mp", "multiplayer" -> MULTIPLAYER;
@@ -716,12 +731,16 @@ public class VariableParser {
 
             case "has_noise" -> {enabled.serverWorld = true; yield HAS_NOISE;}
 
+            case "reaL_am" -> REAL_AM;
+            case "reaL_pm" -> REAL_PM;
+
             default -> null;
         };
     }
 
     private static Supplier<Number> getIntegerSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "profile_errors" -> PROFILE_ERRORS;
             case "fps" -> FPS;
             case "max_fps" -> MAX_FPS;
             case "biome_blend" -> BIOME_BLEND;
@@ -841,9 +860,22 @@ public class VariableParser {
             case "item_max_durability", "item_max_dur" -> ITEM_MAX_DURABILITY;
             case "offhand_item_durability", "oitem_dur" -> OFFHAND_ITEM_DURABILITY;
             case "offhand_item_max_durability", "oitem_max_dur" -> OFFHAND_ITEM_MAX_DURABILITY;
-            case "hour12", "hour", "hours12", "hours" -> { enabled.time = true; yield TIME_HOUR_12; }
             case "lcps" -> { enabled.clicksPerSeconds = true; yield LCPS; }
             case "rcps" -> { enabled.clicksPerSeconds = true; yield RCPS; }
+
+            case "hour12", "hour", "hours12", "hours" -> { enabled.time = true; yield TIME_HOUR_12; }
+
+            case "real_year" -> REAL_YEAR;
+            case "real_month" -> REAL_MONTH;
+            case "real_day" -> REAL_DAY;
+            case "real_day_of_week", "real_dow" -> REAL_DAY_OF_WEEK;
+            case "real_day_of_year", "real_doy" -> REAL_DAY_OF_YEAR;
+            case "real_hour12", "real_hour" -> REAL_HOUR_12;
+            case "real_hour24" -> REAL_HOUR_24;
+            case "real_minute" -> REAL_MINUTE;
+            case "real_second" -> REAL_SECOND;
+            case "real_millisecond", "real_ms" -> REAL_MICROSECOND;
+
             default -> null;
         };
     }
@@ -943,6 +975,7 @@ public class VariableParser {
 
     private static SpecialSupplierElement.Entry getSpecialSupplierElements(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "profile_keybind" -> PROFILE_KEYBIND;
             case "hour24", "hours25" -> { enabled.time = true; yield TIME_HOUR_24; }
             case "minute", "minutes" -> { enabled.time = true; yield TIME_MINUTES; }
             case "second", "seconds" -> { enabled.time = true; yield TIME_SECONDS; }

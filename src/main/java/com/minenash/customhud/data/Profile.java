@@ -11,6 +11,9 @@ import org.lwjgl.glfw.GLFW;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +21,7 @@ import java.util.regex.Pattern;
 public class Profile {
 
     public String name;
+    public LocalDateTime updatedDateTime;
     public KeyBinding keyBinding;
     public boolean cycle = true;
 
@@ -49,6 +53,7 @@ public class Profile {
     public static Profile create(String name) {
         Profile p = new Profile();
         p.name = name;
+        p.updatedDateTime = LocalDateTime.now();
         p.keyBinding = new KeyBinding("custom_hud." + name, GLFW.GLFW_KEY_UNKNOWN, "Toggles");
         return p;
     }
@@ -73,7 +78,7 @@ public class Profile {
         Errors.clearErrors(profileName);
 
         List<String> lines;
-
+        FileTime dateTime;
         try {
             if(!Files.exists(path.getParent()))
                 Files.createDirectory(path.getParent());
@@ -87,6 +92,7 @@ public class Profile {
 //                }
             }
             lines = Files.readAllLines(path);
+            dateTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
             e.printStackTrace();
             Errors.addError(profileName, "N/A", path.relativize(FabricLoader.getInstance().getGameDir().getParent()).toString(), ErrorType.IO, e.getMessage());
@@ -95,6 +101,7 @@ public class Profile {
 
         Profile profile = new Profile();
         profile.name = profileName;
+        profile.updatedDateTime = LocalDateTime.ofInstant(dateTime.toInstant(), ZoneId.systemDefault());
 
         Section section = null;
         HudTheme localTheme = profile.baseTheme.copy();

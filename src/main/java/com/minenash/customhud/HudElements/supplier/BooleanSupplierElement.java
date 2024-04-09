@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.supplier;
 
+import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
@@ -16,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 
+import java.time.LocalTime;
 import java.util.function.Supplier;
 
 public class BooleanSupplierElement implements HudElement {
@@ -23,6 +25,8 @@ public class BooleanSupplierElement implements HudElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static boolean isInDim(Identifier id) { return client.world.getRegistryKey().getValue().equals(id); }
     private static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
+
+    public static final Supplier<Boolean> PROFILE_IN_CYCLE = () -> ProfileManager.getActive() != null && ProfileManager.getActive().cycle;
 
     public static final Supplier<Boolean> VSYNC = () -> client.options.getEnableVsync().getValue();
 
@@ -66,6 +70,10 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> FISHING_IN_OPEN_WATER = () -> client.player.fishHook != null && client.player.fishHook.isOpenOrWaterAround(client.player.fishHook.getBlockPos());
 
     public static final Supplier<Boolean> HAS_NOISE = () -> ComplexData.serverWorld.getChunkManager().getChunkGenerator() instanceof NoiseChunkGenerator;
+
+
+    public static final Supplier<Boolean> REAL_AM = () -> LocalTime.now().getHour() < 12;
+    public static final Supplier<Boolean> REAL_PM = () -> LocalTime.now().getHour() >= 12;
 
 
     @Deprecated public static final Supplier<Boolean> ITEM_HAS_DURABILITY = () -> client.player.getMainHandStack().getMaxDamage() > 0;

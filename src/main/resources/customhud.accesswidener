@@ -34,3 +34,4 @@ accessible field net/minecraft/scoreboard/Scores scores Lit/unimi/dsi/fastutil/o
 accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARATOR Ljava/util/Comparator;
 accessible field net/minecraft/entity/attribute/EntityAttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
+accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;

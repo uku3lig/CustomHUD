@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements.supplier;
 
+import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
@@ -25,7 +27,8 @@ public class StringSupplierElement implements HudElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static Entity cameraEntity() { return client.getCameraEntity(); }
     private static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
-    private static Entity hooked() {return client.player.fishHook == null ? null : client.player.fishHook.getHookedEntity();}
+
+    public static final Supplier<String> PROFILE_NAME = () -> ProfileManager.getActive() == null ? "" : ProfileManager.getActive().name;
 
     public static final Supplier<String> VERSION = () -> SharedConstants.getGameVersion().getName();
     public static final Supplier<String> CLIENT_VERSION = client::getGameVersion;

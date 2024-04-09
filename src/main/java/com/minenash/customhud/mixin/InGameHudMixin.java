@@ -24,7 +24,7 @@ public abstract class InGameHudMixin {
     @Shadow protected abstract void renderCrosshair(DrawContext context);
 
     @Shadow @Final private MinecraftClient client;
-    boolean renderAttackIndicator = false;
+    @Unique boolean renderAttackIndicator = false;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
     private void renderAttackIndicatorForDebugScreen2(DrawContext context, float _tickDelta, CallbackInfo _info) {
@@ -40,14 +40,14 @@ public abstract class InGameHudMixin {
         return client.getDebugHud().shouldShowDebugHud() ? original : !renderAttackIndicator && getCrosshair() == Crosshairs.DEBUG;
     }
 
-    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
+    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))
     private boolean skipNormalCrosshairRendering(DrawContext instance, Identifier texture, int x, int y, int width, int height) {
         return !renderAttackIndicator && getCrosshair() != Crosshairs.NONE;
     }
-    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIIIIIII)V"))
-    private boolean skipNormalCrosshairRendering2(DrawContext instance, Identifier texture, int i, int j, int k, int l, int x, int y, int width, int height) {
-        return !renderAttackIndicator && getCrosshair() != Crosshairs.NONE;
-    }
+//    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIIIIIII)V"))
+//    private boolean skipNormalCrosshairRendering2(DrawContext instance, Identifier texture, int i, int j, int k, int l, int x, int y, int width, int height) {
+//        return !renderAttackIndicator && getCrosshair() != Crosshairs.NONE;
+//    }
 
     @Unique
     private static Crosshairs getCrosshair() {

@@ -15,6 +15,8 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.function.Supplier;
 
+import static com.minenash.customhud.ProfileManager.getActive;
+
 public class SpecialSupplierElement implements HudElement {
 
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -22,6 +24,10 @@ public class SpecialSupplierElement implements HudElement {
         Direction dir = client.getCameraEntity().getHorizontalFacing();
         return dir == Direction.EAST || dir == Direction.SOUTH;
     }
+
+    public static final Entry PROFILE_KEYBIND = of( () -> getActive() == null ? "" : I18n.translate(getActive().keyBinding.getBoundKeyTranslationKey()),
+            () -> getActive() == null ? 0 : getActive().keyBinding.boundKey.getCode(),
+            () -> getActive() != null && !getActive().keyBinding.isUnbound());
 
     public static final Entry TIME_HOUR_24 = of( () -> String.format("%02d", ComplexData.timeOfDay / 1000),
                                                  () -> ComplexData.timeOfDay / 1000,

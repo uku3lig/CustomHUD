@@ -1,6 +1,8 @@
 package com.minenash.customhud.HudElements.supplier;
 
+import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.mixin.accessors.WorldRendererAccess;
 import com.mojang.blaze3d.platform.GLX;
 import net.fabricmc.loader.api.FabricLoader;
@@ -19,11 +21,17 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*;
+import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
 
 public class IntegerSuppliers {
 
@@ -56,6 +64,7 @@ public class IntegerSuppliers {
         return Double.NaN;
     }
 
+    public static final Supplier<Number> PROFILE_ERRORS = () -> ProfileManager.getActive() == null ? 0 : Errors.getErrors(ProfileManager.getActive().name).size();
 
     public static final Supplier<Number> FPS = client::getCurrentFps;
     public static final Supplier<Number> MAX_FPS = () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE ? null : client.options.getMaxFps().getValue();
@@ -115,7 +124,6 @@ public class IntegerSuppliers {
     public static final Supplier<Number> CHUNK_SERVER_ENTITIES_TRACKED = () -> ComplexData.serverWorld == null ? null : ComplexData.serverWorld.entityManager.trackingStatuses.size();
     public static final Supplier<Number> CHUNK_SERVER_ENTITIES_LOADING = () -> ComplexData.serverWorld == null ? null : ComplexData.serverWorld.entityManager.loadingQueue.size();
     public static final Supplier<Number> CHUNK_SERVER_ENTITIES_UNLOADING = () -> ComplexData.serverWorld == null ? null : ComplexData.serverWorld.entityManager.pendingUnloads.size();
-
 
     public static final Supplier<Number> CLIENT_LIGHT = () -> {
         if (ComplexData.clientChunk.isEmpty()) return null;
@@ -206,5 +214,21 @@ public class IntegerSuppliers {
         int hour = ComplexData.timeOfDay / 1000 % 12;
         return hour == 0 ? 12 : hour;
     };
+
+    public static final Supplier<Number> REAL_YEAR = () -> LocalDate.now().getYear();
+    public static final Supplier<Number> REAL_MONTH = () -> LocalDate.now().getMonthValue();
+    public static final Supplier<Number> REAL_DAY = () -> LocalDate.now().getDayOfMonth();
+    public static final Supplier<Number> REAL_DAY_OF_WEEK = () -> LocalDate.now().getDayOfWeek().getValue();
+    public static final Supplier<Number> REAL_DAY_OF_YEAR = () -> LocalDate.now().getDayOfYear();
+
+    public static final Supplier<Number> REAL_HOUR_24 = () -> LocalTime.now().getHour();
+    public static final Supplier<Number> REAL_HOUR_12 = () -> {
+        int hour = LocalTime.now().getHour();
+        return hour == 0 ? 12 : hour;
+    };
+    public static final Supplier<Number> REAL_MINUTE = () -> LocalTime.now().getMinute();
+    public static final Supplier<Number> REAL_SECOND = () -> LocalTime.now().getSecond();
+    public static final Supplier<Number> REAL_MICROSECOND = () -> LocalTime.now().get(MICRO_OF_SECOND);
+
 
 }
