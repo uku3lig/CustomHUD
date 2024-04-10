@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.supplier;
 
+import com.minenash.customhud.HudElements.list.AttributeHelpers;
 import com.minenash.customhud.complex.ComplexData;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
@@ -33,6 +34,8 @@ public class EntitySuppliers {
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_Y = of ( () -> y(hooked()), 0);
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_Z = of ( () -> z(hooked()), 0);
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE = of( () -> dist(hooked()), 1);
+    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE_YAW = of( () -> yaw(hooked()), 1);
+    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE_PITCH = of( () -> pitch(hooked()), 1);
 
 
     public static final Supplier<String> LAST_HIT_ENTITY = () -> type(ComplexData.lastHitEntity);
@@ -61,4 +64,6 @@ public class EntitySuppliers {
     private static Number y(Entity e) { return e == null ? null : e.getY(); }
     private static Number z(Entity e) { return e == null ? null : e.getZ(); }
     private static Number dist(Entity e) { return e == null ? null : e.getPos().distanceTo(CLIENT.cameraEntity.getPos()); }
+    private static Number yaw(Entity e) { return e == null ? null : AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), e.getEyePos()); }
+    private static Number pitch(Entity e) { return e == null ? null : AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getPos(), e.getEyePos()); }
 }

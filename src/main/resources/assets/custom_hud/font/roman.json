@@ -1,0 +1,21 @@
+{
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        " ": 4,
+        "\uE001": -1
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "custom_hud:font/roman.png",
+      "ascent": 8,
+      "chars": [
+        "IVXLCDM:",
+        "ivxlcdm|",
+        "NS12345-"
+      ]
+    }
+  ]
+}

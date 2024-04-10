@@ -10,6 +10,7 @@
     "KeyBindingMixin",
     "MinecraftClientMixin",
     "PingMeasurerMixin",
+    "SubtitleEntryMixin",
     "TitleScreenMixin",
     "accessors.DebugHudAccessor",
     "accessors.GameOptionsAccessor",

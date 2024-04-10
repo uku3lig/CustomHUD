@@ -898,6 +898,8 @@ public class VariableParser {
             case "hooked_entity_y", "hey" -> HOOKED_ENTITY_Y;
             case "hooked_entity_z", "hez" -> HOOKED_ENTITY_Z;
             case "hooked_entity_distance", "hed" -> HOOKED_ENTITY_DISTANCE;
+            case "hooked_entity_distance_yaw", "hedy" -> HOOKED_ENTITY_DISTANCE_YAW;
+            case "hooked_entity_distance_pitch", "hedp" -> HOOKED_ENTITY_DISTANCE_PITCH;
             case "vehicle_entity_health", "vehicle_health", "veh" -> VEHICLE_ENTITY_HEALTH;
             case "vehicle_entity_max_health", "vehicle_max_health", "vemh" -> VEHICLE_ENTITY_MAX_HEALTH;
             case "vehicle_horse_jump", "horse_jump", "vhj" -> VEHICLE_HORSE_JUMP;

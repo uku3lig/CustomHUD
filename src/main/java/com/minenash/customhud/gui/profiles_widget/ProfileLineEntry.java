@@ -24,9 +24,10 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ProfileLineEntry extends LineEntry {
 
-    private final ButtonWidget selected, cycled, keybind, edit, error, toggles;
+    public final ButtonWidget selected, cycled, toggles;
+    private final ButtonWidget keybind, edit, error;
     private final ButtonWidget delete, up, down;
-    private final TextFieldWidget editName;
+    public final TextFieldWidget editName;
     private final ProfileLinesWidget widget;
 
     public final Profile profile;
@@ -125,7 +126,8 @@ public class ProfileLineEntry extends LineEntry {
         posAndRender(context, mX, mY, delta, x, y, eWidth, edit, -16-42);
         posAndRender(context, mX, mY, delta, x, y, eWidth, keybind, -16-42-82);
         posAndRender(context, mX, mY, delta, x, y, eWidth, cycled, -16-42-82-18);
-        if (!profile.toggles.isEmpty())
+        toggles.active = !profile.toggles.isEmpty();
+        if (toggles.active)
             posAndRender(context, mX, mY, delta, x, y, eWidth, toggles, -16-42-82-18-50);
 
     }
@@ -163,7 +165,7 @@ public class ProfileLineEntry extends LineEntry {
             widgets.add(down);
         }
         else {
-            if (!profile.toggles.isEmpty())
+//            if (!profile.toggles.isEmpty())
                 widgets.add(toggles);
             widgets.add(cycled);
             widgets.add(keybind);

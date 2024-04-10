@@ -4,6 +4,7 @@ import com.minenash.customhud.HudElements.FuncElements.Num;
 import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
+import com.minenash.customhud.SubtitleEntryDuck;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
@@ -25,6 +26,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
@@ -87,6 +89,7 @@ public class AttributeFunctions {
     };
 
     // SUBTITLES TODO: ADD ALPHA COLOR
+    public static final Function<SubtitleEntry,String> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
     public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
     public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
     public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
@@ -95,7 +98,7 @@ public class AttributeFunctions {
         int p = MathHelper.floor(MathHelper.clampedLerp(255.0F, 75.0F, (float)(Util.getMeasuringTimeMs() - subtitle.getTime()) / (float)(3000.0 * d)));
         return  (p << 24);
     };
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> subtitle.getPosition().distanceTo(CLIENT.player.getEyePos());
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> subtitle.getPosition().distanceTo(CLIENT.cameraEntity.getEyePos());
     public static final Function<SubtitleEntry,Number> SUBTITLE_X = (subtitle) -> subtitle.getPosition().getX();
     public static final Function<SubtitleEntry,Number> SUBTITLE_Y = (subtitle) -> subtitle.getPosition().getY();
     public static final Function<SubtitleEntry,Number> SUBTITLE_Z = (subtitle) -> subtitle.getPosition().getZ();
@@ -105,6 +108,8 @@ public class AttributeFunctions {
         int dir = subtitle$getDirection(subtitle);
         return dir == 0 ? "=" : dir == 1 ? ">" : "<";
     };
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_YAW = (subtitle) -> AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), subtitle.getPosition());
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_PITCH = (subtitle) -> AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getEyePos(), subtitle.getPosition());;
 
 
     // BLOCK STATES
@@ -319,12 +324,12 @@ public class AttributeFunctions {
 
 
     public static int subtitle$getDirection(SubtitleEntry subtitle) {
-        float xRotation = -CLIENT.player.getPitch() * ((float)Math.PI / 180);
-        float yRotation = -CLIENT.player.getYaw() * ((float)Math.PI / 180);
+        float xRotation = -CLIENT.cameraEntity.getPitch() * ((float)Math.PI / 180);
+        float yRotation = -CLIENT.cameraEntity.getYaw() * ((float)Math.PI / 180);
 
         Vec3d vec3d2 = new Vec3d(0.0, 0.0, -1.0).rotateX(xRotation).rotateY(yRotation);
         Vec3d vec3d3 = new Vec3d(0.0, 1.0, 0.0).rotateX(xRotation).rotateY(yRotation);
-        Vec3d vec3d5 = subtitle.getPosition().subtract(CLIENT.player.getEyePos()).normalize();
+        Vec3d vec3d5 = subtitle.getPosition().subtract(CLIENT.cameraEntity.getEyePos()).normalize();
         double e = vec3d2.crossProduct(vec3d3).dotProduct(vec3d5);
 
         return -vec3d2.dotProduct(vec3d5) > 0.5 || e == 0? 0 : e < 0 ? 1 : -1;

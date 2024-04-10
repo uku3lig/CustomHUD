@@ -19,7 +19,7 @@ public class NumberSupplierElement implements HudElement {
     public static final StatFormatter HEX = (value) -> Integer.toHexString(value).toUpperCase();
 
     private final Supplier<Number> supplier;
-    private final int precision;
+    public final int precision;
     private final double scale;
     private StatFormatter formatter;
 

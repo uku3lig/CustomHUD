@@ -28,6 +28,7 @@ public class CustomHudRenderer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     public static Identifier font;
+    public static HudTheme theme;
 
     public static void render(DrawContext context, float _tickDelta) {
 
@@ -49,7 +50,7 @@ public class CustomHudRenderer {
         bgBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (Section section : profile.sections) {
-            HudTheme theme = profile.baseTheme;
+            theme = profile.baseTheme;
 
             if (section == null || isChatOpen && section.hideOnChat)
                 continue;
@@ -132,6 +133,7 @@ public class CustomHudRenderer {
                             staticWidthY = y;
                         }
                         theme = cte.theme;
+                        font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
                         pieces.add( new RenderPiece(ie, null, xOffset, y, 0, false) );
                         xOffset += ie.getTextWidth();
@@ -156,7 +158,6 @@ public class CustomHudRenderer {
                 addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + section.width, y - 2, theme.bgColor);
             }
 
-
         }
 
         RenderSystem.enableBlend();
@@ -164,6 +165,8 @@ public class CustomHudRenderer {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BufferRenderer.drawWithGlobalProgram(bgBuilder.end());
         RenderSystem.disableBlend();
+
+        font = null;
 
         for (RenderPiece piece : pieces) {
             if (piece.element instanceof IconElement ie )
@@ -178,6 +181,7 @@ public class CustomHudRenderer {
 
         context.getMatrices().pop();
         font = null;
+        theme = null;
 
     }
 

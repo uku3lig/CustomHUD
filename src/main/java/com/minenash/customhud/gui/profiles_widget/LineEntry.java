@@ -33,7 +33,7 @@ public abstract class LineEntry extends ElementListWidget.Entry<LineEntry> {
         private final ProfileLinesWidget parent;
         private final ButtonWidget newProfile;
         private final ButtonWidget reorderProfiles;
-        private final ButtonWidget deleteProfiles;
+        public final ButtonWidget deleteProfiles;
         private final ButtonWidget deleteDone;
 
         public NewProfile(ProfileLinesWidget parent) {

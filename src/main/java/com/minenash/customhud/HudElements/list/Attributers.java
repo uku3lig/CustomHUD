@@ -61,6 +61,7 @@ public class Attributers {
     };
 
     public static final Attributer SUBTITLE = (sup, name, flags) -> switch (name) {
+        case "id" -> new Str(sup, SUBTITLE_ID);
         case "name" -> new Str(sup, SUBTITLE_NAME);
 
         case "age" -> new Num(sup, SUBTITLE_AGE, flags);
@@ -74,6 +75,8 @@ public class Attributers {
         case "dir", "direction" -> new Str(sup, SUBTITLE_DIRECTION);
         case "left" -> new Bool(sup, SUBTITLE_LEFT);
         case "right" -> new Bool(sup, SUBTITLE_RIGHT);
+        case "dir_yaw", "direction_yaw" -> new Num(sup, SUBTITLE_DIRECTION_YAW, flags);
+        case "dir_pitch", "direction_pitch" -> new Num(sup, SUBTITLE_DIRECTION_PITCH, flags);
         default -> null;
     };
 

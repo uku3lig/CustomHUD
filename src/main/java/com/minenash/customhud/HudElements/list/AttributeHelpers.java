@@ -25,6 +25,9 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Position;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 import java.util.function.Function;
@@ -240,6 +243,15 @@ public class AttributeHelpers {
             case PURPLE -> 0x7B00EC;
             case WHITE -> 0xECECEC;
         };
+    }
+
+    public static double getRelativeYaw(Vec3d player, Vec3d other) {
+        return MathHelper.wrapDegrees(CLIENT.player.getYaw() - Math.toDegrees( MathHelper.atan2(-(other.getX() - player.getX()), other.getZ() - player.getZ()) ));
+    }
+    public static double getRelativePitch(Vec3d player, Vec3d other) {
+        double xDist = other.getX() - player.getX();
+        double zDist = other.getZ() - player.getZ();
+        return MathHelper.wrapDegrees(CLIENT.player.getPitch() + Math.toDegrees( MathHelper.atan2(other.getY() - player.getY(), Math.sqrt(xDist*xDist + zDist*zDist ) )));
     }
 
 }

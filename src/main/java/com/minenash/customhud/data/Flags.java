@@ -3,7 +3,9 @@ package com.minenash.customhud.data;
 import com.minenash.customhud.HudElements.FormattedElement;
 import com.minenash.customhud.HudElements.FrequencyElement;
 import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.RomanNumeralElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
+import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 
@@ -25,6 +27,7 @@ public class Flags {
     public int frequency = -1;
 
     public boolean formatted = false;
+    public boolean romanNumerals = false;
 
     public int iconWidth = -1;
     public int iconShiftX = 0;
@@ -65,6 +68,8 @@ public class Flags {
                 case "-nd", "-nodashes" -> flags.noDelimiters = true;
                 // Stat
                 case "-f", "-formatted" -> flags.formatted = true;
+                //Numbers
+                case "-rn", "-roman" -> flags.romanNumerals = true;
                 // Icons
                 case "-dvc" -> flags.iconReferenceCorner = true;
                 // Slot Icons
@@ -197,6 +202,8 @@ public class Flags {
     public static HudElement wrap(HudElement element, Flags flags) {
         if (element instanceof IconElement)
             return element;
+        if (flags.romanNumerals && element instanceof NumberSupplierElement base)
+            element = new RomanNumeralElement(base);
         if (flags.anyTextUsed())
             element = new FormattedElement(element, flags);
         if (flags.frequency > 0)

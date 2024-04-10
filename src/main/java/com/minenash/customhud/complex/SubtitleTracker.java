@@ -1,6 +1,7 @@
 package com.minenash.customhud.complex;
 
 import com.google.common.collect.Lists;
+import com.minenash.customhud.SubtitleEntryDuck;
 import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundInstanceListener;
@@ -41,7 +42,9 @@ public class SubtitleTracker implements SoundInstanceListener {
                     }
                 }
             }
-            this.entries.add(new SubtitlesHud.SubtitleEntry(text, range, new Vec3d(sound.getX(), sound.getY(), sound.getZ())));
+            SubtitlesHud.SubtitleEntry entry = new SubtitlesHud.SubtitleEntry(text, range, new Vec3d(sound.getX(), sound.getY(), sound.getZ()));
+            ((SubtitleEntryDuck)entry).customhud$setSoundID(sound.getId().toString());
+            this.entries.add(entry);
         }
     }
 

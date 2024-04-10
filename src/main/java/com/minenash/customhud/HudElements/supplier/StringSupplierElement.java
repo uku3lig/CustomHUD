@@ -28,7 +28,7 @@ public class StringSupplierElement implements HudElement {
     private static Entity cameraEntity() { return client.getCameraEntity(); }
     private static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
 
-    public static final Supplier<String> PROFILE_NAME = () -> ProfileManager.getActive() == null ? "" : ProfileManager.getActive().name;
+    public static final Supplier<String> PROFILE_NAME = () -> ProfileManager.getActive() == null ? null : ProfileManager.getActive().name;
 
     public static final Supplier<String> VERSION = () -> SharedConstants.getGameVersion().getName();
     public static final Supplier<String> CLIENT_VERSION = client::getGameVersion;
