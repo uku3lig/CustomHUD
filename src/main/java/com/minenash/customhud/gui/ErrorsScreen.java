@@ -34,6 +34,7 @@ public class ErrorsScreen extends Screen {
     public int y_offset = 0;
     private static final int lineColumnX = 15;
     public int sourceSectionWidth = 120;
+    public boolean openedFromNullScreen;
 
     public ErrorsScreen(Screen parent) {
         this(parent, ProfileManager.getActive());
@@ -43,6 +44,7 @@ public class ErrorsScreen extends Screen {
         super(Text.literal((profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
         this.parent = parent;
         this.profile = profile;
+        openedFromNullScreen = parent == null;
     }
 
     public void changeProfile(Profile profile) {
@@ -64,11 +66,25 @@ public class ErrorsScreen extends Screen {
 //        profiles[2] = this.addDrawableChild( ButtonWidget.builder(Text.literal("Profile 3"), button -> changeProfile(3))
 //                .position(this.width / 2 - 40 + 90, 24).size(80, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+        if (openedFromNullScreen) {
+            this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
+                    .position(this.width / 2 - 155, this.height - 26).size(100, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
-                .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+            this.addDrawableChild( ButtonWidget.builder(Text.literal("Profiles"), button -> CLIENT.setScreen( new NewConfigScreen(null) ))
+                    .position(this.width / 2 - 155 + 100 + 5, this.height - 26).size(100, 20).build() );
+
+            this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
+                    .position(this.width / 2 - 155 + 160 + 50, this.height - 26).size(100, 20).build() );
+        }
+        else {
+            this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
+                    .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+
+
+            this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
+                    .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+        }
+
 
         super.init();
     }

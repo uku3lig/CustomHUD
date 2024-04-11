@@ -1,12 +1,13 @@
 package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.NumElement;
 import com.minenash.customhud.data.Flags;
 import net.minecraft.stat.StatFormatter;
 
 import java.util.function.Supplier;
 
-public class NumberSupplierElement implements HudElement {
+public class NumberSupplierElement implements HudElement, NumElement {
 
     public record Entry(Supplier<Number> supplier, int precision, StatFormatter formatter) {}
     public static Entry of(Supplier<Number> supplier, int precision) {
@@ -19,7 +20,7 @@ public class NumberSupplierElement implements HudElement {
     public static final StatFormatter HEX = (value) -> Integer.toHexString(value).toUpperCase();
 
     private final Supplier<Number> supplier;
-    public final int precision;
+    private final int precision;
     private final double scale;
     private StatFormatter formatter;
 
@@ -35,7 +36,10 @@ public class NumberSupplierElement implements HudElement {
         formatter = flags.hex ? HEX : null;
     }
 
-
+    @Override
+    public int getPrecision() {
+        return precision;
+    }
 
     @Override
     public String getString() {

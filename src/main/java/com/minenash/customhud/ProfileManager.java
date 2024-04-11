@@ -60,10 +60,11 @@ public class ProfileManager {
                 }
 
                 profiles.set(i, profile);
+                if (p == active)
+                    active = profile;
                 ConfigManager.save();
+                return;
             }
-            if (p == active)
-                active = profile;
         }
     }
 

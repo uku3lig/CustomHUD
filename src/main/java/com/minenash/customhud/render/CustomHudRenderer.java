@@ -1,10 +1,10 @@
 package com.minenash.customhud.render;
 
-import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
+import com.minenash.customhud.HudElements.icon.TextElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class CustomHudRenderer {
     public static Identifier font;
     public static HudTheme theme;
 
-    public static void render(DrawContext context, float _tickDelta) {
+    public static void render(DrawContext context, float tickDelta) {
 
         Profile profile = ProfileManager.getActive();
         if (profile == null || client.getDebugHud().shouldShowDebugHud())
@@ -137,6 +136,9 @@ public class CustomHudRenderer {
                     } else if (e instanceof IconElement ie) {
                         pieces.add( new RenderPiece(ie, null, xOffset, y, 0, false) );
                         xOffset += ie.getTextWidth();
+                    } else if (e instanceof TextElement te) {
+                        pieces.add( new RenderPiece(te, font, xOffset, y, theme.fgColor.getColor(), theme.textShadow) );
+                        xOffset += te.getTextWidth();
                     }
                     else if (e instanceof FunctionalElement.AdvanceList)    ListManager.advance();
                     else if (e instanceof FunctionalElement.PushList push)  ListManager.push(push.values, formatting.copy());
@@ -175,6 +177,10 @@ public class CustomHudRenderer {
             else if (piece.element instanceof String value && !value.isEmpty()) {
                 font = piece.font;
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
+            }
+            else if (piece.element instanceof TextElement element) {
+                font = piece.font;
+                element.render(context, piece);
             }
 
         }

@@ -202,8 +202,8 @@ public class Flags {
     public static HudElement wrap(HudElement element, Flags flags) {
         if (element instanceof IconElement)
             return element;
-        if (flags.romanNumerals && element instanceof NumberSupplierElement base)
-            element = new RomanNumeralElement(base);
+        if (flags.romanNumerals)
+            element = new RomanNumeralElement(element);
         if (flags.anyTextUsed())
             element = new FormattedElement(element, flags);
         if (flags.frequency > 0)

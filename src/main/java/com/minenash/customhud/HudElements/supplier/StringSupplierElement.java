@@ -33,7 +33,7 @@ public class StringSupplierElement implements HudElement {
     public static final Supplier<String> VERSION = () -> SharedConstants.getGameVersion().getName();
     public static final Supplier<String> CLIENT_VERSION = client::getGameVersion;
     public static final Supplier<String> MODDED_NAME = ClientBrandRetriever::getClientModName;
-    public static final Supplier<String> DISPLAY_NAME = () -> client.player.getDisplayName().getString();
+//    public static final Supplier<String> DISPLAY_NAME = () -> client.player.getDisplayName().getString(); TODO: REMOVE
     public static final Supplier<String> USERNAME = () -> client.player.getGameProfile().getName() == null ? null : client.player.getGameProfile().getName();
     public static final Supplier<String> UUID = () -> client.player.getGameProfile().getId().toString();
     public static final Supplier<String> PLAYER_TEAM = () -> client.player.getScoreboardTeam().getName();

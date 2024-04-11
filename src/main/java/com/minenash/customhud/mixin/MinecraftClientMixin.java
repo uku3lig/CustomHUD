@@ -9,7 +9,6 @@ import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.Window;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +17,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
+import static com.minenash.customhud.CustomHud.PROFILE_FOLDER;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -62,5 +69,22 @@ public abstract class MinecraftClientMixin {
     //    else
     //        window.setScaleFactor(scaleFactor);
     //}
+
+    @Inject(method = "onFinishedLoading", at = @At("RETURN"))
+    public void reloadProfiles(MinecraftClient.LoadingContext loadingContext, CallbackInfo ci) {
+        try(Stream<Path> pathsStream = Files.list(PROFILE_FOLDER).sorted(Comparator.comparing(p -> p.getFileName().toString()))) {
+            for (Path path : pathsStream.toList())
+                if (!Files.isDirectory(path)) {
+                    String name = path.getFileName().toString();
+                    if (name.endsWith(".txt")) {
+                        name = name.substring(0, name.length() - 4);
+                        ProfileManager.replace(Profile.parseProfile(path, name));
+                        CustomHud.showToast(name);
+                    }
+                }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -35,3 +35,13 @@ accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARA
 accessible field net/minecraft/entity/attribute/EntityAttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
+accessible class net/minecraft/client/MinecraftClient$LoadingContext
+accessible field net/minecraft/client/gui/hud/InGameHud overlayMessage Lnet/minecraft/text/Text;
+accessible field net/minecraft/client/gui/hud/InGameHud overlayRemaining I
+accessible field net/minecraft/client/gui/hud/InGameHud overlayTinted Z
+accessible field net/minecraft/client/gui/hud/InGameHud title Lnet/minecraft/text/Text;
+accessible field net/minecraft/client/gui/hud/InGameHud subtitle Lnet/minecraft/text/Text;
+accessible field net/minecraft/client/gui/hud/InGameHud titleRemainTicks I
+accessible field net/minecraft/client/gui/hud/InGameHud titleFadeOutTicks I
+accessible field net/minecraft/client/gui/hud/InGameHud titleStayTicks I
+accessible field net/minecraft/client/gui/hud/InGameHud titleFadeInTicks I

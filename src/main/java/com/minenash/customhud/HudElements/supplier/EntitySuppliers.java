@@ -34,8 +34,8 @@ public class EntitySuppliers {
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_Y = of ( () -> y(hooked()), 0);
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_Z = of ( () -> z(hooked()), 0);
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE = of( () -> dist(hooked()), 1);
-    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE_YAW = of( () -> yaw(hooked()), 1);
-    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DISTANCE_PITCH = of( () -> pitch(hooked()), 1);
+    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DIRECTION_YAW = of( () -> yaw(hooked()), 1);
+    public static final NumberSupplierElement.Entry HOOKED_ENTITY_DIRECTION_PITCH = of( () -> pitch(hooked()), 1);
 
 
     public static final Supplier<String> LAST_HIT_ENTITY = () -> type(ComplexData.lastHitEntity);

@@ -89,6 +89,10 @@ public class NewConfigScreen extends Screen {
             profiles.update();
             return true;
         }
+        if (keyCode == CustomHud.kb_showErrors.boundKey.getCode()) {
+            client.setScreen( new ErrorsScreen(this) );
+            return true;
+        }
 
         switch (keyCode) {
             case GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {

@@ -1,7 +1,6 @@
 package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
-import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.data.HudTheme;
 import com.minenash.customhud.render.CustomHudRenderer;
 import net.minecraft.util.Identifier;
@@ -10,10 +9,12 @@ import java.util.List;
 
 public class RomanNumeralElement implements HudElement, MultiElement {
 
-    private final NumberSupplierElement base;
+    private final HudElement base;
+    private final boolean precision;
 
-    public RomanNumeralElement(NumberSupplierElement base) {
+    public RomanNumeralElement(HudElement base) {
         this.base = base;
+        this.precision = base instanceof NumElement ne && ne.getPrecision() > 0;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class RomanNumeralElement implements HudElement, MultiElement {
 
         return List.of(
                 new FunctionalElement.ChangeTheme(copy),
-                new StringElement( base.precision == 0 ? convert(base.getNumber().intValue()) : convert(base.getNumber().doubleValue()) ),
+                new StringElement( precision ? convert(base.getNumber().intValue()) : convert(base.getNumber().doubleValue()) ),
                 new FunctionalElement.ChangeTheme(CustomHudRenderer.theme.copy())
         );
     }

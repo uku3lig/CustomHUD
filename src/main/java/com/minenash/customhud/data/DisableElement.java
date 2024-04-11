@@ -4,7 +4,7 @@ import java.util.EnumSet;
 
 public enum DisableElement {
     STATUS_BARS, HOTBAR, XP, HEALTH, HUNGER, ARMOR, AIR, SCOREBOARD, BOSSBARS, SUBTITLES, STATUS_EFFECTS, CHAT,
-    HORSE_JUMP, HORSE_HEALTH, HORSE_ARMOR, HORSE;
+    HORSE_JUMP, HORSE_HEALTH, HORSE_ARMOR, HORSE, TITLES, ACTIONBAR;
 
     private static final EnumSet<DisableElement> STATUS = EnumSet.of(HEALTH, HUNGER, ARMOR, AIR, HORSE_HEALTH);
     private static final EnumSet<DisableElement> LOWER = EnumSet.of(HEALTH, HUNGER, ARMOR, AIR, XP, HOTBAR, HORSE_HEALTH, HORSE_JUMP);
@@ -33,6 +33,9 @@ public enum DisableElement {
 
                     case "horse_jump" -> HORSE_JUMP;
                     case "horse_health" -> HORSE_HEALTH;
+
+                    case "titles" -> TITLES;
+                    case "actionbar" -> ACTIONBAR;
 
                     default -> null;
                 };

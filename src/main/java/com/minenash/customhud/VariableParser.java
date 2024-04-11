@@ -30,6 +30,7 @@ import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.Pair;
@@ -56,6 +57,7 @@ import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.*;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
+import static com.minenash.customhud.HudElements.supplier.TextSupplierElement.*;
 
 public class VariableParser {
 
@@ -568,6 +570,9 @@ public class VariableParser {
                 return Flags.wrap(new ItemSupplierIconElement(() -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = true;
                 return Flags.wrap(new ItemSupplierIconElement(() -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags), flags);
+            case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsg(flags), flags);
+            case "title_msg", "title": return Flags.wrap(new TitleMsg(TITLE_MSG, flags), flags);
+            case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsg(SUBTITLE_MSG, flags), flags);
         }
 
         HudElement element = getSupplierElement(part, enabled, flags);
@@ -625,6 +630,10 @@ public class VariableParser {
         if (entry2 != null)
             return new SpecialSupplierElement(entry2);
 
+        supplier = getTextSupplier(name, enabled);
+        if (supplier != null)
+            return new TextSupplierElement(supplier, flags);
+
         Integer color = HudTheme.parseColorName(name);
         if (color != null)
             return new IntElement(color, flags);
@@ -636,13 +645,23 @@ public class VariableParser {
         return null;
     }
 
+    private static Supplier<Text> getTextSupplier(String element, ComplexData.Enabled enabled) {
+        return switch (element) {
+            case "display_name", "name" -> DISPLAY_NAME;
+//            case "actionbar_msg", "actionbar" -> ACTIONBAR_MSG;
+//            case "title_msg", "title" -> TITLE_MSG;
+//            case "subtitle_msg", "subtitle" -> SUBTITLE_MSG;
+            default -> null;
+        };
+    }
+
     private static Supplier<String> getStringSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
             case "profile_name" -> PROFILE_NAME;
             case "version" -> VERSION;
             case "client_version" -> CLIENT_VERSION;
             case "modded_name" -> MODDED_NAME;
-            case "display_name", "name" -> DISPLAY_NAME;
+//            case "display_name", "name" -> DISPLAY_NAME; TODO: remove
             case "username" -> USERNAME;
             case "uuid" -> UUID;
             case "team" -> PLAYER_TEAM;
@@ -898,8 +917,8 @@ public class VariableParser {
             case "hooked_entity_y", "hey" -> HOOKED_ENTITY_Y;
             case "hooked_entity_z", "hez" -> HOOKED_ENTITY_Z;
             case "hooked_entity_distance", "hed" -> HOOKED_ENTITY_DISTANCE;
-            case "hooked_entity_distance_yaw", "hedy" -> HOOKED_ENTITY_DISTANCE_YAW;
-            case "hooked_entity_distance_pitch", "hedp" -> HOOKED_ENTITY_DISTANCE_PITCH;
+            case "hooked_entity_direction_yaw", "hedy" -> HOOKED_ENTITY_DIRECTION_YAW;
+            case "hooked_entity_direction_pitch", "hedp" -> HOOKED_ENTITY_DIRECTION_PITCH;
             case "vehicle_entity_health", "vehicle_health", "veh" -> VEHICLE_ENTITY_HEALTH;
             case "vehicle_entity_max_health", "vehicle_max_health", "vemh" -> VEHICLE_ENTITY_MAX_HEALTH;
             case "vehicle_horse_jump", "horse_jump", "vhj" -> VEHICLE_HORSE_JUMP;
@@ -971,6 +990,10 @@ public class VariableParser {
             case "offhand_item_durability_percent", "oitem_dur_per" -> OFFHAND_ITEM_DURABILITY_PERCENT;
             case "local_difficulty" -> { enabled.localDifficulty = enabled.world = true; yield LOCAL_DIFFICULTY; }
             case "clamped_local_difficulty" -> { enabled.localDifficulty = enabled.world = true; yield CLAMPED_LOCAL_DIFFICULTY; }
+
+            case "actionbar_remaining" -> ACTIONBAR_REMAINING;
+            case "title_remaining" -> TITLE_REMAINING;
+
             default -> null;
         };
     }
@@ -1188,7 +1211,8 @@ public class VariableParser {
             return null;
         }
 
-        boolean hasQuote = part.indexOf('"') != -1 && part.indexOf('\'') != -1;
+        //TODO: I removed `&& part.indexOf('\'') != -1`, not 100% how it worked
+        boolean hasQuote = part.indexOf('"') != -1 ;
         Flags flags = hasQuote ? new Flags() : Flags.parse(profile.name, debugLine, part.split(" "));
         HudElement element = attributer.get(supplier.apply(value), method, flags);
 

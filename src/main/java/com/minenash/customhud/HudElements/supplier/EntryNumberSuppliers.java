@@ -33,6 +33,9 @@ public class EntryNumberSuppliers {
         return function.sample(new DensityFunction.UnblendedNoisePos(pos.getX(), pos.getY(), pos.getZ()));
     }
 
+    public static final Entry ACTIONBAR_REMAINING = of( () -> client.inGameHud.overlayRemaining, 0); //TODO Maybe change to seconds
+    public static final Entry TITLE_REMAINING = of( () -> client.inGameHud.titleRemainTicks, 0); //TODO Maybe change to seconds
+
     public static final Entry X = of( () -> cameraEntity().getX(), 3);
     public static final Entry Y = of( () -> cameraEntity().getY(), 3);
     public static final Entry Z = of( () -> cameraEntity().getZ(), 3);

@@ -58,9 +58,18 @@ public class ExpressionParser {
             char c = chars[i];
             if (c == '(') tokens.add(new Token(TokenType.START_PREN, null));
             else if (c == ')') tokens.add(new Token(TokenType.END_PREN, null));
-            else if (c == '|') tokens.add(new Token(TokenType.OR, null));
-            else if (c == '&') tokens.add(new Token(TokenType.AND, null));
-            else if (c == '=') tokens.add(new Token(TokenType.COMPARISON, Comparison.EQUALS));
+            else if (c == '|') {
+                if (i + 1 != chars.length && chars[i + 1] == '|') i++;
+                tokens.add(new Token(TokenType.OR, null));
+            }
+            else if (c == '&') {
+                if (i + 1 != chars.length && chars[i + 1] == '&') i++;
+                tokens.add(new Token(TokenType.AND, null));
+            }
+            else if (c == '=') {
+                if (i + 1 != chars.length && chars[i + 1] == '=') i++;
+                tokens.add(new Token(TokenType.COMPARISON, Comparison.EQUALS));
+            }
             else if (c == '+') tokens.add(new Token(TokenType.MATH, MathOperator.ADD));
             else if (c == '*') tokens.add(new Token(TokenType.MATH, MathOperator.MULTIPLY));
             else if (c == '/') tokens.add(new Token(TokenType.MATH, MathOperator.DIVIDE));
