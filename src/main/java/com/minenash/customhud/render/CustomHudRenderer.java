@@ -135,7 +135,7 @@ public class CustomHudRenderer {
                         theme = cte.theme;
                         font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
-                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, 0, false) );
+                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, formatting.getColor(), false) );
                         xOffset += ie.getTextWidth();
                     } else if (e instanceof TextElement te) {
                         pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.textShadow) );
@@ -173,7 +173,9 @@ public class CustomHudRenderer {
             font = piece.font;
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
-                catch (Exception ignored){}
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             else if (piece.element instanceof String value && !value.isEmpty())
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
             else if (piece.element instanceof Text text)

@@ -98,7 +98,8 @@ public interface Operation {
             this.right = right;
             this.comparison = comparison;
             this.checkBool = left instanceof SudoElements.Bool || right instanceof SudoElements.Bool;
-            this.checkNum = left instanceof SudoElements.Num || right instanceof SudoElements.Num;
+            this.checkNum = left instanceof SudoElements.Num || right instanceof SudoElements.Num
+                         || left instanceof SudoElements.Op || right instanceof SudoElements.Op;
         }
 
         public double getValue() {

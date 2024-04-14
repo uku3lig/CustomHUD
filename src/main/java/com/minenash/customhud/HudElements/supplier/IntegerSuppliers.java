@@ -21,12 +21,9 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -169,7 +166,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> DISPLAY_WIDTH = () -> client.getWindow().getFramebufferWidth();
     public static final Supplier<Number> DISPLAY_HEIGHT = () -> client.getWindow().getFramebufferHeight();
     public static final Supplier<Number> DISPLAY_REFRESH_RATE = () -> GLX._getRefreshRate(client.getWindow());
-    public static final Supplier<Number> MODS = () -> FabricLoader.getInstance().getAllMods().size();
+    public static final Supplier<Number> MODS_NUM = () -> FabricLoader.getInstance().getAllMods().size();
     public static final Supplier<Number> PING = () -> Math.round(ComplexData.pingMetrics[0]);
     public static final Supplier<Number> LATENCY = () -> client.player.networkHandler.getPlayerListEntry(client.player.getUuid()).getLatency();
     public static final Supplier<Number> SOLAR_TIME = () -> client.world.getTimeOfDay() % 24000;

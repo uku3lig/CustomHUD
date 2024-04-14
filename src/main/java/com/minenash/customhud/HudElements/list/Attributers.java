@@ -3,16 +3,22 @@ package com.minenash.customhud.HudElements.list;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
-import com.minenash.customhud.HudElements.icon.BossbarIcon;
-import com.minenash.customhud.HudElements.icon.PlayerHeadIconElement;
-import com.minenash.customhud.HudElements.icon.ItemSupplierIconElement;
-import com.minenash.customhud.HudElements.icon.StatusEffectIconElement;
+import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
+import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.util.DrawingUtil;
+import com.terraformersmc.modmenu.util.mod.Mod;
+import com.terraformersmc.modmenu.util.mod.fabric.FabricIconHandler;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.ITEM_ATTR_MODIFIER_NAME;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
@@ -232,6 +238,44 @@ public class Attributers {
         default -> null;
     };
 
+    public static final Attributer MOD_AUTHOR = (sup, name, f) -> name.equals("author") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CONTRIBUTOR = (sup, name, f) -> name.equals("contributor") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CREDIT = (sup, name, f) -> name.equals("credit") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_LICENSE = (sup, name, f) -> name.equals("license") ? new Str(sup, DIRECT) : null;
+
+    public static final Attributer MOD_BADGE = (sup, name, flags) -> switch (name) {
+        case "b_name" -> new Str(sup, BADGE_NAME);
+        case "b_outline_color" -> new Num(sup, BADGE_OUTLINE_COLOR, flags);
+        case "b_fill_color" -> new Num(sup, BADGE_FILL_COLOR, flags);
+        case "b_icon" -> new ModBadgeIconElement(flags);
+        default -> null;
+    };
+
+    public static final Attributer MOD = (sup, name, flags) -> switch (name) {
+        case "m_name" -> new Str(sup, MOD_NAME);
+        case "m_id" -> new Str(sup, MOD_ID);
+        case "m_summary" -> new Str(sup, MOD_SUMMARY);
+        case "m_description" -> new Str(sup, MOD_DESCRIPTION);
+        case "m_version" -> new Str(sup, MOD_VERSION);
+        case "m_hash" -> new Str(sup, MOD_HASH);
+
+        case "m_library" -> new Bool(sup, MOD_IS_LIBRARY);
+        case "m_client" -> new Bool(sup, MOD_IS_CLIENT);
+        case "m_deprecated" -> new Bool(sup, MOD_IS_DEPRECATED);
+        case "m_patchwork" -> new Bool(sup, MOD_IS_PATCHWORK);
+        case "m_from_modpack" -> new Bool(sup, MOD_IS_FROM_MODPACK);
+        case "m_minecraft" -> new Bool(sup, MOD_IS_MINECRAFT);
+
+        case "m_badges" -> new CreateListElement(sup, MOD_BADGES, MOD_BADGE);
+        case "m_authors" -> new CreateListElement(sup, MOD_AUTHORS, MOD_AUTHOR);
+        case "m_contributors" -> new CreateListElement(sup, MOD_CONTRIBUTORS, MOD_CONTRIBUTOR);
+        case "m_credits" -> new CreateListElement(sup, MOD_CREDITS, MOD_CREDIT);
+        case "m_licenses" -> new CreateListElement(sup, MOD_LICENSES, MOD_LICENSE);
+
+        case "m_icon" -> new ModIconElement(flags);
+        default -> null;
+    };
+
 
 
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
@@ -256,6 +300,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(PLAYER_SCOREBOARD_SCORES, SCOREBOARD_SCORE);
         ATTRIBUTER_MAP.put(BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(ALL_BOSSBARS, BOSSBAR);
+        ATTRIBUTER_MAP.put(MODS, MOD);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);

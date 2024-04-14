@@ -1,12 +1,13 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.FuncElements;
 import com.minenash.customhud.HudElements.FuncElements.Num;
 import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
 import com.minenash.customhud.HudElements.FuncElements.SpecialText.TextEntry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
 import com.minenash.customhud.SubtitleEntryDuck;
+import com.terraformersmc.modmenu.util.mod.Mod;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
@@ -29,11 +30,11 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -318,6 +319,35 @@ public class AttributeFunctions {
         return null;
     };
     public static final Function<BossBar,Boolean> BOSSBAR_IS_VISIBLE = (bar) -> bar instanceof CommandBossBar cbb ? cbb.isVisible() : null;
+
+
+    // MODS
+    public static final Function<Mod,String> MOD_NAME = (mod) -> mod.getName();
+    public static final Function<Mod,String> MOD_ID = (mod) -> mod.getId();
+    public static final Function<Mod,String> MOD_SUMMARY = (mod) -> mod.getSummary();
+    public static final Function<Mod,String> MOD_DESCRIPTION = (mod) -> mod.getTranslatedDescription();
+    public static final Function<Mod,String> MOD_VERSION = (mod) -> mod.getVersion();
+    public static final Function<Mod,String> MOD_PREFIXED_VERSION = (mod) -> mod.getPrefixedVersion();
+    public static final Function<Mod,String> MOD_HASH = (mod) -> {
+        try { return mod.getSha512Hash(); }
+        catch (IOException e) { return null; }
+    };
+    public static final Function<Mod,Boolean> MOD_IS_LIBRARY = (mod) -> mod.getBadges().contains(Mod.Badge.LIBRARY);
+    public static final Function<Mod,Boolean> MOD_IS_CLIENT = (mod) -> mod.getBadges().contains(Mod.Badge.CLIENT);
+    public static final Function<Mod,Boolean> MOD_IS_DEPRECATED = (mod) -> mod.getBadges().contains(Mod.Badge.DEPRECATED);
+    public static final Function<Mod,Boolean> MOD_IS_PATCHWORK = (mod) -> mod.getBadges().contains(Mod.Badge.PATCHWORK_FORGE);
+    public static final Function<Mod,Boolean> MOD_IS_FROM_MODPACK = (mod) -> mod.getBadges().contains(Mod.Badge.MODPACK);
+    public static final Function<Mod,Boolean> MOD_IS_MINECRAFT = (mod) -> mod.getBadges().contains(Mod.Badge.MINECRAFT);
+
+    public static final Function<Mod.Badge,String> BADGE_NAME = (badge) -> badge.getText().getString();
+    public static final Function<Mod.Badge,Number> BADGE_OUTLINE_COLOR = (badge) -> badge.getOutlineColor();
+    public static final Function<Mod.Badge,Number> BADGE_FILL_COLOR = (badge) -> badge.getFillColor();
+
+
+
+
+
+
 
 
 

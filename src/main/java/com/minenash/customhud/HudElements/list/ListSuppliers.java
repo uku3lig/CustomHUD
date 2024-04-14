@@ -2,6 +2,8 @@ package com.minenash.customhud.HudElements.list;
 
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.SubtitleTracker;
+import com.terraformersmc.modmenu.ModMenu;
+import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,7 +15,6 @@ import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nullables;
 import net.minecraft.world.GameMode;
 
@@ -31,6 +32,8 @@ public class ListSuppliers {
                     .thenComparing((entry) -> Nullables.mapOrElse(entry.getScoreboardTeam(), Team::getName, ""))
                     .thenComparing((entry) -> entry.getProfile().getName(), String::compareToIgnoreCase);
 
+    public static final Comparator<Mod> MOD_ORDERING = Comparator.comparing(mod -> mod.getTranslatedName().toLowerCase(Locale.ROOT));
+
     public static final ListProvider
         STATUS_EFFECTS = () -> CLIENT.player.getStatusEffects().stream().sorted(Comparator.comparingInt(e -> e.getEffectType().getCategory().ordinal())).toList(),
         STATUS_EFFECTS_POSITIVE = () -> CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.BENEFICIAL).toList(),
@@ -40,30 +43,33 @@ public class ListSuppliers {
         ONLINE_PLAYERS = () -> CLIENT.getNetworkHandler().getPlayerList().stream().sorted(ENTRY_ORDERING).toList(),
         SUBTITLES = () -> SubtitleTracker.INSTANCE.entries,
 
-        TARGET_BLOCK_STATES = () ->  ComplexData.targetBlock == null ? Collections.EMPTY_LIST : List.of(ComplexData.targetBlock.getEntries().entrySet().toArray()),
+        TARGET_BLOCK_STATES = () ->  ComplexData.targetBlock == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetBlock.getEntries().entrySet().toArray()),
         TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
         PLAYER_ATTRIBUTES = () -> getEntityAttributes(CLIENT.player),
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
         HOOKED_ENTITY_ATTRIBUTES = () -> hooked() == null ? Collections.EMPTY_LIST : getEntityAttributes(hooked()),
-        TEAMS = () -> List.of(CLIENT.world.getScoreboard().getTeams().toArray()),
+        TEAMS = () -> Arrays.asList(CLIENT.world.getScoreboard().getTeams().toArray()),
 
         ITEMS = () -> AttributeHelpers.compactItems(CLIENT.player.getInventory().main),
         INV_ITEMS = () -> CLIENT.player.getInventory().main.subList(9, CLIENT.player.getInventory().main.size()),
         ARMOR_ITEMS = () -> CLIENT.player.getInventory().armor,
         HOTBAR_ITEMS = () -> CLIENT.player.getInventory().main.subList(0,9),
 
-        SCOREBOARD_OBJECTIVES = () -> List.of(scoreboard().getObjectives().toArray()),
-        PLAYER_SCOREBOARD_SCORES = () -> List.of(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
+        SCOREBOARD_OBJECTIVES = () -> Arrays.asList(scoreboard().getObjectives().toArray()),
+        PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
 
         BOSSBARS = () -> bossbars(false),
-        ALL_BOSSBARS = () -> bossbars(true);
+        ALL_BOSSBARS = () -> bossbars(true),
+
+        MODS = () -> ModMenu.ROOT_MODS.values().stream().sorted(MOD_ORDERING).toList();
+    ;
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
-    public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> List.of(team.getPlayerList().toArray());
+    public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> Arrays.asList(team.getPlayerList().toArray());
     public static final Function<Team,List<?>> TEAM_PLAYERS = (team) -> CLIENT.getNetworkHandler().getPlayerList().stream().filter(p -> p.getScoreboardTeam() == team).sorted(ENTRY_ORDERING).toList();
 
     public static final Function<ItemStack,List<?>> ITEM_ATTRIBUTES = AttributeHelpers::getItemStackAttributes;
-    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> List.of(EnchantmentHelper.get(stack).entrySet().toArray());
+    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> Arrays.asList(EnchantmentHelper.get(stack).entrySet().toArray());
     public static final Function<ItemStack,List<?>> ITEM_LORE_LINES = AttributeHelpers::getLore;
     public static final Function<ItemStack,List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, "CanDestroy");
     public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, "CanPlaceOn");
@@ -73,7 +79,7 @@ public class ListSuppliers {
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;
 
-        List<?> listPlayers = List.of(CLIENT.getNetworkHandler().getPlayerList().toArray());
+        List<?> listPlayers = Arrays.asList(CLIENT.getNetworkHandler().getPlayerList().toArray());
         List<PlayerListEntry> out = new ArrayList<>(cboss.getPlayers().size());
 
         for (var player : cboss.getPlayers())
@@ -91,6 +97,13 @@ public class ListSuppliers {
             .sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
 
     public static final Function<String,List<?>> SCORES = (name) -> Arrays.asList(scoreboard().getScores(name).scores.entrySet().toArray());
+
+
+    public static final Function<Mod,List<?>> MOD_AUTHORS = Mod::getAuthors;
+    public static final Function<Mod,List<?>> MOD_CONTRIBUTORS = Mod::getAuthors;
+    public static final Function<Mod,List<?>> MOD_CREDITS = Mod::getCredits;
+    public static final Function<Mod,List<?>> MOD_BADGES = (mod) -> Arrays.asList(mod.getBadges().toArray());
+    public static final Function<Mod,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(mod.getLicense().toArray());
 
 
 

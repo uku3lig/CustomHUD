@@ -830,7 +830,7 @@ public class VariableParser {
             case "display_width" -> DISPLAY_WIDTH;
             case "display_height" -> DISPLAY_HEIGHT;
             case "display_refresh_rate" -> DISPLAY_REFRESH_RATE;
-            case "mods" -> MODS;
+//            case "mods" -> MODS;
             case "ping" -> {enabled.pingMetrics = true; yield PING;}
             case "latency" -> LATENCY;
             case "time", "solar_time" -> SOLAR_TIME;
@@ -1063,6 +1063,7 @@ public class VariableParser {
             case "scores" -> PLAYER_SCOREBOARD_SCORES;
             case "bossbars" -> BOSSBARS;
             case "all_bossbars" -> ALL_BOSSBARS;
+            case "mods" -> MODS;
 
             default -> null;
         };
