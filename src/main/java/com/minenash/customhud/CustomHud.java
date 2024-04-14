@@ -38,6 +38,7 @@ public class CustomHud implements ModInitializer {
 	//Debug: LD_PRELOAD=/home/jakob/Programs/renderdoc_1.25/lib/librenderdoc.so
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Logger LOGGER = LogManager.getLogger("CustomHud");
+	public static boolean MODMENU_INSTALLED = false;
 
 	public static final Path CONFIG_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud");
 	public static final Path PROFILE_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud/profiles");
@@ -68,6 +69,7 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static void delayedInitialize() {
+		MODMENU_INSTALLED = FabricLoader.getInstance().isModLoaded("modmenu");
 		readProfiles();
 		updateCrosshairObjectShare();
 
@@ -138,7 +140,10 @@ public class CustomHud implements ModInitializer {
 
 		while (kb_showErrors.wasPressed()) {
 			if (client.currentScreen == null)
-				CLIENT.setScreen(new ErrorsScreen(null));
+				if (ProfileManager.getActive() != null)
+					CLIENT.setScreen(new ErrorsScreen(null));
+				else
+					CLIENT.setScreen(new NewConfigScreen(null));
 		}
 
 		updateCrosshairObjectShare();

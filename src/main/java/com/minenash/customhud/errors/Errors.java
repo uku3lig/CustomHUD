@@ -19,14 +19,16 @@ public class Errors {
         getErrors(profileName).clear();
     }
 
-    public static void addError(String profileName, int line, String source, ErrorType type, String context) {
-        addError(profileName, Integer.toString(line), source, type, context);
+    public static Error addError(String profileName, int line, String source, ErrorType type, String context) {
+        return addError(profileName, Integer.toString(line), source, type, context);
     }
-    public static void addError(String profileName, String line, String source, ErrorType type, String context) {
-        getErrors(profileName).add(new Error(line, source, type, context));
+    public static Error addError(String profileName, String line, String source, ErrorType type, String context) {
+        Error e = new Error(line, source, type, context);
+        getErrors(profileName).add(e);
+        return e;
     }
-    public static void addError(ErrorContext context, ErrorType type, String value) {
-        addError(context.profileName(), Integer.toString(context.line()), context.src(), type, value);
+    public static Error addError(ErrorContext context, ErrorType type, String value) {
+        return addError(context.profileName(), Integer.toString(context.line()), context.src(), type, value);
     }
 
 

@@ -20,6 +20,7 @@ import com.minenash.customhud.data.*;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.mod_compat.CustomHudRegistry;
+import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -67,7 +68,7 @@ public class VariableParser {
     private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._-]+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
-    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.-]*))?.*");
+    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.:-]*))?.*");
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
 
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProvider listProvider) {
@@ -305,12 +306,15 @@ public class VariableParser {
 
         if (listProvider == null || !(part.startsWith("scores") && part.contains(","))) { //Fixes naming conflict
             HudElement he = getListSupplierElements(part, profile, debugLine, enabled, original, listProvider);
+            if (he instanceof IgnoreErrorElement) return null;
             if (he != null) return he;
         }
 
         // ATTRS WERE HERE
         HudElement ae = getAttributeElement(part, profile, debugLine, enabled, original);
         if (ae != null) {
+            if (ae instanceof IgnoreErrorElement)
+                return null;
             if (ae instanceof FunctionalElement.CreateListElement cle)
                 return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original);
             return ae;
@@ -358,7 +362,7 @@ public class VariableParser {
         Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
 
         if (listProvider != null) {
-            HudElement element = getListAttributeSupplierElement(part, enabled, flags, listProvider);
+            HudElement element = getListAttributeSupplierElement(part, flags, listProvider);
             if (element instanceof FunctionalElement.CreateListElement cle) {
                 String p = original.substring(1, original.length() - 1);
                 return listElement(cle.provider, p, p.indexOf(','), profile, debugLine, enabled, original);
@@ -1022,6 +1026,10 @@ public class VariableParser {
 
         if (provider == null)
             return null;
+        if (provider == ListProvider.REGUIRES_MODMENU) {
+            Errors.addError(profile.name, debugLine, original, ErrorType.REQUIRES_MODMENU, "");
+            return new FunctionalElement.IgnoreErrorElement();
+        }
         if (parts.size() == 1)
             return new ListCountElement(provider);
 
@@ -1063,9 +1071,9 @@ public class VariableParser {
             case "scores" -> PLAYER_SCOREBOARD_SCORES;
             case "bossbars" -> BOSSBARS;
             case "all_bossbars" -> ALL_BOSSBARS;
-            case "mods" -> MODS;
-            case "mods_and_libs" -> MODS_AND_LIBS;
-            case "all_mods" -> ALL_MODS;
+            case "mods" -> CustomHud.MODMENU_INSTALLED ? MODS : ListProvider.REGUIRES_MODMENU;
+            case "all_root_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_ROOT_MODS : ListProvider.REGUIRES_MODMENU;
+            case "all_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_MODS : ListProvider.REGUIRES_MODMENU;
 
             default -> null;
         };
@@ -1174,7 +1182,7 @@ public class VariableParser {
     }
 
     private static final Supplier<String> RAW = () -> ListManager.getValue().toString();
-    private static HudElement getListAttributeSupplierElement(String name, ComplexData.Enabled enabled, Flags flags, ListProvider listProvider) {
+    private static HudElement getListAttributeSupplierElement(String name, Flags flags, ListProvider listProvider) {
         if (name.endsWith(",")) name = name.substring(0, name.length()-1);
         return switch (name) {
             case "count", "c" -> new NumberSupplierElement(ListManager::getCount, flags);
@@ -1212,11 +1220,16 @@ public class VariableParser {
 
         if (part.startsWith("bossbar:"))
             return attrElement(part, src -> src, (name) -> () -> AttributeHelpers.getBossBar(name),
-                    BOSSBAR, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
+                    BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("mod:"))
+            return attrElement(part, ModMenu.MODS::get, (mod) -> () -> mod,
+                    MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_PROPERTY, profile, debugLine, enabled, original );
+
         return null;
     }
 
-    private static <T> HudElement attrElement(String part, Function<String,T> reader, Function<T,Supplier<?>> supplier,
+    public static <T> HudElement attrElement(String part, Function<String,T> reader, Function<T,Supplier<?>> supplier,
                                               Attributer attributer, ErrorType unknownX, ErrorType unknownAttribute,
                                               Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         Matcher matcher = ITEM_VARIABLE_PATTERN.matcher(part.substring(part.indexOf(':')+1));
@@ -1229,7 +1242,7 @@ public class VariableParser {
         T value = reader.apply(src);
         if (value == null) {
             Errors.addError(profile.name, debugLine, original, unknownX, src);
-            return null;
+            return new IgnoreErrorElement();
         }
 
         //TODO: I removed `&& part.indexOf('\'') != -1`, not 100% how it worked
@@ -1237,8 +1250,10 @@ public class VariableParser {
         Flags flags = hasQuote ? new Flags() : Flags.parse(profile.name, debugLine, part.split(" "));
         HudElement element = attributer.get(supplier.apply(value), method, flags);
 
-        if (element == null)
+        if (element == null) {
             Errors.addError(profile.name, debugLine, original, unknownAttribute, method);
+            return new IgnoreErrorElement();
+        }
         if ( !(element instanceof CreateListElement) )
             return Flags.wrap(element, flags);
         return element;

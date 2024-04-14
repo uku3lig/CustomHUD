@@ -1,5 +1,6 @@
 package com.minenash.customhud.data;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.ConditionalElement;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
@@ -86,9 +87,20 @@ public class MultiLineStacker {
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
         ListProvider superProvider = listProviders.isEmpty() ? null : listProviders.peek();
         ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, superProvider);
+        if (provider == ListProvider.REGUIRES_MODMENU) {
+            Errors.addError(profile.name, line, source, ErrorType.REQUIRES_MODMENU, "");
+            listProviders.push(null);
+            stack.push( new ListElement.MultiLineBuilder(null) );
+            return;
+        }
 
         if (provider == null) {
             HudElement e = VariableParser.getAttributeElement(list, profile, line, enabled, source);
+            if (e instanceof FunctionalElement.IgnoreErrorElement) {
+                listProviders.push(null);
+                stack.push( new ListElement.MultiLineBuilder(null) );
+                return;
+            }
             if (e instanceof FunctionalElement.CreateListElement cle)
                 provider = cle.provider;
         }

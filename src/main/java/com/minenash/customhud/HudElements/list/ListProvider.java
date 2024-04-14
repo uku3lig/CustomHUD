@@ -19,5 +19,13 @@ public interface ListProvider {
             return function.apply(supplier.get());
         }
     }
+
+    RequiredModmenu REGUIRES_MODMENU = new RequiredModmenu();
+    class RequiredModmenu implements ListProvider {
+        @Override
+        public List<?> get() {
+            return null;
+        }
+    }
 }
 

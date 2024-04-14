@@ -89,7 +89,7 @@ public class NewConfigScreen extends Screen {
             profiles.update();
             return true;
         }
-        if (keyCode == CustomHud.kb_showErrors.boundKey.getCode()) {
+        if (keyCode == CustomHud.kb_showErrors.boundKey.getCode() && ProfileManager.getActive() != null) {
             client.setScreen( new ErrorsScreen(this) );
             return true;
         }

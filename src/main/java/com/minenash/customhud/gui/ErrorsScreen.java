@@ -41,7 +41,7 @@ public class ErrorsScreen extends Screen {
     }
 
     public ErrorsScreen(Screen parent, Profile profile) {
-        super(Text.literal((profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
+        super(Text.literal((profile == null || profile.name == null ? "Unknown" : "'" + profile.name + "'") + " Errors"));
         this.parent = parent;
         this.profile = profile;
         openedFromNullScreen = parent == null;

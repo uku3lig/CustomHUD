@@ -18,7 +18,9 @@ public class ProfileManager {
 
 
     public static Profile getActive() {
-        return enabled ? active : null;
+        if (!enabled) return null;
+        fallback();
+        return active;
     }
 
     public static Profile setActive(Profile active) {

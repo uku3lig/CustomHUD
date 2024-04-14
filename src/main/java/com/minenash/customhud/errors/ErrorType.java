@@ -24,6 +24,7 @@ public enum ErrorType {
 
     UNKNOWN_SLOT ("Slots", "references/item_slots", "Unknown Slot: §e"),
     UNAVAILABLE_SLOT ("Slots", "references/item_slots", "The §e" + "§r slot is not available for players"),
+    UNKNOWN_MOD ("CHANGE ME", "references/CHANGE ME", "Mod not installed: §e"),
     UNKNOWN_ITEM_PROPERTY ("Item Properties", "variables#items", "Unknown Item Property: §e"),
     UNKNOWN_ATTRIBUTE ("CHANGE ME", "references/CHANGE ME", "Unknown Attribute: §e"),
     UNKNOWN_ATTRIBUTE_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Attribute Property: §e"),
@@ -31,6 +32,7 @@ public enum ErrorType {
     UNKNOWN_OBJECTIVE_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Objective Property: §e"),
     UNKNOWN_BOSSBAR_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Bossbar Property: §e"),
     UNKNOWN_SCORE_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Score Property: §e"),
+    UNKNOWN_MOD_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Mod Property: §e"),
     //TODO FIX ME
     UNKNOWN_ICON ("Icons", "references/icons", "Unknown item/texture: §e"),
 
@@ -52,7 +54,9 @@ public enum ErrorType {
     EMPTY_TOGGLE ("CHANGE ME", "CHANGE ME", "No toggle name"),
     UNKNOWN_KEY("CHANGE ME", "CHANGE ME", "Invalid key name: "),
 
-    NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: ");
+    NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: "),
+
+    REQUIRES_MODMENU ("Get Mod Menu", "https://modrinth.com/mod/modmenu", "Requires the mod §aMod Menu");
 
     public final String message;
     public final MutableText linkText;

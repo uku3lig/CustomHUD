@@ -58,5 +58,6 @@ public class FunctionalElement implements HudElement {
             Attributers.ATTRIBUTER_MAP.put(provider, attributer);
         }
     }
+    public static class IgnoreErrorElement extends FunctionalElement {}
 
 }

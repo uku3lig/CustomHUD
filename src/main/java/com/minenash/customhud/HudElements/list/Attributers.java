@@ -5,20 +5,13 @@ import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
 import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.data.Flags;
-import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
-import com.terraformersmc.modmenu.util.DrawingUtil;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import com.terraformersmc.modmenu.util.mod.fabric.FabricIconHandler;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.ITEM_ATTR_MODIFIER_NAME;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
@@ -252,32 +245,39 @@ public class Attributers {
     };
 
     public static Attributer MOD2;
-    public static final Attributer MOD = (sup, name, flags) -> switch (name) {
-        case "m_name" -> new Str(sup, MOD_NAME);
-        case "m_id" -> new Str(sup, MOD_ID);
-        case "m_summary" -> new Str(sup, MOD_SUMMARY);
-        case "m_description" -> new Str(sup, MOD_DESCRIPTION);
-        case "m_version" -> new Str(sup, MOD_VERSION);
-        case "m_hash" -> new Str(sup, MOD_HASH);
+    public static final Attributer MOD = (sup, name, flags) -> {
+        if (name.startsWith("m_parent:")) {
+            String attr = name.substring(9);
+            Supplier sup2 = () -> ModMenu.MODS.get( ((Mod) sup.get()).getParent() );
+            return MOD2.get(sup2, attr, flags);
+        }
+        return switch (name) {
+            case "m_name" -> new Str(sup, MOD_NAME);
+            case "m_id" -> new Str(sup, MOD_ID);
+            case "m_summary" -> new Str(sup, MOD_SUMMARY);
+            case "m_description" -> new Str(sup, MOD_DESCRIPTION);
+            case "m_version" -> new Str(sup, MOD_VERSION);
+            case "m_hash" -> new Str(sup, MOD_HASH);
 
-        case "m_library" -> new Bool(sup, MOD_IS_LIBRARY);
-        case "m_client" -> new Bool(sup, MOD_IS_CLIENT);
-        case "m_deprecated" -> new Bool(sup, MOD_IS_DEPRECATED);
-        case "m_patchwork" -> new Bool(sup, MOD_IS_PATCHWORK);
-        case "m_from_modpack" -> new Bool(sup, MOD_IS_FROM_MODPACK);
-        case "m_minecraft" -> new Bool(sup, MOD_IS_MINECRAFT);
+            case "m_library" -> new Bool(sup, MOD_IS_LIBRARY);
+            case "m_client" -> new Bool(sup, MOD_IS_CLIENT);
+            case "m_deprecated" -> new Bool(sup, MOD_IS_DEPRECATED);
+            case "m_patchwork" -> new Bool(sup, MOD_IS_PATCHWORK);
+            case "m_from_modpack" -> new Bool(sup, MOD_IS_FROM_MODPACK);
+            case "m_minecraft" -> new Bool(sup, MOD_IS_MINECRAFT);
 
-        case "m_badges" -> new CreateListElement(sup, MOD_BADGES, MOD_BADGE);
-        case "m_authors" -> new CreateListElement(sup, MOD_AUTHORS, MOD_AUTHOR);
-        case "m_contributors" -> new CreateListElement(sup, MOD_CONTRIBUTORS, MOD_CONTRIBUTOR);
-        case "m_credits" -> new CreateListElement(sup, MOD_CREDITS, MOD_CREDIT);
-        case "m_licenses" -> new CreateListElement(sup, MOD_LICENSES, MOD_LICENSE);
+            case "m_badges" -> new CreateListElement(sup, MOD_BADGES, MOD_BADGE);
+            case "m_authors" -> new CreateListElement(sup, MOD_AUTHORS, MOD_AUTHOR);
+            case "m_contributors" -> new CreateListElement(sup, MOD_CONTRIBUTORS, MOD_CONTRIBUTOR);
+            case "m_credits" -> new CreateListElement(sup, MOD_CREDITS, MOD_CREDIT);
+            case "m_licenses" -> new CreateListElement(sup, MOD_LICENSES, MOD_LICENSE);
 
-        case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
-        case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
+            case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
+            case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
 
-        case "m_icon" -> new ModIconElement(flags);
-        default -> null;
+            case "m_icon" -> new ModIconElement(flags);
+            default -> null;
+        };
     };
     static {
         MOD2 = MOD;
@@ -308,7 +308,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(ALL_BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(MODS, MOD);
-        ATTRIBUTER_MAP.put(MODS_AND_LIBS, MOD);
+        ATTRIBUTER_MAP.put(ALL_ROOT_MODS, MOD);
         ATTRIBUTER_MAP.put(ALL_MODS, MOD);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
