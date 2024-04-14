@@ -2,14 +2,11 @@ package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.boss.BossBar;
-import net.minecraft.entity.boss.BossBar.Color;
-import net.minecraft.entity.boss.BossBar.Style;
-import net.minecraft.util.Pair;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -23,39 +20,28 @@ public class BossbarIcon extends IconElement{
         }
     }
 
-    private final Supplier<BossBar> bossbarSupplier;
-    private final boolean useSupplier;
-    private List<BossBar> bossbars;
-    private int bossbarsIndex = 0;
+    private final Supplier<BossBar> supplier;
 
     public BossbarIcon(Supplier<BossBar> supplier, Flags flags) {
         super(flags, 182);
-        this.bossbarSupplier = supplier;
-        this.useSupplier = supplier != ListManager.SUPPLIER;
+        this.supplier = supplier;
     }
 
     @Override
-    public void render(DrawContext context, int x, int y) {
+    public void render(DrawContext context, RenderPiece piece) {
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        matrices.translate(x + shiftX, y + shiftY + 1, 0);
+        matrices.translate(piece.x + shiftX, piece.y + shiftY + 1, 0);
         if (!referenceCorner)
             matrices.translate(0, -(5*scale-5)/2, 0);
         matrices.scale(scale, scale, 0);
         rotate(matrices, 182, 5);
 
-        BossBar bossBar = useSupplier ? bossbarSupplier.get() : bossbars.get(bossbarsIndex++);
+        BossBar bossBar = supplier == ListManager.SUPPLIER ? (BossBar) piece.value : supplier.get();
         if (bossBar != null)
             CLIENT.inGameHud.getBossBarHud().renderBossBar(context, 0, 0, bossBar);
 
         matrices.pop();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void setList(List<?> values) {
-        bossbars = (List<BossBar>) values;
-        bossbarsIndex = 0;
     }
 
 }

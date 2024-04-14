@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
 
 public class SpaceElement extends IconElement {
@@ -14,7 +15,7 @@ public class SpaceElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, int x, int y) {}
+    public void render(DrawContext context, RenderPiece piece) {}
 
     @Override
     public int getTextWidth() {

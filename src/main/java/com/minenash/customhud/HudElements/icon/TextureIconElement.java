@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -81,11 +82,11 @@ public class TextureIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, int x, int y) {
+    public void render(DrawContext context, RenderPiece piece) {
         if (width == 0)
             return;
         context.getMatrices().push();
-        context.getMatrices().translate(x+shiftX, y+shiftY-yOffset-2, 0);
+        context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2, 0);
         rotate(context.getMatrices(), width, height);
         context.drawTexture(texture, 0, 0, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
         context.getMatrices().pop();

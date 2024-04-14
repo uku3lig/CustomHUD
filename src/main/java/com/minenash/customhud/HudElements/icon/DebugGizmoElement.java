@@ -3,6 +3,7 @@ package com.minenash.customhud.HudElements.icon;
 import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -24,7 +25,7 @@ public class DebugGizmoElement extends IconElement {
 
     //TODO: Mark as non-rotatable
     @Override
-    public void render(DrawContext context, int x, int y) {
+    public void render(DrawContext context, RenderPiece piece) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         MatrixStack matrixStack = RenderSystem.getModelViewStack();
         matrixStack.push();
@@ -56,7 +57,7 @@ public class DebugGizmoElement extends IconElement {
             y_offset += 0;
         }
 
-        matrixStack.translate(x + shiftX + x_offset, y + shiftY + y_offset + (size/2), 100);
+        matrixStack.translate(piece.x + shiftX + x_offset, piece.y + shiftY + y_offset + (size/2), 100);
         if (!referenceCorner)
             matrixStack.translate(0, -(10*scale-10)/2, 0);
         matrixStack.scale(-1, -1, -1);

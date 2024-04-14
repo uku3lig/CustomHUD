@@ -13,6 +13,7 @@ import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nullables;
 import net.minecraft.world.GameMode;
 
@@ -39,30 +40,30 @@ public class ListSuppliers {
         ONLINE_PLAYERS = () -> CLIENT.getNetworkHandler().getPlayerList().stream().sorted(ENTRY_ORDERING).toList(),
         SUBTITLES = () -> SubtitleTracker.INSTANCE.entries,
 
-        TARGET_BLOCK_STATES = () ->  ComplexData.targetBlock == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetBlock.getEntries().entrySet().toArray()),
+        TARGET_BLOCK_STATES = () ->  ComplexData.targetBlock == null ? Collections.EMPTY_LIST : List.of(ComplexData.targetBlock.getEntries().entrySet().toArray()),
         TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
         PLAYER_ATTRIBUTES = () -> getEntityAttributes(CLIENT.player),
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
         HOOKED_ENTITY_ATTRIBUTES = () -> hooked() == null ? Collections.EMPTY_LIST : getEntityAttributes(hooked()),
-        TEAMS = () -> Arrays.asList(CLIENT.world.getScoreboard().getTeams().toArray()),
+        TEAMS = () -> List.of(CLIENT.world.getScoreboard().getTeams().toArray()),
 
         ITEMS = () -> AttributeHelpers.compactItems(CLIENT.player.getInventory().main),
         INV_ITEMS = () -> CLIENT.player.getInventory().main.subList(9, CLIENT.player.getInventory().main.size()),
         ARMOR_ITEMS = () -> CLIENT.player.getInventory().armor,
         HOTBAR_ITEMS = () -> CLIENT.player.getInventory().main.subList(0,9),
 
-        SCOREBOARD_OBJECTIVES = () -> Arrays.asList(scoreboard().getObjectives().toArray()),
-        PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
+        SCOREBOARD_OBJECTIVES = () -> List.of(scoreboard().getObjectives().toArray()),
+        PLAYER_SCOREBOARD_SCORES = () -> List.of(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
 
         BOSSBARS = () -> bossbars(false),
         ALL_BOSSBARS = () -> bossbars(true);
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
-    public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> Arrays.asList(team.getPlayerList().toArray());
+    public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> List.of(team.getPlayerList().toArray());
     public static final Function<Team,List<?>> TEAM_PLAYERS = (team) -> CLIENT.getNetworkHandler().getPlayerList().stream().filter(p -> p.getScoreboardTeam() == team).sorted(ENTRY_ORDERING).toList();
 
     public static final Function<ItemStack,List<?>> ITEM_ATTRIBUTES = AttributeHelpers::getItemStackAttributes;
-    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> Arrays.asList(EnchantmentHelper.get(stack).entrySet().toArray());
+    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> List.of(EnchantmentHelper.get(stack).entrySet().toArray());
     public static final Function<ItemStack,List<?>> ITEM_LORE_LINES = AttributeHelpers::getLore;
     public static final Function<ItemStack,List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, "CanDestroy");
     public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, "CanPlaceOn");
@@ -71,7 +72,16 @@ public class ListSuppliers {
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;
-        return Arrays.asList(cboss.getPlayers().toArray());
+
+        List<?> listPlayers = List.of(CLIENT.getNetworkHandler().getPlayerList().toArray());
+        List<PlayerListEntry> out = new ArrayList<>(cboss.getPlayers().size());
+
+        for (var player : cboss.getPlayers())
+            for (var listPlayer : listPlayers)
+                if (player.getUuid().equals( ((PlayerListEntry) listPlayer).getProfile().getId() ))
+                    out.add( (PlayerListEntry) listPlayer );
+
+        return out;
     };
 
 

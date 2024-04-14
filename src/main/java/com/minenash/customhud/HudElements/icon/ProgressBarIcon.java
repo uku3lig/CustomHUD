@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.boss.BossBar;
@@ -18,8 +19,6 @@ public class ProgressBarIcon extends IconElement {
     private final Operation denominator;
     private final BarStyle style;
 
-
-
     public ProgressBarIcon(Operation numerator, Operation denominator, BarStyle style, Flags flags) {
         super(flags, 182);
         this.numerator = numerator;
@@ -29,10 +28,10 @@ public class ProgressBarIcon extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, int x, int y) {
+    public void render(DrawContext context, RenderPiece piece) {
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        matrices.translate(x + shiftX, y + shiftY + 1, 0);
+        matrices.translate(piece.x + shiftX, piece.y + shiftY + 1, 0);
         if (!referenceCorner)
             matrices.translate(0, -(5*scale-5)/2, 0);
         matrices.scale(scale, scale, 0);

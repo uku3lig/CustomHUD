@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
@@ -36,7 +37,7 @@ public abstract class IconElement extends FunctionalElement {
         referenceCorner = flags.iconReferenceCorner;
     }
 
-    public abstract void render(DrawContext context, int x, int y);
+    public abstract void render(DrawContext context, RenderPiece piece);
     public int getTextWidth() {
         return width;
     };
@@ -65,7 +66,5 @@ public abstract class IconElement extends FunctionalElement {
         matrices.pop();
 
     }
-
-    public void setList(List<?> values) {}
 
 }

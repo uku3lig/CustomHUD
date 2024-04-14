@@ -169,20 +169,15 @@ public class CustomHudRenderer {
         BufferRenderer.drawWithGlobalProgram(bgBuilder.end());
         RenderSystem.disableBlend();
 
-        font = null;
-
         for (RenderPiece piece : pieces) {
+            font = piece.font;
             if (piece.element instanceof IconElement ie )
-                try { ie.render(context, piece.x, piece.y); }
+                try { ie.render(context, piece); }
                 catch (Exception ignored){}
-            else if (piece.element instanceof String value && !value.isEmpty()) {
-                font = piece.font;
+            else if (piece.element instanceof String value && !value.isEmpty())
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
-            }
-            else if (piece.element instanceof Text text) {
-                font = piece.font;
+            else if (piece.element instanceof Text text)
                 context.drawText(client.textRenderer, text, piece.x, piece.y, piece.color, piece.shadow);
-            }
 
         }
 

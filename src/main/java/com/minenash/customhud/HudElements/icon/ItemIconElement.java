@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -26,7 +27,7 @@ public class ItemIconElement extends IconElement {
     }
 
     @Override
-    public void render(DrawContext context, int x, int y) {
-        renderItemStack(context, x, y, stack);
+    public void render(DrawContext context, RenderPiece piece) {
+        renderItemStack(context, piece.x, piece.y, stack);
     }
 }

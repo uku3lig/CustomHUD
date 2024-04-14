@@ -1,6 +1,8 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -19,9 +21,6 @@ public class ItemSupplierIconElement extends IconElement {
     private final Supplier<ItemStack> supplier;
     private final boolean showCount, showDur, showCooldown;
     private final int numSize;
-
-    private List<ItemStack> stacks = null;
-    private int stackIndex = 0;
 
     public ItemSupplierIconElement(Supplier<ItemStack> supplier, Flags flags) {
         super(flags, 11);
@@ -48,14 +47,14 @@ public class ItemSupplierIconElement extends IconElement {
     }
 
     //TODO FIX: Conditional in list?
-    public void render(DrawContext context, int x, int y) {
-        ItemStack stack = stacks == null ? supplier.get() : stacks.get(stackIndex++);
+    public void render(DrawContext context, RenderPiece piece) {
+        ItemStack stack = supplier == ListManager.SUPPLIER ? (ItemStack) piece.value : supplier.get();
         if (stack == null || stack.isEmpty())
             return;
         MatrixStack matrices = context.getMatrices();
 
         matrices.push();
-        matrices.translate(x + shiftX, y + shiftY - 2, 0);
+        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2, 0);
         if (!referenceCorner)
             matrices.translate(0, -(11*scale-11)/2, 0);
         matrices.scale(11/16F * scale, 11/16F * scale, 1);
@@ -87,10 +86,4 @@ public class ItemSupplierIconElement extends IconElement {
         matrices.pop();
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void setList(List<?> values) {
-        stacks = (List<ItemStack>) values;
-        stackIndex = 0;
-    }
 }
