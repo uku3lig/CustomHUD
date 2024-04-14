@@ -20,6 +20,7 @@ import net.minecraft.world.GameMode;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeHelpers.*;
@@ -32,7 +33,10 @@ public class ListSuppliers {
                     .thenComparing((entry) -> Nullables.mapOrElse(entry.getScoreboardTeam(), Team::getName, ""))
                     .thenComparing((entry) -> entry.getProfile().getName(), String::compareToIgnoreCase);
 
+    public static final List<String> IGNORE_MODS = List.of("minecraft", "fabricloader", "java");
     public static final Comparator<Mod> MOD_ORDERING = Comparator.comparing(mod -> mod.getTranslatedName().toLowerCase(Locale.ROOT));
+    public static final Predicate<Mod> MOD_PREDICATE = (mod) -> !(mod.isHidden() || mod.getBadges().contains(Mod.Badge.LIBRARY) || mod.getBadges().contains(Mod.Badge.MINECRAFT) );
+    public static final Predicate<Mod> MOD_AND_LIB_PREDICATE = (mod) -> !(mod.isHidden() || IGNORE_MODS.contains(mod.getId()) );
 
     public static final ListProvider
         STATUS_EFFECTS = () -> CLIENT.player.getStatusEffects().stream().sorted(Comparator.comparingInt(e -> e.getEffectType().getCategory().ordinal())).toList(),
@@ -61,7 +65,9 @@ public class ListSuppliers {
         BOSSBARS = () -> bossbars(false),
         ALL_BOSSBARS = () -> bossbars(true),
 
-        MODS = () -> ModMenu.ROOT_MODS.values().stream().sorted(MOD_ORDERING).toList();
+        MODS = () -> ModMenu.ROOT_MODS.values().stream().filter(MOD_PREDICATE).sorted(MOD_ORDERING).toList(),
+        MODS_AND_LIBS = () -> ModMenu.ROOT_MODS.values().stream().filter(MOD_AND_LIB_PREDICATE).sorted(MOD_ORDERING).toList(),
+        ALL_MODS = () -> ModMenu.MODS.values().stream().sorted(MOD_ORDERING).toList()
     ;
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
@@ -104,6 +110,11 @@ public class ListSuppliers {
     public static final Function<Mod,List<?>> MOD_CREDITS = Mod::getCredits;
     public static final Function<Mod,List<?>> MOD_BADGES = (mod) -> Arrays.asList(mod.getBadges().toArray());
     public static final Function<Mod,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(mod.getLicense().toArray());
+    public static final Function<Mod,List<?>> MOD_PARENTS = (mod) -> {
+        Mod parent = ModMenu.MODS.get(mod.getParent());
+        return parent == null ? Collections.emptyList() : Collections.singletonList(parent);
+    };
+    public static final Function<Mod,List<?>> MOD_CHILDREN = ModMenu.PARENT_MAP::get;
 
 
 

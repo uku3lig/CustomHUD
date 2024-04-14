@@ -251,6 +251,7 @@ public class Attributers {
         default -> null;
     };
 
+    public static Attributer MOD2;
     public static final Attributer MOD = (sup, name, flags) -> switch (name) {
         case "m_name" -> new Str(sup, MOD_NAME);
         case "m_id" -> new Str(sup, MOD_ID);
@@ -272,9 +273,15 @@ public class Attributers {
         case "m_credits" -> new CreateListElement(sup, MOD_CREDITS, MOD_CREDIT);
         case "m_licenses" -> new CreateListElement(sup, MOD_LICENSES, MOD_LICENSE);
 
+        case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
+        case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
+
         case "m_icon" -> new ModIconElement(flags);
         default -> null;
     };
+    static {
+        MOD2 = MOD;
+    }
 
 
 
@@ -301,6 +308,8 @@ public class Attributers {
         ATTRIBUTER_MAP.put(BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(ALL_BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(MODS, MOD);
+        ATTRIBUTER_MAP.put(MODS_AND_LIBS, MOD);
+        ATTRIBUTER_MAP.put(ALL_MODS, MOD);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);

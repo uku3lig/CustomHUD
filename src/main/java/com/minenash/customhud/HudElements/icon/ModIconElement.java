@@ -48,13 +48,13 @@ public class ModIconElement extends IconElement {
 
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        matrices.translate(piece.x + shiftX, piece.y + shiftY, 0);
+        matrices.translate(piece.x + shiftX, piece.y + shiftY - 2, 0);
         if (!referenceCorner)
-            matrices.translate(0, -(5*scale-5)/2, 0);
-        matrices.scale(scale, scale, 0);
+            matrices.translate(0, -(11*scale-11)/2F, 0);
+//        matrices.scale(scale, scale, 0);
         rotate(matrices, width, width);
 
-        context.drawTexture(id, 0, -1, 0, 0, width, width, width, width);
+        context.drawTexture(id, 0, 0, 0, 0, width, width, width, width);
         matrices.pop();
     }
 

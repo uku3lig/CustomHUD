@@ -1064,6 +1064,8 @@ public class VariableParser {
             case "bossbars" -> BOSSBARS;
             case "all_bossbars" -> ALL_BOSSBARS;
             case "mods" -> MODS;
+            case "mods_and_libs" -> MODS_AND_LIBS;
+            case "all_mods" -> ALL_MODS;
 
             default -> null;
         };
