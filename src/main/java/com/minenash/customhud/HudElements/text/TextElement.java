@@ -1,4 +1,4 @@
-package com.minenash.customhud.HudElements.icon;
+package com.minenash.customhud.HudElements.text;
 
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.render.RenderPiece;
@@ -11,8 +11,11 @@ public abstract class TextElement extends FunctionalElement {
 
     public abstract int getTextWidth();
     public abstract Text getText();
-
-    public void render(DrawContext context, RenderPiece piece) {
-        context.drawText(CLIENT.textRenderer, getText(), piece.x, piece.y, piece.color, piece.shadow);
+    public int getColor(int current) {
+        return  current;
     }
+
+//    public void render(DrawContext context, RenderPiece piece) {
+//        context.drawText(CLIENT.textRenderer, getText(), piece.x, piece.y, piece.color, piece.shadow);
+//    }
 }

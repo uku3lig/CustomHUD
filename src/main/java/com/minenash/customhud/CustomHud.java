@@ -221,6 +221,12 @@ public class CustomHud implements ModInitializer {
 						: Text.literal("§aNo errors found")
 		));
 	}
+	public static void showAllUpdatedToast() {
+		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
+				Text.literal("§fAll Profiles Updated"),
+				Text.literal("§aNo errors found")
+		));
+	}
 
 
 }

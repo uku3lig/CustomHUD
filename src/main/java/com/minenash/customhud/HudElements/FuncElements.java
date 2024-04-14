@@ -1,11 +1,15 @@
 package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
+import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.data.Flags;
 import net.minecraft.stat.StatFormatter;
+import net.minecraft.text.Text;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.minenash.customhud.CustomHud.CLIENT;
 
 public abstract class FuncElements<T> implements HudElement {
 
@@ -33,6 +37,19 @@ public abstract class FuncElements<T> implements HudElement {
             try { return function.apply(supplier.get()).length(); }
             catch (Exception ignored) { return 0; }
         }
+    }
+
+    public static class Tex<T> extends TextElement {
+        private final Function<T, Text> function;
+        private final Supplier<T> supplier;
+        public Tex(Supplier<T> supplier, Function<T,Text> func) { this.supplier = supplier; function = func;}
+
+        @Override public String getString() { return getText().getString(); }
+        @Override public boolean getBoolean() { return getNumber().doubleValue() > 0; }
+        @Override public Number getNumber() { return getText().getString().length(); }
+
+        @Override public int getTextWidth() { return CLIENT.textRenderer.getWidth(getText()); }
+        @Override public Text getText() { return FuncElements.sanitize(supplier, function, Text.literal("-")); }
     }
 
     public static class Num<T> extends FuncElements<T> {
@@ -96,8 +113,28 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public boolean getBoolean() { return sanitize(supplier, entry.bool, false); }
     }
 
+    public static class SpecialText<T> extends TextElement {
+        public record TextEntry<T>(Function<T,Text> text, Function<T,Number> num, Function<T,Boolean> bool) {}
 
-    protected <E> E sanitize(Supplier<T> supplier, Function<T,E> function, E onFail) {
+        private final Supplier<T> supplier;
+        private final TextEntry<T> entry;
+        public SpecialText(Supplier<T> supplier, TextEntry<T> entry) { this.supplier = supplier; this.entry = entry; }
+        public SpecialText(Supplier<T> supplier, Function<T,Text> text, Function<T,Number> num, Function<T,Boolean> bool) {
+            this.supplier = supplier;
+            this.entry = new TextEntry<>(text,num,bool);
+        }
+
+        @Override public String getString() { return getText().getString(); }
+        @Override public Number getNumber() { return FuncElements.sanitize(supplier, entry.num, Double.NaN); }
+        @Override public boolean getBoolean() { return FuncElements.sanitize(supplier, entry.bool, false); }
+
+        @Override public int getTextWidth() { return CLIENT.textRenderer.getWidth(getText()); }
+        @Override public Text getText() { return FuncElements.sanitize(supplier, entry.text, Text.literal("-")); }
+
+    }
+
+
+    public static <T,E> E sanitize(Supplier<T> supplier, Function<T,E> function, E onFail) {
         try {
             T input = supplier.get();
             if (input == null) return onFail;

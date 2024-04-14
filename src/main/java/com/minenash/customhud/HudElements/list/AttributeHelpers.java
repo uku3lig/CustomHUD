@@ -111,8 +111,8 @@ public class AttributeHelpers {
         return attributes;
     }
 
-    public static List<String> getLore(ItemStack stack) {
-        List<String> lines = new ArrayList<>();
+    public static List<Text> getLore(ItemStack stack) {
+        List<Text> lines = new ArrayList<>();
         if (stack.hasNbt()) {
             if (stack.getNbt().contains(DISPLAY_KEY, NbtElement.COMPOUND_TYPE)) {
                 NbtCompound nbtCompound = stack.getNbt().getCompound(DISPLAY_KEY);
@@ -122,7 +122,7 @@ public class AttributeHelpers {
                         try {
                             MutableText mutableText2 = Text.Serialization.fromJson(nbtList.getString(j));
                             if (mutableText2 == null) continue;
-                            lines.add(mutableText2.getString());
+                            lines.add(mutableText2);
                         }
                         catch (Exception ignored) {}
                     }

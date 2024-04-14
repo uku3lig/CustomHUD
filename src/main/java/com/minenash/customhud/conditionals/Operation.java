@@ -32,7 +32,7 @@ public interface Operation {
                 return ie.getTextWidth();
             if (element instanceof FunctionalElement) {
                 if (element instanceof FunctionalElement.PushList pl)
-                    ListManager.push(pl.values, null);
+                    ListManager.push(pl.values);
                 else if (element instanceof FunctionalElement.AdvanceList)
                     ListManager.advance();
                 else if (element instanceof FunctionalElement.PopList)

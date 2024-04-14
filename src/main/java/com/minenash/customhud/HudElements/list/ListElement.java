@@ -4,6 +4,7 @@ import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
+import com.minenash.customhud.render.CustomHudRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,13 +18,13 @@ public class ListElement implements HudElement, MultiElement {
 
     private final ListProvider provider;
     private final List<HudElement> elements;
-    private final boolean removeLastNewLine;
+//    private final boolean removeLastNewLine;
 
     public ListElement(ListProvider provider, List<HudElement> format) {
         this.provider = provider;
         this.elements = format;
-        this.removeLastNewLine = elements.size() > 1 && elements.get(elements.size()-1) instanceof FunctionalElement.NewLine;
-        this.elements.add(ADVANCE_LIST_ELEMENT);
+//        this.removeLastNewLine = elements.size() > 1 && elements.get(elements.size()-1) instanceof FunctionalElement.NewLine;
+//        this.elements.add(ADVANCE_LIST_ELEMENT);
     }
 
     public List<HudElement> expand() {
@@ -36,15 +37,20 @@ public class ListElement implements HudElement, MultiElement {
         List<HudElement> expanded = new ArrayList<>();
         expanded.add(new FunctionalElement.PushList(values));
 
+        List<HudElement> expandedElements = new ArrayList<>();
         for (HudElement element : elements)
+            CustomHudRenderer.addElement(expandedElements, element);
+        expandedElements.add(ADVANCE_LIST_ELEMENT);
+
+        for (HudElement element : expandedElements)
             if (element instanceof IconElement ie)
                 ie.setList(values);
 
         for (int i = 0; i < values.size(); i++)
-            expanded.addAll(elements);
+            expanded.addAll(expandedElements);
         expanded.set(expanded.size()-1, POP_LIST_ELEMENT);
-        if (removeLastNewLine)
-            expanded.remove(expanded.size()-2);
+//        if (removeLastNewLine)
+//            expanded.remove(expanded.size()-2);
         return expanded;
     }
 

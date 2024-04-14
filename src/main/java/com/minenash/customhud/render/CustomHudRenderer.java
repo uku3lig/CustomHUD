@@ -4,7 +4,7 @@ import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
-import com.minenash.customhud.HudElements.icon.TextElement;
+import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
@@ -16,6 +16,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.render.*;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
 
@@ -96,7 +97,7 @@ public class CustomHudRenderer {
                     String str = builder.toString();
                     if (!str.isEmpty()) {
                         str = formatting.getFormatting() + str;
-                        pieces.add(new RenderPiece(str, theme.font, xOffset, y, formatting.getColor(), theme.textShadow));
+                        pieces.add(new RenderPiece(str, null, theme.font, xOffset, y, formatting.getColor(), theme.textShadow));
                         xOffset += client.textRenderer.getWidth(str);
                         builder.setLength(0);
                     }
@@ -134,15 +135,15 @@ public class CustomHudRenderer {
                         theme = cte.theme;
                         font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
-                        pieces.add( new RenderPiece(ie, null, xOffset, y, 0, false) );
+                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, 0, false) );
                         xOffset += ie.getTextWidth();
                     } else if (e instanceof TextElement te) {
-                        pieces.add( new RenderPiece(te, font, xOffset, y, theme.fgColor.getColor(), theme.textShadow) );
+                        pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.textShadow) );
                         xOffset += te.getTextWidth();
                     }
                     else if (e instanceof FunctionalElement.AdvanceList)    ListManager.advance();
-                    else if (e instanceof FunctionalElement.PushList push)  ListManager.push(push.values, formatting.copy());
-                    else if (e instanceof FunctionalElement.PopList)        formatting = ListManager.pop();
+                    else if (e instanceof FunctionalElement.PushList push)  ListManager.push(push.values);
+                    else if (e instanceof FunctionalElement.PopList)        ListManager.pop();
 
                 } else {
                     builder.append(e.getString());
@@ -178,9 +179,9 @@ public class CustomHudRenderer {
                 font = piece.font;
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
             }
-            else if (piece.element instanceof TextElement element) {
+            else if (piece.element instanceof Text text) {
                 font = piece.font;
-                element.render(context, piece);
+                context.drawText(client.textRenderer, text, piece.x, piece.y, piece.color, piece.shadow);
             }
 
         }
@@ -192,7 +193,7 @@ public class CustomHudRenderer {
     }
 
 
-    private static int addElement(List<HudElement> allElements, HudElement element) {
+    public static int addElement(List<HudElement> allElements, HudElement element) {
         if (element instanceof MultiElement me) {
             int nl = 0;
             List<HudElement> elements = me.expand();
@@ -206,7 +207,7 @@ public class CustomHudRenderer {
         }
         else {
             if (element instanceof FunctionalElement.AdvanceList) ListManager.advance();
-            else if (element instanceof FunctionalElement.PushList push) ListManager.push(push.values, null);
+            else if (element instanceof FunctionalElement.PushList push) ListManager.push(push.values);
             else if (element instanceof FunctionalElement.PopList) ListManager.pop();
             allElements.add(element);
             return element instanceof FunctionalElement.NewLine ? 1 : 0;

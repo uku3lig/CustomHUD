@@ -1,8 +1,10 @@
 package com.minenash.customhud.HudElements.list;
 
+import com.minenash.customhud.HudElements.FuncElements;
 import com.minenash.customhud.HudElements.FuncElements.Num;
 import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
+import com.minenash.customhud.HudElements.FuncElements.SpecialText.TextEntry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
 import com.minenash.customhud.SubtitleEntryDuck;
 import net.minecraft.block.Block;
@@ -22,6 +24,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.scoreboard.*;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -48,7 +51,7 @@ public class AttributeFunctions {
     };
 
 
-    public static final Function<String,String> DIRECT = (str) -> str;
+    public static final Function<?,?> DIRECT = (str) -> str;
 
 
 
@@ -149,8 +152,8 @@ public class AttributeFunctions {
     public static final Function<ItemStack, String> ITEM_NAME = (stack) -> stack.getItem().getName().getString();
     public static final Function<ItemStack, Number> ITEM_RAW_ID = (stack) -> Item.getRawId(stack.getItem());
     public static final Function<ItemStack, Boolean> ITEM_IS_NOT_EMPTY = (stack) -> !stack.isEmpty();
-    public static final Entry<ItemStack> ITEM_CUSTOM_NAME = new Entry<>(
-            (stack) -> stack.getName().getString(),
+    public static final TextEntry<ItemStack> ITEM_CUSTOM_NAME = new TextEntry<>(
+            (stack) -> stack.getName(),
             (stack) -> stack.getName().getString().length(),
             (stack) -> !stack.getName().getString().equals(stack.getItem().getName().getString()));
 
@@ -223,7 +226,7 @@ public class AttributeFunctions {
 
 
     // TEAM
-    public static final Function<Team,String> TEAM_NAME = (team) -> team.getDisplayName().getString();
+    public static final Function<Team,Text> TEAM_NAME = (team) -> team.getDisplayName();
     public static final Function<Team,String> TEAM_ID = Team::getName;
     public static final Function<Team,Boolean> TEAM_FRIENDLY_FIRE = Team::isFriendlyFireAllowed;
     public static final Function<Team,Boolean> TEAM_FRIENDLY_INVIS = Team::shouldShowFriendlyInvisibles;
@@ -247,7 +250,7 @@ public class AttributeFunctions {
 
 
     // SCOREBOARD OBJECTIVES
-    public static final Function<ScoreboardObjective,String> OBJECTIVE_NAME = (obj) -> obj.getDisplayName().getString();
+    public static final Function<ScoreboardObjective,Text> OBJECTIVE_NAME = (obj) -> obj.getDisplayName();
     public static final Function<ScoreboardObjective,String> OBJECTIVE_ID = (obj) -> obj.getName();
     public static final Function<ScoreboardObjective,String> OBJECTIVE_CRITIERIA = (obj) -> CLIENT.getServer() == null ? "unknown" : obj.getCriterion().getName();
     public static final Function<ScoreboardObjective,String> OBJECTIVE_DISPLAY_SLOT = (obj) -> {
@@ -261,12 +264,12 @@ public class AttributeFunctions {
 
     // SCOREBOARD OBJECTIVE SCORE
     public static final Function<ScoreboardEntry,String> OBJECTIVE_SCORE_HOLDER_OWNER = (score) -> score.owner();
-    public static final Function<ScoreboardEntry,String> OBJECTIVE_SCORE_HOLDER_DISPLAY = (score) -> score.display().getString();
+    public static final Function<ScoreboardEntry,Text> OBJECTIVE_SCORE_HOLDER_DISPLAY = (score) -> score.display();
     public static final Function<ScoreboardEntry,Number> OBJECTIVE_SCORE_VALUE = (score) -> score.value();
 
 
     // SCOREBOARD SCORE
-    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_NAME = (entry) -> entry.getKey().getDisplayName().getString();
+    public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,Text> SCORES_OBJECTIVE_NAME = (entry) -> entry.getKey().getDisplayName();
     public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE_ID = (entry) -> entry.getKey().getName();
     public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,String> SCORES_OBJECTIVE = (entry) -> CLIENT.getServer() == null ? "unknown" : entry.getKey().getCriterion().getName();
     public static final Function<Map.Entry<ScoreboardObjective, ScoreboardScore>,Number> SCORES_VALUE = (entry) -> entry.getValue().getScore();
@@ -280,8 +283,8 @@ public class AttributeFunctions {
     };
 
 
-    // BOSSBARS TODO: ADD COLOR
-    public static final Function<BossBar,String> BOSSBAR_NAME = (bar) -> bar.getName().getString();
+    // BOSSBARS
+    public static final Function<BossBar,Text> BOSSBAR_NAME = (bar) -> bar.getName();
     public static final Function<BossBar,String> BOSSBAR_UUID = (bar) -> bar.getUuid().toString();
     public static final Function<BossBar,Number> BOSSBAR_PERCENT = (bar) -> bar.getPercent();
     public static final Function<BossBar,Boolean> BOSSBAR_DARKEN_SKY = (bar) -> bar.shouldDarkenSky();

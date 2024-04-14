@@ -1,7 +1,5 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.FormattedElement;
-import com.minenash.customhud.HudElements.FuncElements;
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
@@ -103,9 +101,9 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ITEM_LORE_LINE = (sup, name, f) -> name.equals("line") ? new Str(sup, DIRECT) : null;
+    public static final Attributer ITEM_LORE_LINE = (sup, name, f) -> name.equals("line") ? new Tex(sup, DIRECT) : null;
     public static final Attributer ITEM_INFO_INFO = (sup, name, f) -> name.equals("info") ? new Str(sup, DIRECT) : null;
-    public static final Attributer LOOP_ITEM = (sup, name, flags) -> name.equals("value") ? new Num(sup, n -> n, flags) : null;
+    public static final Attributer LOOP_ITEM = (sup, name, flags) -> name.equals("value") ? new Num(sup, DIRECT, flags) : null;
 
     public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
         case "m_slot" -> new Str(sup,ITEM_ATTR_SLOT);
@@ -131,7 +129,7 @@ public class Attributers {
     public static final Attributer ITEM = (sup, name, flags) -> switch (name) {
         case "", "i_item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
         case "i_id" -> new Special(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
-        case "i_name" -> new Special(sup, ITEM_CUSTOM_NAME);
+        case "i_name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
         case "i_count" -> new NumBool(sup, ITEM_COUNT, ITEM_IS_NOT_EMPTY, flags);
         case "i_max_count" -> new NumBool(sup, ITEM_MAX_COUNT, ITEM_IS_STACKABLE, flags);
         case "i_dur","i_durability" -> new NumBool(sup, ITEM_DURABILITY, ITEM_HAS_DURABILITY, flags);
@@ -177,7 +175,7 @@ public class Attributers {
     public static final Attributer TEAM_MEMBER = (sup, name, f) -> name.equals("member") ? new Str(sup, DIRECT) : null;
 
     public static final Attributer TEAM = (sup, name, flags) -> switch (name) {
-        case "t_name" -> new Str(sup, TEAM_NAME);
+        case "", "t_name" -> new Tex(sup, TEAM_NAME);
         case "t_id" -> new Str(sup, TEAM_ID);
         case "t_friendly_fire" -> new Bool(sup, TEAM_FRIENDLY_FIRE);
         case "t_see_friendly_invisibility", "t_friendly_invis" -> new Bool(sup, TEAM_FRIENDLY_INVIS);
@@ -192,14 +190,14 @@ public class Attributers {
 
     public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sup, name, flags) -> switch (name) {
         case "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
-        case "s_display_name", "s_display" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
+        case "s_display_name", "s_display" -> new Tex(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
         case "s_score", "s_value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
         default -> null;
     };
 
 
     public static final Attributer SCOREBOARD_OBJECTIVE = (sup, name, flags) -> switch (name) {
-        case "o_name" -> new Str(sup, OBJECTIVE_NAME);
+        case "", "o_name" -> new Tex(sup, OBJECTIVE_NAME);
         case "o_id" -> new Str(sup, OBJECTIVE_ID);
         case "o_criteria","o_criterion" -> new Str(sup, OBJECTIVE_CRITIERIA);
         case "o_display_slot" -> new Str(sup, OBJECTIVE_DISPLAY_SLOT);
@@ -209,16 +207,16 @@ public class Attributers {
     };
 
     public static final Attributer SCOREBOARD_SCORE = (sup, name, flags) -> switch (name) {
-        case "ss_name" -> new Str(sup, SCORES_OBJECTIVE_NAME);
+        case "ss_name" -> new Tex(sup, SCORES_OBJECTIVE_NAME);
         case "ss_id" -> new Str(sup, SCORES_OBJECTIVE_ID);
         case "ss_criteria","ss_criterion" -> new Str(sup, SCORES_OBJECTIVE_CRITIERIA);
         case "ss_display_slot" -> new Str(sup, SCORES_OBJECTIVE_DISPLAY_SLOT);
-        case "ss_score","value" -> new Num(sup, SCORES_VALUE, flags);
+        case "ss_score","ss_value" -> new Num(sup, SCORES_VALUE, flags);
         default -> null;
     };
 
     public static final Attributer BOSSBAR = (sup, name, flags) -> switch (name) {
-        case "b_name" -> new Str(sup, BOSSBAR_NAME);
+        case "b_name" -> new Tex(sup, BOSSBAR_NAME);
         case "b_uuid" -> new Str(sup, BOSSBAR_UUID);
         case "b_id" -> new Str(sup, BOSSBAR_ID); //SP Only
         case "b_percent","b_per","b_value","" -> new Num(sup, BOSSBAR_PERCENT, flags);

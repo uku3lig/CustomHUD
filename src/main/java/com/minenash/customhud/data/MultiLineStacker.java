@@ -2,10 +2,13 @@ package com.minenash.customhud.data;
 
 import com.minenash.customhud.HudElements.ConditionalElement;
 import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.HudElements.list.Attributers;
 import com.minenash.customhud.HudElements.list.ListElement;
 import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.VariableParser;
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.errors.ErrorType;
@@ -81,7 +84,27 @@ public class MultiLineStacker {
     }
 
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
-        ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, listProviders.isEmpty() ? null : listProviders.peek());
+        ListProvider superProvider = listProviders.isEmpty() ? null : listProviders.peek();
+        ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, superProvider);
+
+        if (provider == null) {
+            HudElement e = VariableParser.getAttributeElement(list, profile, line, enabled, source);
+            if (e instanceof FunctionalElement.CreateListElement cle)
+                provider = cle.provider;
+        }
+
+        if (provider == null && superProvider != null) {
+            Attributers.Attributer attributer = Attributers.ATTRIBUTER_MAP.get(superProvider);
+            if (attributer != null) {
+                HudElement e = attributer.get(ListManager.SUPPLIER, list, new Flags());
+                if (e instanceof FunctionalElement.CreateListElement cle)
+                    provider = cle.provider;
+            }
+        }
+
+        if (provider == null)
+            Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
+
         listProviders.push(provider);
         stack.push( new ListElement.MultiLineBuilder(provider) );
     }

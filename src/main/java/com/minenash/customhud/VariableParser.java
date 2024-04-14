@@ -9,6 +9,9 @@ import com.minenash.customhud.HudElements.list.Attributers.Attributer;
 import com.minenash.customhud.HudElements.stats.CustomStatElement;
 import com.minenash.customhud.HudElements.stats.TypedStatElement;
 import com.minenash.customhud.HudElements.supplier.*;
+import com.minenash.customhud.HudElements.text.ActionbarMsgElement;
+import com.minenash.customhud.HudElements.text.TextSupplierElement;
+import com.minenash.customhud.HudElements.text.TitleMsgElement;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.ExpressionParser;
@@ -57,7 +60,7 @@ import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.*;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
-import static com.minenash.customhud.HudElements.supplier.TextSupplierElement.*;
+import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
 
 public class VariableParser {
 
@@ -236,6 +239,12 @@ public class VariableParser {
 
         String original = part;
         part = part.substring(1, part.length()-1);
+
+        if (part.isBlank()) {
+            Errors.addError(profile.name, debugLine, original, ErrorType.EMPTY_VARIABLE, "");
+            return null;
+        }
+
         if (part.startsWith("{") && part.length() > 1) {
             part = part.substring(1, part.length() - 1);
 
@@ -299,6 +308,29 @@ public class VariableParser {
             if (he != null) return he;
         }
 
+        // ATTRS WERE HERE
+        HudElement ae = getAttributeElement(part, profile, debugLine, enabled, original);
+        if (ae != null) {
+            if (ae instanceof FunctionalElement.CreateListElement cle)
+                return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original);
+            return ae;
+        }
+
+        if (part.startsWith("bar"))
+            return barElement(part, profile, debugLine, enabled, original, listProvider);
+
+        if (part.startsWith("space:")) {
+            String widthStr = part.substring(6).trim();
+            Operation op;
+
+            Matcher matcher = SPACE_STR_PATTERN.matcher(widthStr);
+            if (matcher.matches())
+                op = new Operation.Length(addElements(matcher.group(1), profile, debugLine, enabled, false, listProvider));
+            else
+                op = ExpressionParser.parseExpression(widthStr.trim(), part, profile, debugLine, enabled, listProvider);
+            return new SpaceElement( op );
+        }
+
         if (part.startsWith("real_time:")) {
             try {
                 return new RealTimeElement(new SimpleDateFormat(part.substring(10)));
@@ -317,49 +349,6 @@ public class VariableParser {
             catch (IllegalArgumentException e) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.INVALID_TIME_FORMAT, e.getMessage());
             }
-        }
-
-        if (part.startsWith("item:"))
-            return attrElement(part, SLOT_READER, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
-                    ITEM, ErrorType.UNKNOWN_ITEM_ID, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("attribute:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("target_entity_attribute:") || part.startsWith("target_entity_attr:") || part.startsWith("tea:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(ComplexData.targetEntity, attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("hooked_entity_attribute:") || part.startsWith("hooked_entity_attr:") || part.startsWith("hea:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("team:"))
-            return attrElement(part, src -> src, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
-                    TEAM, null, ErrorType.UNKNOWN_TEAM_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("objective:"))
-            return attrElement(part, src -> src, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
-                    SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("bossbar:"))
-            return attrElement(part, src -> src, (name) -> () -> AttributeHelpers.getBossBar(name),
-                    BOSSBAR, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
-
-        if (part.startsWith("bar"))
-            return barElement(part, profile, debugLine, enabled, original, listProvider);
-
-        if (part.startsWith("space:")) {
-            String widthStr = part.substring(6).trim();
-            Operation op;
-
-            Matcher matcher = SPACE_STR_PATTERN.matcher(widthStr);
-            if (matcher.matches())
-                op = new Operation.Length(addElements(matcher.group(1), profile, debugLine, enabled, false, listProvider));
-            else
-                op = ExpressionParser.parseExpression(widthStr.trim(), part, profile, debugLine, enabled, listProvider);
-            return new SpaceElement( op );
         }
 
 
@@ -570,9 +559,9 @@ public class VariableParser {
                 return Flags.wrap(new ItemSupplierIconElement(() -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = true;
                 return Flags.wrap(new ItemSupplierIconElement(() -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags), flags);
-            case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsg(flags), flags);
-            case "title_msg", "title": return Flags.wrap(new TitleMsg(TITLE_MSG, flags), flags);
-            case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsg(SUBTITLE_MSG, flags), flags);
+            case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
+            case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
+            case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
         }
 
         HudElement element = getSupplierElement(part, enabled, flags);
@@ -648,9 +637,11 @@ public class VariableParser {
     private static Supplier<Text> getTextSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
             case "display_name", "name" -> DISPLAY_NAME;
-//            case "actionbar_msg", "actionbar" -> ACTIONBAR_MSG;
-//            case "title_msg", "title" -> TITLE_MSG;
-//            case "subtitle_msg", "subtitle" -> SUBTITLE_MSG;
+            case "target_entity_name", "ten" -> {enabled.targetEntity = true; yield TARGET_ENTITY_NAME;}
+            case "last_hit_name", "lhn" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_NAME;}
+            case "hooked_entity_name", "hen" -> HOOKED_ENTITY_NAME;
+            case "vehicle_entity_name", "vehicle_name", "ven" -> VEHICLE_ENTITY_NAME;
+            case "team_name" -> PLAYER_TEAM_NAME;
             default -> null;
         };
     }
@@ -675,19 +666,15 @@ public class VariableParser {
             case "moon_phase_word" -> { enabled.clientChunk = true; yield MOON_PHASE_WORD; }
             case "target_entity", "te" -> {enabled.targetEntity = true; yield TARGET_ENTITY;}
             case "target_entity_id", "tei" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ID;}
-            case "target_entity_name", "ten" -> {enabled.targetEntity = true; yield TARGET_ENTITY_NAME;}
             case "target_entity_uuid", "teu" -> {enabled.targetEntity = true; yield TARGET_ENTITY_UUID;}
             case "last_hit", "lh" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY;}
             case "last_hit_id", "lhi" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_ID;}
-            case "last_hit_name", "lhn" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_NAME;}
             case "last_hit_uuid", "lhu" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_UUID;}
             case "hooked_entity", "he" -> HOOKED_ENTITY;
             case "hooked_entity_id", "hei" -> HOOKED_ENTITY_ID;
-            case "hooked_entity_name", "hen" -> HOOKED_ENTITY_NAME;
             case "hooked_entity_uuid", "heu" -> HOOKED_ENTITY_UUID;
             case "vehicle_entity", "vehicle", "ve" -> VEHICLE_ENTITY;
             case "vehicle_entity_id", "vehicle_id", "vei" -> VEHICLE_ENTITY_ID;
-            case "vehicle_entity_name", "vehicle_name", "ven" -> VEHICLE_ENTITY_NAME;
             case "vehicle_entity_uuid", "vehicle_uuid", "veu" -> VEHICLE_ENTITY_UUID;
             case "vehicle_horse_armor", "horse_armor", "vha" -> VEHICLE_HORSE_ARMOR;
             case "world_name", "world" -> WORLD_NAME;
@@ -1195,6 +1182,37 @@ public class VariableParser {
 
     }
 
+    public static HudElement getAttributeElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
+        if (part.startsWith("item:"))
+            return attrElement(part, SLOT_READER, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
+                    ITEM, ErrorType.UNKNOWN_ITEM_ID, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("attribute:"))
+            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("target_entity_attribute:") || part.startsWith("target_entity_attr:") || part.startsWith("tea:"))
+            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(ComplexData.targetEntity, attr),
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("hooked_entity_attribute:") || part.startsWith("hooked_entity_attr:") || part.startsWith("hea:"))
+            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("team:"))
+            return attrElement(part, src -> src, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
+                    TEAM, null, ErrorType.UNKNOWN_TEAM_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("objective:"))
+            return attrElement(part, src -> src, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
+                    SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("bossbar:"))
+            return attrElement(part, src -> src, (name) -> () -> AttributeHelpers.getBossBar(name),
+                    BOSSBAR, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
+        return null;
+    }
+
     private static <T> HudElement attrElement(String part, Function<String,T> reader, Function<T,Supplier<?>> supplier,
                                               Attributer attributer, ErrorType unknownX, ErrorType unknownAttribute,
                                               Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
@@ -1216,12 +1234,18 @@ public class VariableParser {
         Flags flags = hasQuote ? new Flags() : Flags.parse(profile.name, debugLine, part.split(" "));
         HudElement element = attributer.get(supplier.apply(value), method, flags);
 
-        if (element instanceof FunctionalElement.CreateListElement cle)
-            return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original);
-        if (element != null)
+        if (element == null)
+            Errors.addError(profile.name, debugLine, original, unknownAttribute, method);
+        if ( !(element instanceof CreateListElement) )
             return Flags.wrap(element, flags);
-        Errors.addError(profile.name, debugLine, original, unknownAttribute, method);
-        return null;
+        return element;
+
+//        if (element instanceof FunctionalElement.CreateListElement cle)
+//            return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original);
+//        if (element != null)
+//            return Flags.wrap(element, flags);
+//        Errors.addError(profile.name, debugLine, original, unknownAttribute, method);
+//        return null;
     }
 
 

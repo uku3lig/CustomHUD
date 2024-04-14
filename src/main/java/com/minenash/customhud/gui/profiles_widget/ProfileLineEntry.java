@@ -42,6 +42,9 @@ public class ProfileLineEntry extends LineEntry {
             ProfileManager.setActive(profile);
             b.setTooltip(Tooltip.of(Text.literal(ProfileManager.getActive() == profile ? "Turn off this profile" : "Swap to this profile")));
         });
+
+//        String editText = "Will open in your text editor\n\n Not opening? Shift-click to edit in game";
+
         this.edit = button("Edit", "Will open in your text editor", 40, (b) -> ProfileManager.open(profile));
         this.cycled = button(profile.cycle ? "☑" : "☐", "Include this profile in the profile cycle", 16, (b) -> {
             profile.cycle = !profile.cycle;
@@ -52,8 +55,10 @@ public class ProfileLineEntry extends LineEntry {
             widget.screen.selectedKeybind = profile.keyBinding;
             widget.update();
         });
-        this.error = button("§c!", "§c5 Errors Found", 16, (b) -> CLIENT.setScreen(new ErrorsScreen(widget.screen, profile)));
-        this.toggles = button("Toggles", "3 Toggles in the profile",48, (b) -> CLIENT.setScreen(new TogglesScreen(widget.screen, profile)));
+        int errors = Errors.getErrors(profile.name).size();
+        int toggles = profile.toggles.size();
+        this.error = button("§c!", "§c" + (errors == 1 ? "1 Error Found" : errors + " Errors Found") , 16, (b) -> CLIENT.setScreen(new ErrorsScreen(widget.screen, profile)));
+        this.toggles = button("Toggles", toggles == 1 ? "1 Toggle in the profile" : toggles + " Toggles in the profile",48, (b) -> CLIENT.setScreen(new TogglesScreen(widget.screen, profile)));
         this.delete = button("§cDelete", "§cThis Can't Be §nUndone!!!!", 48, (b) -> widget.deleteProfile(this));
         this.up = button("§a↑", 16, b -> widget.move(this, -1));
         this.down = button("§c↓", 16, b -> widget.move(this, 1));

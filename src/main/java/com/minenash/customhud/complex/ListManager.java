@@ -12,16 +12,18 @@ public class ListManager {
     private static final Stack<List<?>> values = new Stack<>();
     private static final Stack<CHFormatting> color = new Stack<>();
 
-    public static void push(List<?> values, CHFormatting formatting) {
+    //REMOVED: CHFormatting input
+    public static void push(List<?> values) {
         ListManager.index.push(0);
         ListManager.values.push(values);
-        ListManager.color.push(formatting);
+//        ListManager.color.push(formatting);
     }
 
-    public static CHFormatting pop() {
+    //REMOVED: RETURNED COLOR
+    public static void pop() {
         ListManager.index.pop();
         ListManager.values.pop();
-        return color.pop();
+//        return color.pop();
     }
 
     public static void advance() {
