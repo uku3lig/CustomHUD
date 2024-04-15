@@ -18,16 +18,16 @@ public class RecordIconElement extends IconElement {
 
     @Override
     public Number getNumber() {
-        return MusicAndRecordTracker.isRecordPlaying ? Item.getRawId(MusicAndRecordTracker.recordIcon.getItem()) : 0;
+        return MusicAndRecordTracker.isRecordPlaying ? Item.getRawId(MusicAndRecordTracker.getClosestRecord().icon.getItem()) : 0;
     }
 
     @Override
     public boolean getBoolean() {
-        return MusicAndRecordTracker.isRecordPlaying && MusicAndRecordTracker.recordIcon.isEmpty();
+        return MusicAndRecordTracker.isRecordPlaying && MusicAndRecordTracker.getClosestRecord().icon.isEmpty();
     }
 
     public void render(DrawContext context, RenderPiece piece) {
-        renderItemStack(context, piece.x, piece.y, MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.recordIcon : NO_RECORD);
+        renderItemStack(context, piece.x, piece.y, MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().icon : NO_RECORD);
     }
 
 }

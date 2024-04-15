@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.supplier;
 
-import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.HudElement;
@@ -11,7 +10,6 @@ import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.biome.source.util.VanillaBiomeParameters;
@@ -64,8 +62,7 @@ public class StringSupplierElement implements HudElement {
 
     public static final Supplier<String> MUSIC_ID = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicId : null;
     public static final Supplier<String> MUSIC_NAME = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicName : null;
-    public static final Supplier<String> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.recordName : null;
-    public static final Supplier<String> RECORD_ID = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.recordId : null;
+    public static final Supplier<String> RECORD_ID = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().id : null;
 
     public static final Supplier<String> BIOME_BUILDER_PEAKS = () -> isNoise() ? VanillaBiomeParameters.getPeaksValleysDescription(DensityFunctions.getPeaksValleysNoise((float)sample(sampler().ridges()))) : null;
     public static final Supplier<String> BIOME_BUILDER_CONTINENTS = () -> isNoise() ? par.getContinentalnessDescription(sample(sampler().continents())) : null;

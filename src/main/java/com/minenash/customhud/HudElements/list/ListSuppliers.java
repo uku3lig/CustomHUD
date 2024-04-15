@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.list;
 
 import com.google.common.collect.Lists;
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.complex.SubtitleTracker;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -68,6 +69,8 @@ public class ListSuppliers {
 
         BOSSBARS = () -> bossbars(false),
         ALL_BOSSBARS = () -> bossbars(true),
+
+        RECORDS = () -> MusicAndRecordTracker.records,
 
         MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>) MOD_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
         ALL_ROOT_MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>)ALL_ROOT_MODS_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),

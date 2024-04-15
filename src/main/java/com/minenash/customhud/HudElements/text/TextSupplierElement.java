@@ -1,10 +1,8 @@
 package com.minenash.customhud.HudElements.text;
 
+import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
-import com.minenash.customhud.render.RenderPiece;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.function.Supplier;
 
@@ -17,7 +15,7 @@ public class TextSupplierElement extends TextElement {
     public static final Supplier<Text> TITLE_MSG = () -> CLIENT.inGameHud.title;
     public static final Supplier<Text> SUBTITLE_MSG = () -> CLIENT.inGameHud.titleRemainTicks == 0 ? null : CLIENT.inGameHud.subtitle;
     public static final Supplier<Text> PLAYER_TEAM_NAME = () -> CLIENT.player.getScoreboardTeam().getDisplayName();
-
+    public static final Supplier<Text> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().name : null;
 
 
 

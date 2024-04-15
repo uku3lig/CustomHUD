@@ -295,6 +295,17 @@ public class Attributers {
         default -> null;
     };
 
+    public static final Attributer RECORD = (sup, name, flags) -> switch (name) {
+        case "","r_name" -> new Tex(sup, RECORD_NAME);
+        case "r_id" -> new Str(sup, RECORD_ID);
+        case "r_length" -> new Num(sup, RECORD_LENGTH, flags);
+        case "r_elapsed" -> new Num(sup, RECORD_ELAPSED, flags);
+        case "r_remaining" -> new Num(sup, RECORD_REMAINING, flags);
+        case "r_elapsed_percentage", "r_elapsed_per" -> new Num(sup, RECORD_ELAPSED_PER, flags);
+        case "r_icon" -> new ListRecordIconElement(flags);
+        default -> null;
+    };
+
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
     static {
         ATTRIBUTER_MAP.put(STATUS_EFFECTS, EFFECT);
@@ -324,6 +335,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(DISABLED_RESOURCE_PACKS, PACK);
         ATTRIBUTER_MAP.put(DATA_PACKS, PACK);
         ATTRIBUTER_MAP.put(DISABLED_DATA_PACKS, PACK);
+        ATTRIBUTER_MAP.put(RECORDS, RECORD);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);

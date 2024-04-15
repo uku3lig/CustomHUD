@@ -5,6 +5,7 @@ import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
 import com.minenash.customhud.HudElements.FuncElements.SpecialText.TextEntry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
+import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -345,6 +346,7 @@ public class AttributeFunctions {
     public static final Function<Mod.Badge,Number> BADGE_FILL_COLOR = (badge) -> badge.getFillColor();
 
 
+    // PACKS
     public static final Function<ResourcePackProfile,Text> PACK_NAME = (pack) -> pack.getDisplayName();
     public static final Function<ResourcePackProfile,String> PACK_ID = (pack) -> pack.getName();
     public static final Function<ResourcePackProfile,Text> PACK_DESCRIPTION = (pack) -> pack.getDescription();
@@ -355,8 +357,13 @@ public class AttributeFunctions {
     public static final Function<ResourcePackProfile,Boolean> PACK_IS_COMPATIBLE = (pack) -> pack.getCompatibility().isCompatible();
 
 
-
-
+    // RECORDS
+    public static final Function<MusicAndRecordTracker.RecordInstance,Text> RECORD_NAME = (rec) -> rec.name;
+    public static final Function<MusicAndRecordTracker.RecordInstance,String> RECORD_ID = (rec) -> rec.id;
+    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_LENGTH = (rec) -> rec.length / 20F;
+    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED = (rec) -> rec.elapsed / 20F;
+    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_REMAINING = (rec) -> (rec.length - rec.elapsed) / 20F;
+    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED_PER = (rec) -> 100F * rec.elapsed / rec.length;
 
 
 

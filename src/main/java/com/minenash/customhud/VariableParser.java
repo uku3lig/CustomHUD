@@ -646,6 +646,7 @@ public class VariableParser {
             case "hooked_entity_name", "hen" -> HOOKED_ENTITY_NAME;
             case "vehicle_entity_name", "vehicle_name", "ven" -> VEHICLE_ENTITY_NAME;
             case "team_name" -> PLAYER_TEAM_NAME;
+            case "record_name" -> {enabled.music = true; yield RECORD_NAME;}
             default -> null;
         };
     }
@@ -692,7 +693,6 @@ public class VariableParser {
             case "music_id" -> {enabled.music = true; yield MUSIC_ID;}
             case "music_name" -> {enabled.music = true; yield MUSIC_NAME;}
             case "record_id" -> {enabled.music = true; yield RECORD_ID;}
-            case "record_name" -> {enabled.music = true; yield RECORD_NAME;}
 
             case "bb_peaks","biome_builder_peaks" -> {enabled.serverWorld = true; yield BIOME_BUILDER_PEAKS;}
             case "bb_cont","biome_builder_continents" -> {enabled.serverWorld = true; yield BIOME_BUILDER_CONTINENTS;}
@@ -1081,6 +1081,7 @@ public class VariableParser {
             case "disabled_resource_packs" -> DISABLED_RESOURCE_PACKS;
             case "data_packs", "datapacks" -> DATA_PACKS;
             case "disabled_data_packs", "disabled_datapacks" -> DISABLED_DATA_PACKS;
+            case "records" -> {enabled.music = true; yield RECORDS;}
 
             default -> null;
         };
