@@ -6,11 +6,13 @@ import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.mixin.accessors.WorldRendererAccess;
 import com.mojang.blaze3d.platform.GLX;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
@@ -166,7 +168,6 @@ public class IntegerSuppliers {
     public static final Supplier<Number> DISPLAY_WIDTH = () -> client.getWindow().getFramebufferWidth();
     public static final Supplier<Number> DISPLAY_HEIGHT = () -> client.getWindow().getFramebufferHeight();
     public static final Supplier<Number> DISPLAY_REFRESH_RATE = () -> GLX._getRefreshRate(client.getWindow());
-    public static final Supplier<Number> MODS_NUM = () -> FabricLoader.getInstance().getAllMods().size();
     public static final Supplier<Number> PING = () -> Math.round(ComplexData.pingMetrics[0]);
     public static final Supplier<Number> LATENCY = () -> client.player.networkHandler.getPlayerListEntry(client.player.getUuid()).getLatency();
     public static final Supplier<Number> SOLAR_TIME = () -> client.world.getTimeOfDay() % 24000;
@@ -226,6 +227,10 @@ public class IntegerSuppliers {
     public static final Supplier<Number> REAL_MINUTE = () -> LocalTime.now().getMinute();
     public static final Supplier<Number> REAL_SECOND = () -> LocalTime.now().getSecond();
     public static final Supplier<Number> REAL_MICROSECOND = () -> LocalTime.now().get(MICRO_OF_SECOND);
+
+
+    public static final Supplier<Number> RESOURCE_PACK_VERSION = () -> SharedConstants.getGameVersion().getResourceVersion(ResourceType.CLIENT_RESOURCES);
+    public static final Supplier<Number> DATA_PACK_VERSION = () -> SharedConstants.getGameVersion().getResourceVersion(ResourceType.SERVER_DATA);
 
 
 }

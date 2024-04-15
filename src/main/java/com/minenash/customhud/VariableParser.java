@@ -886,6 +886,9 @@ public class VariableParser {
             case "real_second" -> REAL_SECOND;
             case "real_millisecond", "real_ms" -> REAL_MICROSECOND;
 
+            case "resource_pack_version" -> RESOURCE_PACK_VERSION;
+            case "data_pack_version", "datapack_version" -> DATA_PACK_VERSION;
+
             default -> null;
         };
     }
