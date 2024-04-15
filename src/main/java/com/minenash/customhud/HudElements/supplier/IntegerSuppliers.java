@@ -232,5 +232,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> RESOURCE_PACK_VERSION = () -> SharedConstants.getGameVersion().getResourceVersion(ResourceType.CLIENT_RESOURCES);
     public static final Supplier<Number> DATA_PACK_VERSION = () -> SharedConstants.getGameVersion().getResourceVersion(ResourceType.SERVER_DATA);
 
+    public static final Supplier<Number> MAINHAND_SLOT = () -> CLIENT.player.getInventory().selectedSlot;
+
 
 }

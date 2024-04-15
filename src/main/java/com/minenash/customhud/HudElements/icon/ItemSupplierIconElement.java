@@ -10,19 +10,21 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ItemSupplierIconElement extends IconElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
-    private final Supplier<ItemStack> supplier;
+    private final Supplier<?> supplier;
     private final boolean showCount, showDur, showCooldown;
     private final int numSize;
 
-    public ItemSupplierIconElement(Supplier<ItemStack> supplier, Flags flags) {
+    public ItemSupplierIconElement(Supplier<?> supplier, Flags flags) {
         super(flags, 11);
         this.supplier = supplier;
         this.showCount = flags.iconShowCount;
@@ -33,22 +35,41 @@ public class ItemSupplierIconElement extends IconElement {
 
     @Override
     public Number getNumber() {
-        return Item.getRawId(supplier.get().getItem());
+        return Item.getRawId(getStack().getItem());
     }
 
     @Override
     public boolean getBoolean() {
-        return supplier.get().isEmpty();
+        return getStack().isEmpty();
     }
 
     @Override
     public int getTextWidth() {
-        return supplier.get().isEmpty() ? 0 : width;
+        return getStack().isEmpty() ? 0 : width;
+    }
+
+    private ItemStack getStack() {
+        Object result = supplier.get();
+        if (result instanceof ItemStack stack)
+            return stack;
+        if (result instanceof Pair pair)
+            return (ItemStack) ((Supplier)pair.getLeft()).get();
+        return ItemStack.EMPTY;
+    }
+    private ItemStack getStack(RenderPiece piece) {
+        if (supplier == ListManager.SUPPLIER)
+            return (ItemStack) piece.value;
+        Object result = supplier.get();
+        if (result instanceof ItemStack stack)
+            return stack;
+        if (result instanceof Pair pair)
+            return (ItemStack) ((Function)pair.getRight()).apply(piece);
+        return ItemStack.EMPTY;
     }
 
     //TODO FIX: Conditional in list?
     public void render(DrawContext context, RenderPiece piece) {
-        ItemStack stack = supplier == ListManager.SUPPLIER ? (ItemStack) piece.value : supplier.get();
+        ItemStack stack = getStack(piece);
         if (stack == null || stack.isEmpty())
             return;
         MatrixStack matrices = context.getMatrices();

@@ -14,13 +14,14 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Nullables;
+import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 
 import java.util.*;
@@ -58,11 +59,19 @@ public class ListSuppliers {
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
         HOOKED_ENTITY_ATTRIBUTES = () -> hooked() == null ? Collections.EMPTY_LIST : getEntityAttributes(hooked()),
         TEAMS = () -> Arrays.asList(CLIENT.world.getScoreboard().getTeams().toArray()),
+        TARGET_VILLAGER_OFFERS = () -> ComplexData.offers,
 
         ITEMS = () -> AttributeHelpers.compactItems(CLIENT.player.getInventory().main),
         INV_ITEMS = () -> CLIENT.player.getInventory().main.subList(9, CLIENT.player.getInventory().main.size()),
         ARMOR_ITEMS = () -> CLIENT.player.getInventory().armor,
         HOTBAR_ITEMS = () -> CLIENT.player.getInventory().main.subList(0,9),
+        ALL_ITEMS = () -> {
+            PlayerInventory inv = CLIENT.player.getInventory();
+            List<ItemStack> items = new ArrayList<>( inv.main );
+            items.addAll(inv.armor);
+            items.add(inv.offHand.get(0));
+            return items;
+        },
 
         SCOREBOARD_OBJECTIVES = () -> Arrays.asList(scoreboard().getObjectives().toArray()),
         PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
@@ -139,6 +148,13 @@ public class ListSuppliers {
         return parent == null ? Collections.emptyList() : Collections.singletonList(parent);
     };
     public static final Function<?,List<?>> MOD_CHILDREN = (mod) -> ModMenu.PARENT_MAP.get(((Mod)mod));
+
+
+
+    public static final Function<TradeOffer,List<?>> OFFER_FIRST_ADJUSTED = (offer) -> Collections.singletonList( offer.getAdjustedFirstBuyItem() );
+    public static final Function<TradeOffer,List<?>> OFFER_FIRST_BASE = (offer) -> Collections.singletonList( offer.getOriginalFirstBuyItem() );
+    public static final Function<TradeOffer,List<?>> OFFER_SECOND = (offer) -> Collections.singletonList( offer.getSecondBuyItem() );
+    public static final Function<TradeOffer,List<?>> OFFER_RESULT = (offer) -> Collections.singletonList( offer.getSellItem() );
 
 
 

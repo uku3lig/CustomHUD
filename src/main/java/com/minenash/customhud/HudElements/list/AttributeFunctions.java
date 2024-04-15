@@ -19,6 +19,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -33,6 +34,7 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -364,6 +366,45 @@ public class AttributeFunctions {
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED = (rec) -> rec.elapsed / 20F;
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_REMAINING = (rec) -> (rec.length - rec.elapsed) / 20F;
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED_PER = (rec) -> 100F * rec.elapsed / rec.length;
+
+
+    // OFFERS
+    public static final Function<TradeOffer,Number> OFFER_USES = (offer) -> offer.getUses();
+    public static final Function<TradeOffer,Number> OFFER_MAX_USES = (offer) -> offer.getMaxUses();
+    public static final Function<TradeOffer,Number> OFFER_SPECIAL_PRICE = (offer) -> offer.getSpecialPrice();
+    public static final Function<TradeOffer,Number> OFFER_DEMAND_BONUS = (offer) -> offer.getDemandBonus();
+    public static final Function<TradeOffer,Number> OFFER_PRICE_MULTIPLIER = (offer) -> offer.getPriceMultiplier();
+    public static final Function<TradeOffer,Boolean> OFFER_DISABLED = (offer) -> offer.isDisabled();
+    public static final Function<TradeOffer,Boolean> OFFER_CAN_AFFORD = (offer) -> {
+        if (offer.isDisabled() || CLIENT.player == null) return false;
+        ItemStack first = offer.getAdjustedFirstBuyItem();
+        ItemStack second = offer.getSecondBuyItem();
+
+        int amountOfFirst = 0;
+        int amountOfSecond = 0;
+
+        PlayerInventory inv = CLIENT.player.getInventory();
+        ItemStack offhand = inv.offHand.get(0);
+        if (ItemStack.canCombine(first, offhand))
+            amountOfFirst += offhand.getCount();
+        else if (ItemStack.canCombine(second, offhand))
+            amountOfSecond += offhand.getCount();
+
+        if (amountOfFirst >= first.getCount() && amountOfSecond >= second.getCount())
+            return true;
+
+        for (ItemStack stack : inv.main) {
+            if (ItemStack.canCombine(first, stack))
+                amountOfFirst += stack.getCount();
+            else if (ItemStack.canCombine(second, stack))
+                amountOfSecond += stack.getCount();
+
+            if (amountOfFirst >= first.getCount() && amountOfSecond >= second.getCount())
+                return true;
+        }
+        return false;
+
+    };
 
 
 

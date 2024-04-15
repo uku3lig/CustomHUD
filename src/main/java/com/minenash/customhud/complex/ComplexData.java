@@ -10,13 +10,16 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossBar;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientStatusC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -26,6 +29,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.PerformanceLog;
+import net.minecraft.village.TradeOfferList;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -35,6 +39,8 @@ import oshi.hardware.CentralProcessor;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+
+import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ComplexData {
 
@@ -87,6 +93,11 @@ public class ComplexData {
     private static long lastStatUpdate = 0;
 
     public static final Map<UUID, BossBar> bossbars = new HashMap<>();
+
+    public static TradeOfferList offers = new TradeOfferList();
+    public static UUID villagerUUID = null;
+    public static int fakeVillagerInteract = 0;
+    public static long villagerLastGot = Long.MAX_VALUE;
 
     @SuppressWarnings("ConstantConditions")
     public static void update(Profile profile) {
@@ -246,6 +257,24 @@ public class ComplexData {
         if (profile.enabled.music)
             MusicAndRecordTracker.tick();
 
+        if (profile.enabled.targetVillager) {
+            if ( !(targetEntity instanceof VillagerEntity) && villagerUUID != null) {
+                offers.clear();
+                villagerUUID = null;
+                villagerLastGot = Long.MAX_VALUE;
+                System.out.println("Cleared Offers");
+            }
+            else if (targetEntity instanceof VillagerEntity && (villagerUUID == null ||
+                    !targetEntity.getUuid().equals(villagerUUID) || System.currentTimeMillis() - villagerLastGot > 30_000)) {
+                villagerUUID = targetEntity.getUuid();
+                fakeVillagerInteract = 2;
+                CLIENT.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.interact(targetEntity, false, Hand.OFF_HAND));
+                villagerLastGot = System.currentTimeMillis();
+                System.out.println("Sent Interact Packet");
+            }
+
+        }
+
         SubtitleTracker.INSTANCE.setEnable(profile.enabled.subtitles);
         CustomHudRegistry.runComplexData();
 
@@ -339,6 +368,7 @@ public class ComplexData {
         public boolean packetMetrics = false;
 
         public boolean slots = false;
+        public boolean targetVillager = false;
     }
 
 

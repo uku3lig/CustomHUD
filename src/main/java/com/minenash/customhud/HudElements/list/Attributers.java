@@ -5,11 +5,16 @@ import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
 import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Pair;
+import net.minecraft.village.TradeOffer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
@@ -306,6 +311,50 @@ public class Attributers {
         default -> null;
     };
 
+    public static final Attributer OFFER = (sup, name, flags) -> {
+        int collinIndex = name.indexOf(":");
+        if (collinIndex > 0) {
+            String attr = name.substring(collinIndex+1);
+            Supplier sup2 = switch (name.substring(0, collinIndex)) {
+                case "o_first" -> () -> new Pair(
+                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getAdjustedFirstBuyItem(),
+                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getAdjustedFirstBuyItem()
+                );
+                case "o_first_base" -> () -> new Pair(
+                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem(),
+                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getOriginalFirstBuyItem()
+                );
+                case "o_second" -> () -> new Pair(
+                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSecondBuyItem(),
+                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getSecondBuyItem()
+                );
+                case "o_result" -> () -> new Pair(
+                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem(),
+                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getSellItem()
+                );
+                default -> null;
+            };
+            if (sup2 != null)
+                return ITEM.get(sup2, attr, flags);
+        }
+        return switch (name) {
+            case "o_uses" -> new Num(sup, OFFER_USES, flags);
+            case "o_max_uses" -> new Num(sup, OFFER_MAX_USES, flags);
+            case "o_special_price" -> new Num(sup, OFFER_SPECIAL_PRICE, flags);
+            case "o_demand_bonus" -> new Num(sup, OFFER_DEMAND_BONUS, flags);
+            case "o_price_multiplier" -> new Num(sup, OFFER_PRICE_MULTIPLIER, flags);
+            case "o_disabled" -> new Bool(sup, OFFER_DISABLED);
+            case "o_can_afford" -> new Bool(sup, OFFER_CAN_AFFORD);
+
+            case "o_first" -> new CreateListElement(sup, OFFER_FIRST_ADJUSTED, ITEM);
+            case "o_first_base" -> new CreateListElement(sup, OFFER_FIRST_BASE, ITEM);
+            case "o_second" -> new CreateListElement(sup, OFFER_SECOND, ITEM);
+            case "o_result" -> new CreateListElement(sup, OFFER_RESULT, ITEM);
+            default -> null;
+        };
+    };
+
+
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
     static {
         ATTRIBUTER_MAP.put(STATUS_EFFECTS, EFFECT);
@@ -320,6 +369,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(TARGET_ENTITY_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(HOOKED_ENTITY_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(TEAMS, TEAM);
+        ATTRIBUTER_MAP.put(ALL_ITEMS, ITEM);
         ATTRIBUTER_MAP.put(INV_ITEMS, ITEM);
         ATTRIBUTER_MAP.put(ARMOR_ITEMS, ITEM);
         ATTRIBUTER_MAP.put(HOTBAR_ITEMS, ITEM);
@@ -336,6 +386,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(DATA_PACKS, PACK);
         ATTRIBUTER_MAP.put(DISABLED_DATA_PACKS, PACK);
         ATTRIBUTER_MAP.put(RECORDS, RECORD);
+        ATTRIBUTER_MAP.put(TARGET_VILLAGER_OFFERS, OFFER);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);

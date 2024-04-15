@@ -47,6 +47,7 @@ public class CustomHud implements ModInitializer {
 	public static final KeyBinding kb_enable = registerKeyBinding("enable", GLFW.GLFW_KEY_UNKNOWN);
 	public static final KeyBinding kb_cycleProfiles = registerKeyBinding("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
 	public static final KeyBinding kb_showErrors = registerKeyBinding("show_errors", GLFW.GLFW_KEY_B);
+	public static final KeyBinding kb_sendPacket = registerKeyBinding("send_packet", GLFW.GLFW_KEY_H);
 
 	private static KeyBinding registerKeyBinding(String binding, int defaultKey) {
 		return KeyBindingHelper.registerKeyBinding(new KeyBinding("key.custom_hud." + binding, InputUtil.Type.KEYSYM, defaultKey, "category.custom_hud"));
@@ -145,6 +146,11 @@ public class CustomHud implements ModInitializer {
 				else
 					CLIENT.setScreen(new NewConfigScreen(null));
 		}
+
+//		while (kb_sendPacket.wasPressed()) {
+//			if (ComplexData.targetEntity != null)
+//				VillagerTrades.getTrades(ComplexData.targetEntity);
+//		}
 
 		updateCrosshairObjectShare();
 //		CustomHud.justSaved = true;

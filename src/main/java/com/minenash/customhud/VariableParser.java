@@ -889,6 +889,8 @@ public class VariableParser {
             case "resource_pack_version" -> RESOURCE_PACK_VERSION;
             case "data_pack_version", "datapack_version" -> DATA_PACK_VERSION;
 
+            case "mainhand_slot" -> MAINHAND_SLOT;
+
             default -> null;
         };
     }
@@ -1065,11 +1067,13 @@ public class VariableParser {
             case "attributes" -> PLAYER_ATTRIBUTES;
             case "target_entity_attributes", "target_entity_attrs", "teas" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ATTRIBUTES;}
             case "hooked_entity_attributes", "hooked_entity_attrs", "heas" -> HOOKED_ENTITY_ATTRIBUTES;
+            case "target_villager_offers", "tvo" -> {enabled.targetEntity = true; enabled.targetVillager = true; yield TARGET_VILLAGER_OFFERS;}
             case "teams" -> TEAMS;
             case "items" -> ITEMS;
             case "inventory_items", "inv_items" -> INV_ITEMS;
             case "armor_items" -> ARMOR_ITEMS;
             case "hotbar_items" -> HOTBAR_ITEMS;
+            case "all_items" -> ALL_ITEMS;
             case "objectives" -> SCOREBOARD_OBJECTIVES;
             case "scores" -> PLAYER_SCOREBOARD_SCORES;
             case "bossbars" -> BOSSBARS;
