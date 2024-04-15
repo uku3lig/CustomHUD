@@ -45,3 +45,4 @@ accessible field net/minecraft/client/gui/hud/InGameHud titleRemainTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleFadeOutTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleStayTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleFadeInTicks I
+accessible field net/minecraft/resource/ResourcePackProfile metadata Lnet/minecraft/resource/ResourcePackProfile$Metadata;

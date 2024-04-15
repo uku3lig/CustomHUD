@@ -30,6 +30,8 @@
   "mixins": [
     "BossBarS2CPacketMixin",
     "PlayerEntityMixin",
+    "ResourcePackProfileMetadataMixin",
+    "ResourcePackProfileMixin",
     "accessors.AttributeContainerAccessor",
     "accessors.DefaultAttributeContainerAccessor"
   ]

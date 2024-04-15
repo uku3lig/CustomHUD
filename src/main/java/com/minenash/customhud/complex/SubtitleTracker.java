@@ -1,7 +1,7 @@
 package com.minenash.customhud.complex;
 
 import com.google.common.collect.Lists;
-import com.minenash.customhud.SubtitleEntryDuck;
+import com.minenash.customhud.ducks.SubtitleEntryDuck;
 import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundInstanceListener;

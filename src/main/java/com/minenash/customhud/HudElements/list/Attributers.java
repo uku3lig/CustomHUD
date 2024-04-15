@@ -237,7 +237,7 @@ public class Attributers {
     public static final Attributer MOD_LICENSE = (sup, name, f) -> name.equals("license") ? new Str(sup, DIRECT) : null;
 
     public static final Attributer MOD_BADGE = (sup, name, flags) -> switch (name) {
-        case "b_name" -> new Str(sup, BADGE_NAME);
+        case "", "b_name" -> new Str(sup, BADGE_NAME);
         case "b_outline_color" -> new Num(sup, BADGE_OUTLINE_COLOR, flags);
         case "b_fill_color" -> new Num(sup, BADGE_FILL_COLOR, flags);
         case "b_icon" -> new ModBadgeIconElement(flags);
@@ -252,10 +252,10 @@ public class Attributers {
             return MOD2.get(sup2, attr, flags);
         }
         return switch (name) {
-            case "m_name" -> new Str(sup, MOD_NAME);
+            case "", "m_name" -> new Str(sup, MOD_NAME);
             case "m_id" -> new Str(sup, MOD_ID);
             case "m_summary" -> new Str(sup, MOD_SUMMARY);
-            case "m_description" -> new Str(sup, MOD_DESCRIPTION);
+            case "m_description", "m_desc" -> new Str(sup, MOD_DESCRIPTION);
             case "m_version" -> new Str(sup, MOD_VERSION);
             case "m_hash" -> new Str(sup, MOD_HASH);
 
@@ -275,7 +275,7 @@ public class Attributers {
             case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
             case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
 
-            case "m_icon" -> new ModIconElement(flags);
+            case "m_icon" -> new ModIconElement(sup, flags);
             default -> null;
         };
     };
@@ -283,7 +283,17 @@ public class Attributers {
         MOD2 = MOD;
     }
 
-
+    public static final Attributer PACK = (sup, name, flags) -> switch (name) {
+        case "","p_name" -> new Tex(sup, PACK_NAME);
+        case "p_id" -> new Str(sup, PACK_ID);
+        case "p_description", "p_desc" -> new Tex(sup, PACK_DESCRIPTION);
+        case "p_version" -> new Num(sup, PACK_VERSION, flags);
+        case "p_always_enabled" -> new Bool(sup, PACK_ALWAYS_ENABLED);
+        case "p_pinned" -> new Bool(sup, PACK_IS_PINNED);
+        case "p_compatible" -> new Bool(sup, PACK_IS_COMPATIBLE);
+        case "p_icon" -> new PackIconElement(sup, flags);
+        default -> null;
+    };
 
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
     static {
@@ -310,6 +320,10 @@ public class Attributers {
         ATTRIBUTER_MAP.put(MODS, MOD);
         ATTRIBUTER_MAP.put(ALL_ROOT_MODS, MOD);
         ATTRIBUTER_MAP.put(ALL_MODS, MOD);
+        ATTRIBUTER_MAP.put(RESOURCE_PACKS, PACK);
+        ATTRIBUTER_MAP.put(DISABLED_RESOURCE_PACKS, PACK);
+        ATTRIBUTER_MAP.put(DATA_PACKS, PACK);
+        ATTRIBUTER_MAP.put(DISABLED_DATA_PACKS, PACK);
 
         // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);

@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.list;
 
+import com.google.common.collect.Lists;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.SubtitleTracker;
 import com.terraformersmc.modmenu.ModMenu;
@@ -13,8 +14,11 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Nullables;
 import net.minecraft.world.GameMode;
 
@@ -67,7 +71,23 @@ public class ListSuppliers {
 
         MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>) MOD_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
         ALL_ROOT_MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>)ALL_ROOT_MODS_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
-        ALL_MODS = () -> ModMenu.MODS.values().stream().sorted((Comparator<? super Mod>)MOD_ORDERING).toList()
+        ALL_MODS = () -> ModMenu.MODS.values().stream().sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
+
+        RESOURCE_PACKS = () -> Arrays.asList(CLIENT.getResourcePackManager().getEnabledProfiles().toArray()),
+        DISABLED_RESOURCE_PACKS = () -> {
+            List<ResourcePackProfile> profiles = Lists.newArrayList(CLIENT.getResourcePackManager().getProfiles());
+            profiles.removeAll(CLIENT.getResourcePackManager().getEnabledProfiles());
+            return profiles;
+        },
+        DATA_PACKS = () -> CLIENT.getServer() == null ? Collections.EMPTY_LIST : Arrays.asList(CLIENT.getServer().getDataPackManager().getEnabledProfiles().toArray()),
+        DISABLED_DATA_PACKS = () -> {
+            if (CLIENT.getServer() == null) return Collections.EMPTY_LIST;
+
+            ResourcePackManager manager = CLIENT.getServer().getDataPackManager();
+            List<ResourcePackProfile> profiles = Lists.newArrayList(manager.getProfiles());
+            profiles.removeAll(manager.getEnabledProfiles());
+            return profiles;
+        }
     ;
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
@@ -105,13 +125,14 @@ public class ListSuppliers {
     public static final Function<String,List<?>> SCORES = (name) -> Arrays.asList(scoreboard().getScores(name).scores.entrySet().toArray());
 
 
-    public static final Function<Mod,List<?>> MOD_AUTHORS = (mod) -> ((Mod)mod).getAuthors();
-    public static final Function<Mod,List<?>> MOD_CONTRIBUTORS = (mod) -> ((Mod)mod).getContributors();
-    public static final Function<Mod,List<?>> MOD_CREDITS = (mod) -> ((Mod)mod).getCredits();
-    public static final Function<Mod,List<?>> MOD_BADGES = (mod) -> Arrays.asList(((Mod)mod).getBadges().toArray());
-    public static final Function<Mod,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(((Mod)mod).getLicense().toArray());
+    // Don't change to method references
+    public static final Function<Mod,List<?>> MOD_AUTHORS = (mod) -> mod.getAuthors();
+    public static final Function<Mod,List<?>> MOD_CONTRIBUTORS = (mod) -> mod.getContributors();
+    public static final Function<Mod,List<?>> MOD_CREDITS = (mod) -> mod.getCredits();
+    public static final Function<Mod,List<?>> MOD_BADGES = (mod) -> Arrays.asList(mod.getBadges().toArray());
+    public static final Function<Mod,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(mod.getLicense().toArray());
     public static final Function<Mod,List<?>> MOD_PARENTS = (mod) -> {
-        Mod parent = ModMenu.MODS.get(((Mod)mod).getParent());
+        Mod parent = ModMenu.MODS.get(mod.getParent());
         return parent == null ? Collections.emptyList() : Collections.singletonList(parent);
     };
     public static final Function<?,List<?>> MOD_CHILDREN = (mod) -> ModMenu.PARENT_MAP.get(((Mod)mod));

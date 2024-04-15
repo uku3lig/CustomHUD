@@ -1074,6 +1074,10 @@ public class VariableParser {
             case "mods" -> CustomHud.MODMENU_INSTALLED ? MODS : ListProvider.REGUIRES_MODMENU;
             case "all_root_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_ROOT_MODS : ListProvider.REGUIRES_MODMENU;
             case "all_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_MODS : ListProvider.REGUIRES_MODMENU;
+            case "resource_packs" -> RESOURCE_PACKS;
+            case "disabled_resource_packs" -> DISABLED_RESOURCE_PACKS;
+            case "data_packs", "datapacks" -> DATA_PACKS;
+            case "disabled_data_packs", "disabled_datapacks" -> DISABLED_DATA_PACKS;
 
             default -> null;
         };
@@ -1225,6 +1229,14 @@ public class VariableParser {
         if (part.startsWith("mod:"))
             return attrElement(part, ModMenu.MODS::get, (mod) -> () -> mod,
                     MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_PROPERTY, profile, debugLine, enabled, original );
+
+        if (part.startsWith("resource_pack:"))
+            return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), (pack) -> () -> pack,
+                    PACK, ErrorType.UNKNOWN_RESOURCE_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
+
+        if (part.startsWith("data_pack:") || part.startsWith("datapack:"))
+            return attrElement(part, DATA_PACK_READER, (pack) -> () -> pack,
+                    PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
 
         return null;
     }

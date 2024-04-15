@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.list;
 
+import com.google.common.collect.Lists;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.mixin.accessors.AttributeContainerAccessor;
 import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
@@ -21,6 +22,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -39,6 +42,10 @@ import static net.minecraft.item.ItemStack.LORE_KEY;
 public class AttributeHelpers {
 
     public static final Function<String, EntityAttribute> ENTITY_ATTR_READER = (src) -> Registries.ATTRIBUTE.get(Identifier.tryParse(src));
+    public static final Function<String, ResourcePackProfile> DATA_PACK_READER = (src) -> {
+        return CLIENT.getServer() == null ? null : CLIENT.getServer().getDataPackManager().getProfile(src);
+    };
+
     public static final Function<String, Integer> SLOT_READER = (src) -> {
         if (src.isBlank())
             return null;

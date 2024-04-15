@@ -39,10 +39,10 @@ public class ListManager {
     }
 
     public static Object getValue() {
-        return values.peek().get(index.peek());
+        return values.empty() ? null : values.peek().get(index.peek());
     }
     public static Object getValue(int index) {
-        return values.peek().get(index);
+        return values.empty() ? null : values.peek().get(index);
     }
 
     public static final Supplier<?> SUPPLIER = ListManager::getValue;

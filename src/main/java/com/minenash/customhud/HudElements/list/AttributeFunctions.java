@@ -5,9 +5,9 @@ import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
 import com.minenash.customhud.HudElements.FuncElements.SpecialText.TextEntry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
-import com.minenash.customhud.SubtitleEntryDuck;
+import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
+import com.minenash.customhud.ducks.SubtitleEntryDuck;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
@@ -22,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.*;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.state.property.Property;
@@ -342,6 +343,16 @@ public class AttributeFunctions {
     public static final Function<Mod.Badge,String> BADGE_NAME = (badge) -> badge.getText().getString();
     public static final Function<Mod.Badge,Number> BADGE_OUTLINE_COLOR = (badge) -> badge.getOutlineColor();
     public static final Function<Mod.Badge,Number> BADGE_FILL_COLOR = (badge) -> badge.getFillColor();
+
+
+    public static final Function<ResourcePackProfile,Text> PACK_NAME = (pack) -> pack.getDisplayName();
+    public static final Function<ResourcePackProfile,String> PACK_ID = (pack) -> pack.getName();
+    public static final Function<ResourcePackProfile,Text> PACK_DESCRIPTION = (pack) -> pack.getDescription();
+    public static final Function<ResourcePackProfile,Number> PACK_VERSION = (pack) -> ((ResourcePackProfileMetadataDuck)(Object)pack.metadata).customhud$getPackVersion();
+
+    public static final Function<ResourcePackProfile,Boolean> PACK_ALWAYS_ENABLED = (pack) -> pack.isAlwaysEnabled();
+    public static final Function<ResourcePackProfile,Boolean> PACK_IS_PINNED = (pack) -> pack.isPinned();
+    public static final Function<ResourcePackProfile,Boolean> PACK_IS_COMPATIBLE = (pack) -> pack.getCompatibility().isCompatible();
 
 
 
