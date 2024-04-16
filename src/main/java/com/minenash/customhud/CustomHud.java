@@ -153,6 +153,7 @@ public class CustomHud implements ModInitializer {
 		return ProfileManager.getActive() == null || !ProfileManager.getActive().disabled.contains(element);
 	}
 
+	public static boolean ignoreFirstToast = false;
 	private static void updateProfiles() {
 		WatchKey key = CustomHud.profileWatcher.poll();
 		if (key == null)
@@ -173,8 +174,9 @@ public class CustomHud implements ModInitializer {
 				continue;
 			}
 			if (event.kind().name().equals("ENTRY_CREATE")) {
-				if (profile != null)
+				if (profile != null) {
 					continue;
+				}
 				else
 					ProfileManager.add( Profile.parseProfile(path, fileName) );
 			}
@@ -196,7 +198,9 @@ public class CustomHud implements ModInitializer {
 			}
 
 			LOGGER.info("Updated Profile " + fileName);
-			showToast(fileName);
+			if (!ignoreFirstToast)
+				showToast(fileName);
+			ignoreFirstToast = false;
 		}
 		key.reset();
 	}

@@ -8,8 +8,12 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
+import java.util.Collections;
 import java.util.List;
+
+import static com.minenash.customhud.CustomHud.CLIENT;
 
 public abstract class LineEntry extends ElementListWidget.Entry<LineEntry> {
     public void update() {}
@@ -27,6 +31,7 @@ public abstract class LineEntry extends ElementListWidget.Entry<LineEntry> {
         return ButtonWidget.builder(Text.literal(text), action).dimensions(0, 0, width, 16)
                 .tooltip(Tooltip.of(Text.literal(tooltip))).build();
     }
+
 
     public static class NewProfile extends LineEntry {
 

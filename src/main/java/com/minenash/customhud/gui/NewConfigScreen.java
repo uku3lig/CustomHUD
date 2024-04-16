@@ -10,18 +10,24 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.GuiNavigation;
-import net.minecraft.client.gui.navigation.GuiNavigationPath;
 import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 import static com.minenash.customhud.CustomHud.CLIENT;
+import static com.minenash.customhud.CustomHud.ignoreFirstToast;
 import static net.minecraft.client.gui.navigation.NavigationDirection.*;
 
 public class NewConfigScreen extends Screen {
@@ -60,6 +66,8 @@ public class NewConfigScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(font, Text.translatable("config.custom_hud.title"), this.width / 2, 11, 0xFFFFFF);
         profiles.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(font, "§8§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0xFFFFFF);
+
     }
 
     @Override
@@ -153,6 +161,23 @@ public class NewConfigScreen extends Screen {
     private boolean move(NavigationDirection... ds) {
         for (var d : ds) this.switchFocus( super.getNavigationPath(new GuiNavigation.Arrow(d)) );
         return true;
+    }
+
+    @Override
+    public void filesDragged(List<Path> paths) {
+        System.out.println("Path's: " + paths);
+
+        for (Path path : paths) {
+            if (!path.getFileName().toString().endsWith(".txt"))
+                continue;
+            try {
+                ignoreFirstToast = true;
+                Files.copy(path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
+            } catch (IOException e) {
+                CustomHud.LOGGER.warn("Failed to copy profile from {} to {}", path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
+                SystemToast.addPackCopyFailure(client, path.toString());
+            }
+        }
     }
 
     @Override

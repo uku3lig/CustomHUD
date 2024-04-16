@@ -25,9 +25,9 @@ public class ProfileLinesWidget extends ElementListWidget<LineEntry> {
         setRenderBackground(false);
         this.screen = screen;
 
-        for (Profile p : ProfileManager.getProfiles()) {
+        for (Profile p : ProfileManager.getProfiles())
             this.addEntry(new ProfileLineEntry(p, this));
-        }
+
         this.addEntry(new LineEntry.NewProfile(this));
     }
 
