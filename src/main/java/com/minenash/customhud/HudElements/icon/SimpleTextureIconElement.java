@@ -2,29 +2,22 @@ package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.Optional;
 
-public class TextureIconElement extends IconElement {
+public class SimpleTextureIconElement extends IconElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Identifier TEXTURE_NOT_FOUND = new Identifier("textures/item/barrier.png");
 
     private final Identifier texture;
-    private final int u;
-    private final int v;
     private final int textureWidth;
     private final int textureHeight;
-    private final int regionWidth;
-    private final int regionHeight;
     private final int width;
     private final int height;
     private final int yOffset;
@@ -33,10 +26,8 @@ public class TextureIconElement extends IconElement {
     private final boolean iconAvailable;
 
 
-    public TextureIconElement(Identifier texture, int u, int v, int w, int h, Flags flags) {
+    public SimpleTextureIconElement(Identifier texture, Flags flags) {
         super(flags, 0);
-        this.u = u;
-        this.v = v;
 
         NativeImage img = null;
         try {
@@ -52,11 +43,9 @@ public class TextureIconElement extends IconElement {
 
         textureWidth = iconAvailable ? img.getWidth() : 16;
         textureHeight = iconAvailable ? img.getHeight() : 16;
-        regionWidth = w != -1 ? w : textureWidth;
-        regionHeight = h != -1 ? h : textureHeight;
 
         height = (int) (11 * flags.scale);
-        width = (int) (height * ((float)w/h));
+        width = (int) (height * ((float)textureWidth/textureHeight));
         yOffset = referenceCorner ? 0 : (int) ((height*scale-height)/(scale*2));
         textWidth = flags.iconWidth == -1 ? width : flags.iconWidth;
 
@@ -88,7 +77,7 @@ public class TextureIconElement extends IconElement {
         context.getMatrices().push();
         context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2, 0);
         rotate(context.getMatrices(), width, height);
-        context.drawTexture(texture, 0, 0, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+        context.drawTexture(texture, 0, 0, width, height, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
         context.getMatrices().pop();
     }
 

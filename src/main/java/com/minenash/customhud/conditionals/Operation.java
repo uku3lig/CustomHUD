@@ -134,6 +134,21 @@ public interface Operation {
         }
     }
 
+    record BiMathOperation(Operation left, Operation right, ExpressionParser.MathOperator op) implements Operation {
+
+        @Override
+        public double getValue() {
+            return MathOperation.apply(left.getValue(), right.getValue(), op);
+        }
+
+        @Override
+        public void printTree(int indent) {
+            System.out.println(indent(indent) + "- Operations(" + op.name()+ ")");
+            left.printTree(indent + 2);
+            right.printTree(indent + 2);
+        }
+    }
+
     record MathOperation(List<HudElement> elements, List<ExpressionParser.MathOperator> operations) implements Operation {
         public double getValue() {
             if (elements.isEmpty()) return 0;

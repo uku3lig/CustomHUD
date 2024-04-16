@@ -68,7 +68,7 @@ import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
 
 public class VariableParser {
 
-    private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._-]+)(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?(?:,(\\d+))?");
+    private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._ -]+)(?:,([^,]+))?(?:,([^,]+))?(?:,([^,]+))?(?:,([^,]+))?");
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
     private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.:-]*))?.*");
@@ -389,6 +389,49 @@ public class VariableParser {
             }
         }
 
+        if (part.startsWith("icon:")) {
+            part = part.substring(part.indexOf(':')+1);
+            String[] flagParts = part.split(" ");
+            String main = flagParts[0];
+
+            Item item = Registries.ITEM.get(Identifier.tryParse(main));
+            if (item != Items.AIR) {
+                Flags flags = Flags.parse(profile.name, debugLine, flagParts);
+                return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
+            }
+
+            if (!part.contains(",")) {
+                Identifier id = new Identifier(main.endsWith(".png") ? main : main + ".png");
+                Flags flags = Flags.parse(profile.name, debugLine, flagParts);
+                SimpleTextureIconElement element = new SimpleTextureIconElement(id, flags);
+                if (element.isIconAvailable())
+                    return Flags.wrap(element, flags);
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
+                return null;
+            }
+
+            Matcher matcher = TEXTURE_ICON_PATTERN.matcher(part);
+            if (!matcher.matches()) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, part);
+                return null;
+            }
+
+            String[] mainParts = matcher.group(1).split(" ");
+            Identifier id = new Identifier(mainParts[0].endsWith(".png") ? mainParts[0] : mainParts[0] + ".png");
+            Operation u = matcher.group(2) == null ? null : ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProvider);
+            Operation v = matcher.group(3) == null ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProvider);
+            Operation w = matcher.group(4) == null ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProvider);
+            Operation h = matcher.group(5) == null ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProvider);
+
+
+            Flags flags = Flags.parse(profile.name, debugLine, mainParts);
+            NewTextureIconElement element = new NewTextureIconElement(id, u, v, w, h, flags);
+            if (element.isIconAvailable())
+                return element;
+            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
+            return null;
+        }
+
 
 
         String[] flagParts = part.split(" ");
@@ -460,31 +503,31 @@ public class VariableParser {
             return null;
         }
 
-        if (part.startsWith("icon:")) {
-            part = part.substring(part.indexOf(':')+1);
-
-            Item item = Registries.ITEM.get(Identifier.tryParse(part));
-            if (item != Items.AIR)
-                return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
-
-            Matcher matcher = TEXTURE_ICON_PATTERN.matcher(part);
-            if (!matcher.matches()) {
-                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, part);
-                return null;
-            }
-
-            Identifier id = new Identifier(matcher.group(1) + ".png");
-            int u = matcher.group(2) == null ? 0 : Integer.parseInt(matcher.group(2));
-            int v = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
-            int w = matcher.group(4) == null ? -1 : Integer.parseInt(matcher.group(4));
-            int h = matcher.group(5) == null ? -1 : Integer.parseInt(matcher.group(5));
-
-            TextureIconElement element = new TextureIconElement(id, u, v, w, h, flags);
-            if (element.isIconAvailable())
-                return Flags.wrap(element, flags);
-            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
-            return null;
-        }
+//        if (part.startsWith("icon:")) {
+//            part = part.substring(part.indexOf(':')+1);
+//
+//            Item item = Registries.ITEM.get(Identifier.tryParse(part));
+//            if (item != Items.AIR)
+//                return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
+//
+//            Matcher matcher = TEXTURE_ICON_PATTERN.matcher(part);
+//            if (!matcher.matches()) {
+//                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, part);
+//                return null;
+//            }
+//
+//            Identifier id = new Identifier(matcher.group(1) + ".png");
+//            int u = matcher.group(2) == null ? 0 : Integer.parseInt(matcher.group(2));
+//            int v = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
+//            int w = matcher.group(4) == null ? -1 : Integer.parseInt(matcher.group(4));
+//            int h = matcher.group(5) == null ? -1 : Integer.parseInt(matcher.group(5));
+//
+//            TextureIconElement element = new TextureIconElement(id, u, v, w, h, flags);
+//            if (element.isIconAvailable())
+//                return Flags.wrap(element, flags);
+//            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
+//            return null;
+//        }
 
         if (part.startsWith("itemcount:")) {
             part = part.substring(part.indexOf(':')+1);

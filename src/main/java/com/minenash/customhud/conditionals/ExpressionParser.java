@@ -16,9 +16,9 @@ import java.util.List;
 @SuppressWarnings("DuplicatedCode")
 public class ExpressionParser {
 
-    enum TokenType { START_PREN, END_PREN, FULL_PREN, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE }
-    enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS }
-    enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
+    public enum TokenType { START_PREN, END_PREN, FULL_PREN, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE }
+    public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS }
+    public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
 
     record Token(TokenType type, Object value) {
         public String toString() {
