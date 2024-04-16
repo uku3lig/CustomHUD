@@ -599,6 +599,13 @@ public class VariableParser {
             return Flags.wrap(new TimerElement(end, interval, flags), flags);
         }
 
+        if (part.startsWith("slime_chunk:")) {
+            String seedStr = part.substring(12).trim();
+            if (seedStr.isEmpty())
+                return new BooleanSupplierElement(IS_SLIME_CHUNK);
+            return new SeededSlimeChunkElement(seedStr);
+        }
+
         switch (part) {
             case "gizmo": return Flags.wrap(new DebugGizmoElement(flags), flags);
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);

@@ -24,7 +24,7 @@ public class BooleanSupplierElement implements HudElement {
 
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static boolean isInDim(Identifier id) { return client.world.getRegistryKey().getValue().equals(id); }
-    private static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
+    protected static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
 
     public static final Supplier<Boolean> PROFILE_IN_CYCLE = () -> ProfileManager.getActive() != null && ProfileManager.getActive().cycle;
 
