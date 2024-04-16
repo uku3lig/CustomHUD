@@ -262,7 +262,6 @@ public class ComplexData {
                 offers.clear();
                 villagerUUID = null;
                 villagerLastGot = Long.MAX_VALUE;
-                System.out.println("Cleared Offers");
             }
             else if (targetEntity instanceof VillagerEntity && (villagerUUID == null ||
                     !targetEntity.getUuid().equals(villagerUUID) || System.currentTimeMillis() - villagerLastGot > 30_000)) {
@@ -270,7 +269,6 @@ public class ComplexData {
                 fakeVillagerInteract = 2;
                 CLIENT.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.interact(targetEntity, false, Hand.OFF_HAND));
                 villagerLastGot = System.currentTimeMillis();
-                System.out.println("Sent Interact Packet");
             }
 
         }

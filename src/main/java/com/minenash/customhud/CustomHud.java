@@ -47,7 +47,6 @@ public class CustomHud implements ModInitializer {
 	public static final KeyBinding kb_enable = registerKeyBinding("enable", GLFW.GLFW_KEY_UNKNOWN);
 	public static final KeyBinding kb_cycleProfiles = registerKeyBinding("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
 	public static final KeyBinding kb_showErrors = registerKeyBinding("show_errors", GLFW.GLFW_KEY_B);
-	public static final KeyBinding kb_sendPacket = registerKeyBinding("send_packet", GLFW.GLFW_KEY_H);
 
 	private static KeyBinding registerKeyBinding(String binding, int defaultKey) {
 		return KeyBindingHelper.registerKeyBinding(new KeyBinding("key.custom_hud." + binding, InputUtil.Type.KEYSYM, defaultKey, "category.custom_hud"));
@@ -100,7 +99,6 @@ public class CustomHud implements ModInitializer {
 
 
 	private static ComplexData.Enabled previousEnabled = ComplexData.Enabled.DISABLED;
-//	public static boolean justSaved = false;
 	private static int saveDelay = -1;
 	private static void onTick(MinecraftClient client) {
 		if (saveDelay > 0)
@@ -147,13 +145,7 @@ public class CustomHud implements ModInitializer {
 					CLIENT.setScreen(new NewConfigScreen(null));
 		}
 
-//		while (kb_sendPacket.wasPressed()) {
-//			if (ComplexData.targetEntity != null)
-//				VillagerTrades.getTrades(ComplexData.targetEntity);
-//		}
-
 		updateCrosshairObjectShare();
-//		CustomHud.justSaved = true;
 		saveDelay = 100;
 	}
 
@@ -166,11 +158,6 @@ public class CustomHud implements ModInitializer {
 		if (key == null)
 			return;
 		for (WatchEvent<?> event : key.pollEvents()) {
-//			if (CustomHud.justSaved) {
-//				System.out.println("Just Saved, IGNORING:" + event.context());
-//				CustomHud.justSaved = false;
-//				continue;
-//			}
 			Path path = CustomHud.PROFILE_FOLDER.resolve((Path) event.context());
 			String fileName = path.getFileName().toString();
 			System.out.println("Filename: `" + fileName + "`");

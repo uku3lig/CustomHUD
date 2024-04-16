@@ -26,7 +26,6 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onSetTradeOffers", at = @At("HEAD"))
     public void getTradeOffer(SetTradeOffersS2CPacket packet, CallbackInfo ci) {
-        System.out.println("A");
         if (ComplexData.fakeVillagerInteract > 0) {
             ComplexData.fakeVillagerInteract--;
             ComplexData.offers = packet.getOffers();
@@ -35,7 +34,6 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(at = @At("HEAD"), method = "onOpenScreen", cancellable = true)
     public void onOpenScreen(OpenScreenS2CPacket packet, CallbackInfo ci) {
-        System.out.println("B");
         if (packet.getScreenHandlerType() == ScreenHandlerType.MERCHANT && ComplexData.fakeVillagerInteract > 0) {
             CLIENT.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(packet.getSyncId()));
             ComplexData.fakeVillagerInteract--;
