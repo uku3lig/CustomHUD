@@ -33,7 +33,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
         this.supplier = supplier;
         this.precision = flags.precision == -1 ? 0 : flags.precision;
         this.scale = flags.scale;
-        formatter = flags.hex ? HEX : null;
+        this.formatter = flags.hex ? HEX : null;
     }
 
     @Override
@@ -45,23 +45,12 @@ public class NumberSupplierElement implements HudElement, NumElement {
     public String getString() {
         try {
             double num = supplier.get().doubleValue() * scale;
-            return formatString(num, formatter, precision);
+            return NumElement.formatString(num, formatter, precision);
 
         }
         catch (Exception _e) {
             return "-";
         }
-    }
-
-    public static String formatString(double num, StatFormatter formatter, int precision) {
-        if (Double.isNaN(num))
-            return "-";
-        if (formatter != null)
-            return formatter.format((int)num);
-        if (precision == 0)
-            return Integer.toString((int)num);
-
-        return String.format("%."+precision+"f", num);
     }
 
     @Override

@@ -45,8 +45,8 @@ public class Profile {
     public Crosshairs crosshair = Crosshairs.NORMAL;
     public EnumSet<DisableElement> disabled = EnumSet.noneOf(DisableElement.class);
     public Map<String,Toggle> toggles = new LinkedHashMap<>();
-
-    private String displayName = null;
+    public Map<String, Double> values = new LinkedHashMap<>();
+    public Map<String, Macro> macros = new LinkedHashMap<>();
 
     private MultiLineStacker stacker = new MultiLineStacker();
 
@@ -122,7 +122,7 @@ public class Profile {
                     profile.crosshair = Crosshairs.parse(matcher.group(1));
                     if (profile.crosshair == null) {
                         profile.crosshair = Crosshairs.NORMAL;
-                        Errors.addError(profileName, i+1, line, ErrorType.UNKNOWN_CROSSHAIR, matcher.group(1));
+                        Errors.addError(profileName, i, line, ErrorType.UNKNOWN_CROSSHAIR, matcher.group(1));
                     }
                     continue;
                 }
@@ -130,12 +130,12 @@ public class Profile {
                 matcher = DISABLE_PATTERN.matcher(lineLC);
                 if (matcher.matches()) {
                     if (!DisableElement.add(profile.disabled, matcher.group(1)))
-                        Errors.addError(profileName, i+1, line, ErrorType.UNKNOWN_HUD_ELEMENT, matcher.group(1));
+                        Errors.addError(profileName, i, line, ErrorType.UNKNOWN_HUD_ELEMENT, matcher.group(1));
                     continue;
                 }
 
                 matcher = GLOBAL_THEME_PATTERN.matcher(lineLC);
-                if (matcher.matches() && profile.baseTheme.parse(true, matcher.group(1), profileName, i+1))
+                if (matcher.matches() && profile.baseTheme.parse(true, matcher.group(1), profileName, i))
                     continue;
 
             }
@@ -200,17 +200,17 @@ public class Profile {
                 profile.stacker.endFor(profile, i, line);
 
             else if (( matcher = LOCAL_THEME_PATTERN.matcher(lineLC) ).matches()) {
-                if (localTheme.parse(false, matcher.group(1), profileName, i+1))
+                if (localTheme.parse(false, matcher.group(1), profileName, i))
                     profile.stacker.addElement(new FunctionalElement.ChangeTheme(localTheme.copy()));
                 else
-                    Errors.addError(profileName, i+1, line, ErrorType.UNKNOWN_THEME_FLAG, "");
+                    Errors.addError(profileName, i, line, ErrorType.UNKNOWN_THEME_FLAG, "");
             }
 
             else if (GLOBAL_THEME_PATTERN.matcher(lineLC).matches() )
-                Errors.addError(profileName, i+1, line, ErrorType.ILLEGAL_GLOBAL_THEME_FLAG, "");
+                Errors.addError(profileName, i, line, ErrorType.ILLEGAL_GLOBAL_THEME_FLAG, "");
 
             else
-                profile.stacker.addElements(line, profile, i + 1, profile.enabled);
+                profile.stacker.addElements(line, profile, i, profile.enabled);
 
         }
 
@@ -221,10 +221,6 @@ public class Profile {
         profile.sections.removeIf(s -> s.elements.isEmpty());
 
         return profile;
-    }
-
-    public String getDisplayName() {
-        return displayName != null ? displayName : name;
     }
 
 }

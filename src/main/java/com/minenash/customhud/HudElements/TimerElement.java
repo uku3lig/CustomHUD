@@ -41,7 +41,7 @@ public class TimerElement implements HudElement {
 
     @Override
     public String getString() {
-        return NumberSupplierElement.formatString(get()*scale, formatter, precision);
+        return NumElement.formatString(get()*scale, formatter, precision);
     }
 
     @Override

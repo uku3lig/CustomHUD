@@ -83,7 +83,7 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public boolean getBoolean() { return sanitize(supplier, function, Double.NaN).doubleValue() > 0; }
         @Override public String getString() {
             double num = getNumber().doubleValue() * scale;
-            return NumberSupplierElement.formatString(num, formatter, precision);
+            return NumElement.formatString(num, formatter, precision);
         }
     }
 

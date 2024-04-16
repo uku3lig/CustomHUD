@@ -2,7 +2,9 @@ package com.minenash.customhud.render;
 
 import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.MultiElement;
+import com.minenash.customhud.HudElements.functional.ExecuteElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.HudElements.functional.SetValueElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.ProfileManager;
@@ -144,6 +146,8 @@ public class CustomHudRenderer {
                     else if (e instanceof FunctionalElement.AdvanceList)    ListManager.advance();
                     else if (e instanceof FunctionalElement.PushList push)  ListManager.push(push.values);
                     else if (e instanceof FunctionalElement.PopList)        ListManager.pop();
+
+                    if (e instanceof ExecuteElement ee)                     ee.run();
 
                 } else {
                     builder.append(e.getString());

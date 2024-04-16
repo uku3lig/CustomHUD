@@ -32,9 +32,9 @@ public class MultiLineStacker {
 
     public void elseIf(String cond, Profile profile, int line, String source, ComplexData.Enabled enabled) {
         if (stack.isEmpty())
-            Errors.addError(profile.name, line+1, source, ErrorType.CONDITIONAL_NOT_STARTED, "else if");
+            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else if");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
-            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line + 1, enabled, getProvider()));
+            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, getProvider()));
         else {
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
@@ -42,13 +42,13 @@ public class MultiLineStacker {
                     break;
                 }
             }
-            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line + 1, enabled, getProvider()));
+            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, getProvider()));
         }
     }
 
     public void else1(Profile profile, int line, String source) {
         if (stack.isEmpty())
-            Errors.addError(profile.name, line+1, source, ErrorType.CONDITIONAL_NOT_STARTED, "=else=");
+            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "=else=");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
             mlb.setConditional(new Operation.Literal(1));
         else {
@@ -65,7 +65,7 @@ public class MultiLineStacker {
 
     public void endIf(Profile profile, int line, String source) {
         if (stack.isEmpty())
-            Errors.addError(profile.name, line+1, source, ErrorType.CONDITIONAL_NOT_STARTED, "end");
+            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "end");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb) {
             HudElement element = mlb.build();
             stack.pop();
@@ -123,7 +123,7 @@ public class MultiLineStacker {
 
     public void endFor(Profile profile, int line, String source) {
         if (stack.isEmpty()) {
-            Errors.addError(profile.name, line + 1, source, ErrorType.LIST_NOT_STARTED, "");
+            Errors.addError(profile.name, line, source, ErrorType.LIST_NOT_STARTED, "");
             return;
         }
         if (stack.peek() instanceof ListElement.MultiLineBuilder leb) {
@@ -155,7 +155,7 @@ public class MultiLineStacker {
     }
 
     public void addElements(String source, Profile profile, int line, ComplexData.Enabled enabled) {
-        List<HudElement> elements = VariableParser.addElements(source, profile, line + 1, enabled, true, getProvider());
+        List<HudElement> elements = VariableParser.addElements(source, profile, line, enabled, true, getProvider());
         if (stack.empty())
             base.addAll(elements);
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
@@ -169,12 +169,12 @@ public class MultiLineStacker {
             if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb) {
                 stack.pop();
                 addElement(mlb.build());
-                Errors.addError(profile.name, endLine+1, endOfFile ? "end of profile" : "end of section", ErrorType.CONDITIONAL_NOT_ENDED, "");
+                Errors.addError(profile.name, endLine, endOfFile ? "end of profile" : "end of section", ErrorType.CONDITIONAL_NOT_ENDED, "");
             }
             else if (stack.peek() instanceof ListElement.MultiLineBuilder leb) {
                 stack.pop();
                 addElement(leb.build());
-                Errors.addError(profile.name, endLine+1, endOfFile ? "end of profile" : "end of section", ErrorType.LIST_NOT_STARTED, "");
+                Errors.addError(profile.name, endLine, endOfFile ? "end of profile" : "end of section", ErrorType.LIST_NOT_STARTED, "");
             }
 
         }

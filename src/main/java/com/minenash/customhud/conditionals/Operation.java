@@ -40,7 +40,7 @@ public interface Operation {
                 return 0;
             }
             if (!(element instanceof MultiElement me))
-                return  CLIENT.textRenderer.getWidth(element.getString());
+                return CLIENT.textRenderer.getWidth(element.getString());
 
             double length = 0;
             for (HudElement e : me.expand())

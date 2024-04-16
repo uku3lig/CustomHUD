@@ -1,6 +1,8 @@
 package com.minenash.customhud;
 
 import com.minenash.customhud.HudElements.*;
+import com.minenash.customhud.HudElements.functional.GetValueElement;
+import com.minenash.customhud.HudElements.functional.SetValueElement;
 import com.minenash.customhud.HudElements.list.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.HudElement;
@@ -44,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -335,6 +338,37 @@ public class VariableParser {
             return new SpaceElement( op );
         }
 
+        if (part.startsWith("set:")) {
+            int commaIndex = part.indexOf(",");
+            if (commaIndex == -1) {
+                String valueName = part.substring(4).trim();
+                return new SetValueElement(valueName, new Operation.Literal(0));
+            }
+            Operation op = ExpressionParser.parseExpression(part.substring(commaIndex+1).trim(), part, profile, debugLine, enabled, listProvider);
+            return new SetValueElement(part.substring(4,commaIndex), op);
+        }
+
+        if (part.startsWith("setmacro:") || part.startsWith("setm:")) {
+            int commaIndex = part.indexOf(",");
+            if (commaIndex == -1) {
+                String macroName = part.substring(part.indexOf(":")+1).trim();
+                profile.macros.put(macroName, new Macro(Collections.singletonList( new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine() ), null));
+                return new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine();
+            }
+            String macroName = part.substring(part.indexOf(":")+1, commaIndex).trim();
+            String macroStr = part.substring(commaIndex+1).trim();
+            Macro macro;
+
+            Matcher matcher = SPACE_STR_PATTERN.matcher(macroStr);
+            if (matcher.matches())
+                macro = new Macro(addElements(matcher.group(1), profile, debugLine, enabled, false, listProvider), null);
+            else
+               macro = new Macro(null, ExpressionParser.parseExpression(macroStr.trim(), part, profile, debugLine, enabled, listProvider));
+            profile.macros.put(macroName, macro);
+
+            return new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine();
+        }
+
         if (part.startsWith("real_time:")) {
             try {
                 return new RealTimeElement(new SimpleDateFormat(part.substring(10)));
@@ -369,6 +403,15 @@ public class VariableParser {
             }
             if (element != null)
                 return Flags.wrap(element, flags);
+        }
+
+        if (part.startsWith("get:")) {
+            String valueName = part.substring(4);
+            return new GetValueElement(valueName, flags);
+        }
+
+        if (part.startsWith("macro:") || part.startsWith("m:")) {
+            return new MacroElement( part.substring(part.indexOf(":")+1), flags );
         }
 
         if (part.startsWith("score:")) {
@@ -1278,12 +1321,6 @@ public class VariableParser {
             return Flags.wrap(element, flags);
         return element;
 
-//        if (element instanceof FunctionalElement.CreateListElement cle)
-//            return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original);
-//        if (element != null)
-//            return Flags.wrap(element, flags);
-//        Errors.addError(profile.name, debugLine, original, unknownAttribute, method);
-//        return null;
     }
 
 

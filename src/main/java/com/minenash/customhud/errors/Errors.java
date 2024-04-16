@@ -20,7 +20,7 @@ public class Errors {
     }
 
     public static Error addError(String profileName, int line, String source, ErrorType type, String context) {
-        return addError(profileName, Integer.toString(line), source, type, context);
+        return addError(profileName, Integer.toString(line+1), source, type, context);
     }
     public static Error addError(String profileName, String line, String source, ErrorType type, String context) {
         Error e = new Error(line, source, type, context);

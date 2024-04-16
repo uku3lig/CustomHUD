@@ -36,7 +36,7 @@ public class ProfileLineEntry extends LineEntry {
     public ProfileLineEntry(Profile profile, ProfileLinesWidget widget) {
         this.profile = profile;
         this.widget = widget;
-        this.displayName = profile.getDisplayName();
+        this.displayName = profile.name;
 
         this.selected = button(ProfileManager.getActive() == profile ? "☑" : "☐", "Swap to this profile", 16, (b) -> {
             ProfileManager.setActive(profile);
@@ -103,7 +103,7 @@ public class ProfileLineEntry extends LineEntry {
         else {
             if (!editName.getText().equals(profile.name)) {
                 ProfileManager.rename(profile, editName.getText());
-                displayName = profile.getDisplayName();
+                displayName = profile.name;
             }
             context.drawTextWithShadow(CLIENT.textRenderer, truncateName(x, eWidth), x + 16 + 20 + 4, y + 4, 0xFFFFFF);
         }
