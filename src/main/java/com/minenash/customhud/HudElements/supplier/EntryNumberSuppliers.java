@@ -130,4 +130,12 @@ public class EntryNumberSuppliers {
     public static final Entry ALLOCATED = of( () -> toMiB(runtime.totalMemory()), 0);
 //    public static final Entry OFF_HEAP = of( () -> toMiB(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed() + NativeBuffer.getTotalAllocated()), 0);
 
+    private static final double PHI_CONST = (1 + Math.sqrt(5))/2;
+
+    public static final Entry E = of( () -> Math.E, 10);
+    public static final Entry PI = of( () -> Math.PI, 10);
+    public static final Entry TAU = of( () -> Math.PI*2, 10);
+    public static final Entry PHI = of( () -> PHI_CONST, 10);
+
+
 }

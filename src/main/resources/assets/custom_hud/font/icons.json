@@ -1,0 +1,12 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "custom_hud:font/icons.png",
+      "ascent": 8,
+      "chars": [
+        "D"
+      ]
+    }
+  ]
+}

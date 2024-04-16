@@ -8,6 +8,7 @@ import java.util.List;
 
 public abstract class Section {
     private static MinecraftClient client = MinecraftClient.getInstance();
+    public enum TextAlign {LEFT, CENTER, RIGHT}
 
     public int xOffset = 0;
     public int yOffset = 0;

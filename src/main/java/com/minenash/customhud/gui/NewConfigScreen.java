@@ -13,11 +13,14 @@ import net.minecraft.client.gui.navigation.GuiNavigation;
 import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
@@ -59,6 +62,24 @@ public class NewConfigScreen extends Screen {
 
         this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
                 .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+
+        this.addDrawableChild( ButtonWidget.builder(linkText("D", " Support"),
+                button -> Util.getOperatingSystem().open("https://jakobt.dev/discord"))
+                .position(width - 68 - 4, 6).size(68, 16).build() );
+
+        this.addDrawableChild( ButtonWidget.builder( Text.literal("Wiki / Docs"),
+                button -> Util.getOperatingSystem().open("https://customhud.dev/v3/getting_started"))
+                .position(width - 68 - 4 - 68 - 4, 6).size(68, 16).build() );
+
+
+        this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
+                .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+    }
+
+    private static final Style ICONS = Style.EMPTY.withFont(Identifier.of("custom_hud", "icons"));
+    private static final Style DEFAULT = Style.EMPTY.withFont(Style.DEFAULT_FONT_ID);
+    private Text linkText(String icon, String msg) {
+        return Text.literal(icon).setStyle(ICONS).append(Text.literal(msg).setStyle(DEFAULT));
     }
 
     @Override
@@ -66,7 +87,7 @@ public class NewConfigScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(font, Text.translatable("config.custom_hud.title"), this.width / 2, 11, 0xFFFFFF);
         profiles.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(font, "§8§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(font, "§oDrag and drop profile files here to add it", this.width / 2, this.height-46, 0x888888);
 
     }
 
