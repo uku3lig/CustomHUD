@@ -19,7 +19,7 @@ import java.util.function.Function;
 @SuppressWarnings("DuplicatedCode")
 public class ExpressionParser {
 
-    public enum TokenType { START_PREN, END_PREN, FULL_PREN, FUNCTION, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE, IF, ELSE, TERNARY }
+    public enum TokenType { START_PREN, END_PREN, FULL_PREN, FUNCTION, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE, NEGATED_VARIABLE, IF, ELSE, TERNARY }
     public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS }
     public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
     public record TernaryTokens(List<Token> conditional, List<Token> left, List<Token> right) {}
@@ -84,11 +84,21 @@ public class ExpressionParser {
             else if (c == '-' && i+1 < chars.length && (!tokens.isEmpty() && SUBTRACTABLE.contains(tokens.get(tokens.size() - 1).type)))
                 tokens.add(new Token(TokenType.MATH, MathOperator.SUBTRACT));
             else if (c == '!') {
-                if (i + 1 == chars.length || chars[i + 1] != '=')
+                if (i + 1 == chars.length)
                     throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "!");
-                tokens.add(new Token(TokenType.COMPARISON, Comparison.NOT_EQUALS));
-                i += 2;
-                continue;
+                if (chars[i + 1] == '=') {
+                    tokens.add(new Token(TokenType.COMPARISON, Comparison.NOT_EQUALS));
+                    i++;
+                }
+                else if (chars[i + 1] == '(') {
+                    tokens.add(new Token(TokenType.START_PREN, NEGATE));
+                    i++;
+                }
+                else if (isVar(chars[i + 1])) {
+                    i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSupplier) - 1;
+                }
+                else
+                    throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "!");
             }
             else if (c == '>') {
                 boolean hasEqual =  i + 1 != chars.length && chars[i + 1] == '=';
@@ -128,25 +138,7 @@ public class ExpressionParser {
                 continue;
             }
             else if (isVar(c)) {
-                Pair<Token,Integer> func = getFunctionStart(chars, i);
-                if (func != null) {
-                    tokens.add(func.getLeft());
-                    i += func.getRight();
-                    continue;
-                }
-
-                StringBuilder builder = new StringBuilder();
-                builder.append('{');
-                while (i < chars.length && isVar(chars[i])) {
-                    builder.append(chars[i]);
-                    i++;
-                }
-                builder.append('}');
-                HudElement element = VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSupplier);
-                if (element == null)
-                    tokens.add(new Token(TokenType.BOOLEAN, false));
-                else
-                    tokens.add(new Token(TokenType.VARIABLE, element));
+                i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSupplier);
                 continue;
             }
             i++;
@@ -183,12 +175,46 @@ public class ExpressionParser {
     }
     private static boolean isVar(char c) {
         return c == '.' || c == ':' || c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
-                || c == '[' || c == ']' || c == ',';
+                || c == '[' || c == ']' || c == ',' || c == 'π' || c == 'τ' || c == 'φ';
+    }
+
+    private static int parseVariable(List<Token> tokens, char[] chars, int i, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProvider listSupplier) {
+        Pair<Token,Integer> func = getFunctionStart(chars, i);
+        if (func != null) {
+            tokens.add(func.getLeft());
+            return func.getRight();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append('{');
+        int offset = 0;
+
+        boolean negate = false;
+        if (chars[i] == '!') {
+            negate = true;
+            i++;
+            offset++;
+        }
+
+        while (i < chars.length && isVar(chars[i])) {
+            builder.append(chars[i]);
+            i++;
+            offset++;
+        }
+        builder.append('}');
+
+        HudElement element = VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSupplier);
+        if (element == null)
+            tokens.add(new Token(TokenType.BOOLEAN, false));
+        else
+            tokens.add(new Token(negate ? TokenType.NEGATED_VARIABLE : TokenType.VARIABLE, element));
+        return offset;
     }
 
 
     private static final double DR = 0.017453292519943295;
     private static final double RD = 57.29577951308232;
+    private static final Function<Double,Double> NEGATE = (in) -> in > 0 ? 0.0 : 1.0;
     private static final Function<Double,Double> SIN  = (in) -> round (Math.sin(in * DR) );
     private static final Function<Double,Double> COS  = (in) -> round (Math.cos(in * DR) );
     private static final Function<Double,Double> TAN  = (in) -> round (Math.tan(in * DR) );
@@ -214,6 +240,8 @@ public class ExpressionParser {
             if (!isFunc(chars[j]) )
                 return null;
         }
+        if (pren == -1)
+            return null;
 
         String funcStr = new String(Arrays.copyOfRange(chars, i, pren));
         Function<Double,Double> func = switch ( funcStr ) {
@@ -321,7 +349,7 @@ public class ExpressionParser {
 
     private static Operation getConditional(List<Token> tokens) throws ErrorException {
         if (tokens.isEmpty())
-            throw new ErrorException(ErrorType.EMPTY_TERNARY_SECTION, "");
+            throw new ErrorException(ErrorType.EMPTY_SECTION, "");
         List<List<Token>> ors = split(tokens, TokenType.OR);
         List<Operation> conditionals = new ArrayList<>();
         for (var or : ors)
@@ -403,6 +431,7 @@ public class ExpressionParser {
     private static HudElement getValueElement(Token token) throws ErrorException {
         return switch (token.type()) {
             case VARIABLE -> (HudElement) token.value();
+            case NEGATED_VARIABLE -> new SudoElements.Op(new Operation.Negate((HudElement) token.value()));
             case STRING -> new SudoElements.Str((String) token.value());
             case NUMBER -> new SudoElements.Num((Number) token.value());
             case BOOLEAN -> new SudoElements.Bool((Boolean) token.value());
@@ -433,6 +462,7 @@ public class ExpressionParser {
             case BOOLEAN -> new Operation.Literal(((Boolean) token.value()) ? 1 : 0);
             case NUMBER -> new Operation.Literal((Double) token.value());
             case VARIABLE -> new Operation.Element((HudElement) token.value());
+            case NEGATED_VARIABLE -> new Operation.Negate((HudElement) token.value());
             case FUNCTION -> {
                 Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
                 yield new Operation.Func(pair.getLeft(), getConditional(pair.getRight()));

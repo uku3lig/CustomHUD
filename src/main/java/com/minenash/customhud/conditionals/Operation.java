@@ -106,6 +106,19 @@ public interface Operation {
         }
     }
 
+    record Negate(HudElement element) implements Operation {
+        @Override
+        public double getValue() {
+            return element.getBoolean() ? 0 : 1;
+        }
+
+        @Override
+        public void printTree(int indent) {
+            System.out.println(indent(indent) + "- Negate: " + element.getString());
+
+        }
+    }
+
     class Comparison implements Operation {
         public final HudElement left, right;
         public final boolean checkBool, checkNum;
