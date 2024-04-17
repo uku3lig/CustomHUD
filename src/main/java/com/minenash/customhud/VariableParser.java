@@ -1083,6 +1083,11 @@ public class VariableParser {
             case "actionbar_remaining" -> ACTIONBAR_REMAINING;
             case "title_remaining" -> TITLE_REMAINING;
 
+            case "pi", "π" -> PI;
+            case "tau", "τ" -> TAU;
+            case "phi", "φ", "golden_ratio" -> PHI;
+            case "e" -> E;
+
             default -> null;
         };
     }
