@@ -50,6 +50,7 @@ public enum ErrorType {
     CONDITIONAL_UNEXPECTED_VALUE ("Conditionals", "conditionals", "Unexpected Value: §e"),
     CONDITIONAL_WRONG_NUMBER_OF_TOKENS ("Conditionals", "conditionals", "Expected 4 tokens, found §e"),
     MALFORMED_CONDITIONAL ("Conditionals", "conditionals", "Malformed conditional: "),
+    EMPTY_TERNARY_SECTION ("Conditionals", "conditionals", "Empty ternary section"),
     MALFORMED_LIST ("CHANGE ME", "CHANGE ME", "Malformed list variable: "),
     MALFORMED_BAR ("CHANGE ME", "CHANGE ME", "Malformed bar variable: "),
     MALFORMED_LOOP ("CHANGE ME", "CHANGE ME", "Malformed loop: "),

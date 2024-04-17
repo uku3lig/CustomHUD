@@ -8,17 +8,21 @@ import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.ErrorException;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 @SuppressWarnings("DuplicatedCode")
 public class ExpressionParser {
 
-    public enum TokenType { START_PREN, END_PREN, FULL_PREN, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE }
+    public enum TokenType { START_PREN, END_PREN, FULL_PREN, FUNCTION, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE, IF, ELSE, TERNARY }
     public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS }
     public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
+    public record TernaryTokens(List<Token> conditional, List<Token> left, List<Token> right) {}
 
     record Token(TokenType type, Object value) {
         public String toString() {
@@ -58,6 +62,8 @@ public class ExpressionParser {
             char c = chars[i];
             if (c == '(') tokens.add(new Token(TokenType.START_PREN, null));
             else if (c == ')') tokens.add(new Token(TokenType.END_PREN, null));
+            else if (c == '?') tokens.add(new Token(TokenType.IF, null));
+            else if (c == ';') tokens.add(new Token(TokenType.ELSE, null));
             else if (c == '|') {
                 if (i + 1 != chars.length && chars[i + 1] == '|') i++;
                 tokens.add(new Token(TokenType.OR, null));
@@ -122,6 +128,13 @@ public class ExpressionParser {
                 continue;
             }
             else if (isVar(c)) {
+                Pair<Token,Integer> func = getFunctionStart(chars, i);
+                if (func != null) {
+                    tokens.add(func.getLeft());
+                    i += func.getRight();
+                    continue;
+                }
+
                 StringBuilder builder = new StringBuilder();
                 builder.append('{');
                 while (i < chars.length && isVar(chars[i])) {
@@ -150,12 +163,13 @@ public class ExpressionParser {
                 start = i;
             }
             else if (type == TokenType.END_PREN) {
-                reduceList(tokens, start, i);
+                reducePren(tokens, start, i);
                 start = -1;
                 i = -1;
             }
-
         }
+
+        reduceTernary0(tokens);
 
 //        System.out.println("---------------");
 //        for (Token token : tokens)
@@ -171,13 +185,143 @@ public class ExpressionParser {
         return c == '.' || c == ':' || c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
                 || c == '[' || c == ']' || c == ',';
     }
-    private static void reduceList(List<Token> original, int start, int end) {
-        original.set(start, new Token(TokenType.FULL_PREN, new ArrayList<>(original.subList(start+1, end))));
+
+
+    private static final double DR = 0.017453292519943295;
+    private static final double RD = 57.29577951308232;
+    private static final Function<Double,Double> SIN  = (in) -> round (Math.sin(in * DR) );
+    private static final Function<Double,Double> COS  = (in) -> round (Math.cos(in * DR) );
+    private static final Function<Double,Double> TAN  = (in) -> round (Math.tan(in * DR) );
+    private static final Function<Double,Double> CSC  = (in) -> round (1 / (Math.sin(in * DR)) );
+    private static final Function<Double,Double> SEC  = (in) -> round (1 / (Math.cos(in * DR)) );
+    private static final Function<Double,Double> COT  = (in) -> round (1 / (Math.tan(in * DR)) );
+    private static final Function<Double,Double> ASIN = (in) -> round (RD * Math.asin(in) );
+    private static final Function<Double,Double> ACOS = (in) -> round (RD * Math.acos(in) );
+    private static final Function<Double,Double> ATAN = (in) -> round (RD * Math.atan(in) );
+    private static final Function<Double,Double> ACSC = (in) -> round (RD * Math.asin(1 / in) );
+    private static final Function<Double,Double> ASEC = (in) -> round (RD * Math.acos(1 / in) );
+    private static final Function<Double,Double> ACOT = (in) -> round (RD * Math.atan(1 / in) );
+    private static final Function<Double,Double> ROUND = (in) -> (double) Math.round(in);
+    private static double round(double in) { return Math.round(in * 100000) / 100000D; }
+
+    private static Pair<Token,Integer> getFunctionStart(char[] chars, int i) {
+        int pren = -1;
+        for (int j = i; j < chars.length; j++) {
+            if (chars[j] == '(') {
+                pren = j;
+                break;
+            }
+            if (!isFunc(chars[j]) )
+                return null;
+        }
+
+        String funcStr = new String(Arrays.copyOfRange(chars, i, pren));
+        Function<Double,Double> func = switch ( funcStr ) {
+            case "sin" -> SIN;
+            case "cos" -> COS;
+            case "tan" -> TAN;
+            case "csc" -> CSC;
+            case "sec" -> SEC;
+            case "cot" -> COT;
+            case "asin" -> ASIN;
+            case "acos" -> ACOS;
+            case "atan" -> ATAN;
+            case "acsc" -> ACSC;
+            case "asec" -> ASEC;
+            case "acot" -> ACOT;
+
+            case "round" -> ROUND;
+            case "ceil" -> Math::ceil;
+            case "floor" -> Math::floor;
+            case "ln" -> Math::log;
+            case "log" -> Math::log10;
+            case "sqrt" -> Math::sqrt;
+            case "abs" -> Math::abs;
+            default -> null;
+        };
+        return func == null ? null : new Pair<>(new Token(TokenType.START_PREN, func), funcStr.length()+1);
+
+    }
+    private static boolean isFunc(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+
+    private static void reducePren(List<Token> original, int start, int end) {
+        Function<Double,Double> func = (Function<Double, Double>) original.get(start).value;
+        if (func == null)
+            original.set(start, new Token(TokenType.FULL_PREN, new ArrayList<>(original.subList(start+1, end))));
+        else
+            original.set(start, new Token(TokenType.FUNCTION, new Pair<>( func, new ArrayList<>(original.subList(start+1, end)))));
         for (; end > start; end--)
             original.remove(end);
     }
 
+    private static void reduceTernary0(List<Token> original) {
+        for (Token token : original)
+            if (token.type == TokenType.FULL_PREN)
+                reduceTernary0( (List<Token>) token.value );
+        reduceTernary(original);
+    }
+
+    private static void reduceTernary(List<Token> original) {
+        boolean foundIf;
+        do {
+            int start = 0;
+            int ifIndex = -1;
+            int elseIndex = -1;
+            foundIf = false;
+
+            for (int i = 0; i < original.size(); i++) {
+                TokenType type = original.get(i).type();
+                if (type == TokenType.IF) {
+                    foundIf = true;
+                    start = elseIndex != -1 ? elseIndex + 1 : ifIndex + 1;
+                    ifIndex = i;
+                    elseIndex = -1;
+                } else if (type == TokenType.ELSE && ifIndex != -1) {
+                    if (elseIndex == -1) {
+                        elseIndex = i;
+                    } else {
+                        List<Token> conditional = new ArrayList<>(original.subList(start, ifIndex));
+                        List<Token> left = new ArrayList<>(original.subList(ifIndex + 1, elseIndex));
+                        List<Token> right = new ArrayList<>(original.subList(elseIndex + 1, i));
+                        Token ter = new Token(TokenType.TERNARY, new TernaryTokens(conditional, left, right));
+                        original.set(start, ter);
+                        while (--i > start)
+                            original.remove(i);
+                        i = -1;
+                        start = 0;
+                        ifIndex = elseIndex = -1;
+                    }
+                }
+            }
+            if (elseIndex != -1) {
+                List<Token> conditional = new ArrayList<>(original.subList(start, ifIndex));
+                List<Token> left = new ArrayList<>(original.subList(ifIndex + 1, elseIndex));
+                List<Token> right = new ArrayList<>(original.subList(elseIndex + 1, original.size()));
+                Token ter = new Token(TokenType.TERNARY, new TernaryTokens(conditional, left, right));
+                original.set(start, ter);
+                if (original.size() > start + 1)
+                    original.subList(start + 1, original.size()).clear();
+            } else if (ifIndex != -1) {
+                List<Token> conditional = new ArrayList<>(original.subList(start, ifIndex));
+                List<Token> left = new ArrayList<>(original.subList(ifIndex + 1, original.size()));
+                List<Token> right = Collections.emptyList();
+                Token ter = new Token(TokenType.TERNARY, new TernaryTokens(conditional, left, right));
+                original.set(start, ter);
+                if (original.size() > start + 1)
+                    original.subList(start + 1, original.size()).clear();
+            }
+        } while (foundIf);
+
+
+
+    }
+
     private static Operation getConditional(List<Token> tokens) throws ErrorException {
+        if (tokens.isEmpty())
+            throw new ErrorException(ErrorType.EMPTY_TERNARY_SECTION, "");
         List<List<Token>> ors = split(tokens, TokenType.OR);
         List<Operation> conditionals = new ArrayList<>();
         for (var or : ors)
@@ -232,14 +376,14 @@ public class ExpressionParser {
         Pair<List<List<Token>>, List<MathOperator>> addPairs = split(tokens, List.of(MathOperator.ADD, MathOperator.SUBTRACT));
         List<Operation> ops = new ArrayList<>();
 
-        for (var partTokens : addPairs.getFirst()) {
+        for (var partTokens : addPairs.getLeft()) {
             Pair<List<List<Token>>, List<MathOperator>> multiplyPairs = split(partTokens, List.of(MathOperator.MULTIPLY, MathOperator.DIVIDE, MathOperator.MOD));
             List<Operation> ops2 = new ArrayList<>();
 
-            for (var partPartToken : multiplyPairs.getFirst()) {
+            for (var partPartToken : multiplyPairs.getLeft()) {
                 Pair<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
                 List<HudElement> elements = new ArrayList<>();
-                for (var partPartPartToken : exponentPairs.getFirst()) {
+                for (var partPartPartToken : exponentPairs.getLeft()) {
                     if (partPartPartToken.size() > 1)
                         throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation between values");
                     elements.add( getValueElement(partPartPartToken.get(0)) );
@@ -247,13 +391,11 @@ public class ExpressionParser {
                 if (elements.size() == 1)
                     ops2.add(new Operation.Element(elements.get(0)));
                 else
-                    ops2.add(new Operation.MathOperation(elements, exponentPairs.getSecond()));
+                    ops2.add(new Operation.MathOperation(elements, exponentPairs.getRight()));
             }
-            ops.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getSecond()));
+            ops.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getRight()));
         }
-        return ops.size() == 1 ? ops.get(0) : new Operation.MathOperationsOp(ops, addPairs.getSecond());
-
-
+        return ops.size() == 1 ? ops.get(0) : new Operation.MathOperationsOp(ops, addPairs.getRight());
 
     }
 
@@ -265,6 +407,21 @@ public class ExpressionParser {
             case NUMBER -> new SudoElements.Num((Number) token.value());
             case BOOLEAN -> new SudoElements.Bool((Boolean) token.value());
             case FULL_PREN -> new SudoElements.Op(getConditional((List<Token>) token.value()));
+            case FUNCTION -> {
+                Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
+                yield new SudoElements.Op(new Operation.Func(pair.getLeft(), getConditional(pair.getRight())));
+            }
+            case TERNARY -> {
+                TernaryTokens tokens = (TernaryTokens) token.value();
+                yield new SudoElements.Op( new Operation.Ternary(
+                        getConditional( tokens.conditional),
+                        getConditional( tokens.left),
+                        getConditional( tokens.right)
+                ) );
+            }
+            case IF -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "? (IF)");
+            case ELSE -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "; (ELSE)");
+
             default -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, token.type().toString());
         };
     }
@@ -276,6 +433,21 @@ public class ExpressionParser {
             case BOOLEAN -> new Operation.Literal(((Boolean) token.value()) ? 1 : 0);
             case NUMBER -> new Operation.Literal((Double) token.value());
             case VARIABLE -> new Operation.Element((HudElement) token.value());
+            case FUNCTION -> {
+                Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
+                yield new Operation.Func(pair.getLeft(), getConditional(pair.getRight()));
+            }
+            case TERNARY -> {
+                TernaryTokens tokens = (TernaryTokens) token.value();
+                yield new Operation.Ternary(
+                        getConditional( tokens.conditional),
+                        getConditional( tokens.left),
+                        getConditional( tokens.right)
+                );
+            }
+            case IF -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "? (IF)");
+            case ELSE -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "; (ELSE)");
+
             default -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, token.type().toString());
         };
     }
@@ -312,7 +484,7 @@ public class ExpressionParser {
                 current.add(token);
         }
         sections.add(current);
-        return Pair.of(sections, operators);
+        return new Pair<>(sections, operators);
     }
 
 

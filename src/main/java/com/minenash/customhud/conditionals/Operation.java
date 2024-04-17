@@ -7,6 +7,7 @@ import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.complex.ListManager;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -53,6 +54,23 @@ public interface Operation {
             System.out.println(indent(indent) + "- Length: ");
             for (HudElement elem : elements)
                 System.out.println(indent(indent+1) + elem.toString());
+        }
+    }
+
+    record Ternary(Operation conditional, Operation left, Operation right) implements Operation {
+
+        @Override
+        public double getValue() {
+            return conditional.getValue() > 0 ? left.getValue() : right.getValue();
+        }
+
+        @Override
+        public void printTree(int indent) {
+            System.out.println(indent(indent) + "- Ternary: ");
+            conditional.printTree(indent+2);
+            left.printTree(indent+2);
+            right.printTree(indent+2);
+
         }
     }
 
@@ -193,6 +211,18 @@ public interface Operation {
             System.out.println(indent(indent) + "- Operations: " + operations.toString());
             for (Operation op : elements)
                 op.printTree(indent + 2);
+        }
+    }
+
+    record Func(Function<Double,Double> func, Operation op) implements Operation {
+        public double getValue() {
+            return func.apply(op.getValue());
+        }
+
+        @Override
+        public void printTree(int indent) {
+            System.out.println(indent(indent) + "- Function: " + func.toString());
+            op.printTree(indent + 2);
         }
     }
 
