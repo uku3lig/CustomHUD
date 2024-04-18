@@ -2,6 +2,7 @@ package com.minenash.customhud.data;
 
 import com.minenash.customhud.HudElements.HudElement;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +29,17 @@ public abstract class Section {
             case CENTER -> maxLineWidth/2F - lineWidth/2F;
             case RIGHT -> maxLineWidth-lineWidth;
         };
-        return xOffset + Math.round(switch (sAlign) {
-            case LEFT -> 5 + base + xOffset;
-            case CENTER -> right/2F - maxLineWidth/2F + base;
+        return xOffset + MathHelper.ceil(switch (sAlign) {
+            case LEFT -> 5 + base;
+            case CENTER -> 1 + right/2F - maxLineWidth/2F + base;
             case RIGHT -> right - maxLineWidth + base;
         });
     }
 
-    public int getSetWidthBgX(int right, int maxLineWidth) { return Math.round(switch (sAlign) {
-        case LEFT -> 5 + xOffset;
-        case CENTER -> right/2F - (width >= 0 ? width : maxLineWidth)/2F;
-        case RIGHT -> right - 1 - (width >= 0 ? width : maxLineWidth);
+    public int getSetWidthBgX(int right, int maxLineWidth) { return xOffset + MathHelper.ceil(switch (sAlign) {
+        case LEFT -> 5;
+        case CENTER -> 1 + right/2F - (width >= 0 ? width : maxLineWidth)/2F;
+        case RIGHT -> right - (width >= 0 ? width : maxLineWidth);
     });}
 
 
@@ -54,7 +55,7 @@ public abstract class Section {
     public static class Center extends Section {
         public Center(Align sAlign) { super(sAlign); }
         public int getStartY(HudTheme theme, int lines) {
-            return (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale()))/2 - (lines * (9 + theme.lineSpacing))/2 + yOffset;
+            return (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale()))/2 - (lines * (9 + theme.lineSpacing))/2 + yOffset +1;
         }
     }
 
