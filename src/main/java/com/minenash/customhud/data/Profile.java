@@ -25,7 +25,7 @@ public class Profile {
     public KeyBinding keyBinding;
     public boolean cycle = true;
 
-    public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+))? ?(?:, ?([-+]?\\d+))? ?(?:, ?(true|false))? ?(?:, ?(-?\\d+|fit|max))? ?==");
+    public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+))? ?(?:, ?([-+]?\\d+))? ?(?:, ?(true|false))? ?(?:, ?(-?\\d+|fit|max))? ?(?:, ?(left|right|center))? ?==");
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
@@ -148,17 +148,17 @@ public class Profile {
                 profile.stacker = new MultiLineStacker();
 
                 section = switch (matcher.group(1)) {
-                    case "topleft" -> new Section.TopLeft();
-                    case "topcenter" -> new Section.TopCenter();
-                    case "topright" -> new Section.TopRight();
+                    case "topleft" -> new Section.Top(Section.Align.LEFT);
+                    case "topcenter" -> new Section.Top(Section.Align.CENTER);
+                    case "topright" -> new Section.Top(Section.Align.RIGHT);
 
-                    case "centerleft" -> new Section.CenterLeft();
-                    case "centercenter" -> new Section.CenterCenter();
-                    case "centerright" -> new Section.CenterRight();
+                    case "centerleft" -> new Section.Center(Section.Align.LEFT);
+                    case "centercenter" -> new Section.Center(Section.Align.CENTER);
+                    case "centerright" -> new Section.Center(Section.Align.RIGHT);
 
-                    case "bottomleft" -> new Section.BottomLeft();
-                    case "bottomcenter" -> new Section.BottomCenter();
-                    case "bottomright" -> new Section.BottomRight();
+                    case "bottomleft" -> new Section.Bottom(Section.Align.LEFT);
+                    case "bottomcenter" -> new Section.Bottom(Section.Align.CENTER);
+                    case "bottomright" -> new Section.Bottom(Section.Align.RIGHT);
                     default -> null;
                 };
 
@@ -174,12 +174,21 @@ public class Profile {
                         default -> Integer.parseInt(matcher.group(5));
                     };
 
+                String textAlign = matcher.group(6);
+                if (textAlign != null)
+                    section.textAlign = switch (textAlign) {
+                        case "left" -> Section.Align.LEFT;
+                        case "right" -> Section.Align.RIGHT;
+                        case "center" -> Section.Align.CENTER;
+                        default -> section.textAlign;
+                    };
+
                 profile.sections.add(section);
 
                 continue;
             }
             if (section == null)
-                profile.sections.add(section = new Section.TopLeft());
+                profile.sections.add(section = new Section.Top(Section.Align.LEFT));
 
             if (( matcher = IF_PATTERN.matcher(lineLC) ).matches())
                 profile.stacker.startIf(matcher.group(1), profile, i, line, profile.enabled);

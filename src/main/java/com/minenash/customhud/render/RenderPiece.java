@@ -8,17 +8,20 @@ public class RenderPiece {
     public final Object value;
     public final Identifier font;
     public final int color;
+    public final int bgColor;
     public final boolean shadow;
     public final int y;
     public int x;
+    public int lineWith;
 
-    public RenderPiece(Object element, Object value, Identifier font, int x, int y, int color, boolean shadow) {
+    public RenderPiece(Object element, Object value, Identifier font, int x, int y, int color, int bgColor, boolean shadow) {
         this.element = element;
         this.value = value;
         this.font = font;
         this.x = x;
         this.y = y;
         this.color = color;
+        this.bgColor = bgColor;
         this.shadow = shadow;
     }
 

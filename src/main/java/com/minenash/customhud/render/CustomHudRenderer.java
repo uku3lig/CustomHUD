@@ -4,7 +4,6 @@ import com.minenash.customhud.HudElements.HudElement;
 import com.minenash.customhud.HudElements.MultiElement;
 import com.minenash.customhud.HudElements.functional.ExecuteElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
-import com.minenash.customhud.HudElements.functional.SetValueElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.ProfileManager;
@@ -58,10 +57,11 @@ public class CustomHudRenderer {
                 continue;
 
             CHFormatting formatting = theme.fgColor.copy();
-            int right = (int) (client.getWindow().getScaledWidth() * (1 / theme.getScale())) - 3 + section.xOffset;
-            boolean dynamicWidth = section.width == -1;
-            boolean maxWidth = section.width == -2;
-            int piecesOffset = pieces.size();
+            final int right = (int) (client.getWindow().getScaledWidth() * (1 / theme.getScale())) - 3 + section.xOffset;
+            final boolean dynamicWidth = section.width == -1;
+            final boolean maxWidth = section.width == -2;
+            int initialPiecesOffset = pieces.size();
+            int piecesOffset = initialPiecesOffset;
             int maxLineWidth = 0;
             List<MaxLineRenderPiece> maxLineRenderPieces = maxWidth ? new ArrayList<>() : null;
 
@@ -99,20 +99,15 @@ public class CustomHudRenderer {
                     String str = builder.toString();
                     if (!str.isEmpty()) {
                         str = formatting.getFormatting() + str;
-                        pieces.add(new RenderPiece(str, null, theme.font, xOffset, y, formatting.getColor(), theme.textShadow));
+                        pieces.add(new RenderPiece(str, null, theme.font, xOffset, y, formatting.getColor(), theme.bgColor, theme.textShadow));
                         xOffset += client.textRenderer.getWidth(str);
                         builder.setLength(0);
                     }
                     if (e instanceof FunctionalElement.NewLine) {
-                        int x1 = section.getStartX(right, xOffset);
+                        maxLineWidth = Math.max(maxLineWidth, xOffset);
                         for (int i = piecesOffset; i < pieces.size(); i++)
-                            pieces.get(i).x += x1;
+                            pieces.get(i).lineWith = xOffset;
                         piecesOffset = pieces.size();
-
-                        if (dynamicWidth && xOffset != 0)
-                            addLineBg(context, bgBuilder, x1-2, y - 2, x1 + xOffset + 2, y + 9 + theme.lineSpacing - 2, theme.bgColor);
-                        else if (maxWidth)
-                            maxLineWidth = Math.max(maxLineWidth, xOffset);
 
                         y += 9 + theme.lineSpacing;
                         xOffset = 0;
@@ -127,20 +122,21 @@ public class CustomHudRenderer {
                         formatting.apply(cfe.getFormatting(), theme);
                     } else if (e instanceof FunctionalElement.ChangeTheme cte) {
                         if ((maxWidth || !dynamicWidth) && theme.bgColor != cte.theme.bgColor) {
-                            int x1 = section.getStartX(right + 3, section.width) - 2;
                             if (maxWidth)
                                 maxLineRenderPieces.add(new MaxLineRenderPiece(theme.bgColor, staticWidthY - 2, y-2));
-                            else
+                            else {
+                                int x1 = section.getSetWidthBgX(right, maxLineWidth);
                                 addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + section.width, y - 2, theme.bgColor);
+                            }
                             staticWidthY = y;
                         }
                         theme = cte.theme;
                         font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
-                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, formatting.getColor(), false) );
+                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, formatting.getColor(), theme.bgColor, false) );
                         xOffset += ie.getTextWidth();
                     } else if (e instanceof TextElement te) {
-                        pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.textShadow) );
+                        pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.bgColor, theme.textShadow) );
                         xOffset += te.getTextWidth();
                     }
                     else if (e instanceof FunctionalElement.AdvanceList)    ListManager.advance();
@@ -154,14 +150,25 @@ public class CustomHudRenderer {
                 }
             }
 
+            for (;initialPiecesOffset < pieces.size(); initialPiecesOffset++) {
+                RenderPiece piece = pieces.get(initialPiecesOffset);
+                int left = section.getStartX(right, piece.lineWith, maxLineWidth);
+
+                if (dynamicWidth && piece.x == 0) {
+                    addLineBg(context, bgBuilder, left-2, piece.y - 2, left + piece.lineWith + 2, piece.y + 9 + theme.lineSpacing - 2, piece.bgColor);
+                }
+
+                piece.x += left;
+            }
+
             if (maxLineRenderPieces != null) {
-                int x1 = section.getStartX(right + 3, maxLineWidth+4) - 2;
+                int x1 = section.getSetWidthBgX(right, maxLineWidth);
                 for (MaxLineRenderPiece piece : maxLineRenderPieces)
-                    addLineBg(context, bgBuilder, x1, piece.y1, x1+maxLineWidth+4, piece.y2, piece.color);
-                addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + maxLineWidth+4, y - 2, theme.bgColor);
+                    addLineBg(context, bgBuilder, x1 - 2, piece.y1, x1+maxLineWidth+2, piece.y2, piece.color);
+                addLineBg(context, bgBuilder, x1 - 2, staticWidthY - 2, x1 + maxLineWidth+2, y - 2, theme.bgColor);
             }
             else if (!dynamicWidth) {
-                int x1 = section.getStartX(right + 3, section.width) - 2;
+                int x1 = section.getSetWidthBgX(right + 3, maxLineWidth) - 2;
                 addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + section.width, y - 2, theme.bgColor);
             }
 

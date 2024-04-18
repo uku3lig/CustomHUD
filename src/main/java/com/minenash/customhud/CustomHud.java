@@ -211,17 +211,18 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static void showToast(String profileName) {
-		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
-				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
-				Errors.hasErrors(profileName) ?
-						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
-							.append(CLIENT.currentScreen instanceof TitleScreen ?
-								Text.literal("§7, view in config screen via modmenu ")
-								: Text.literal("§7, press ")
-									.append(((MutableText)kb_showErrors.getBoundKeyLocalizedText()).formatted(Formatting.AQUA))
-									.append("§7 to view"))
-						: Text.literal("§aNo errors found")
-		));
+		return;
+//		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
+//				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
+//				Errors.hasErrors(profileName) ?
+//						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
+//							.append(CLIENT.currentScreen instanceof TitleScreen ?
+//								Text.literal("§7, view in config screen via modmenu ")
+//								: Text.literal("§7, press ")
+//									.append(((MutableText)kb_showErrors.getBoundKeyLocalizedText()).formatted(Formatting.AQUA))
+//									.append("§7 to view"))
+//						: Text.literal("§aNo errors found")
+//		));
 	}
 	public static void showAllUpdatedToast() {
 		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
