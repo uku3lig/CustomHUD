@@ -315,23 +315,20 @@ public class Attributers {
         int collinIndex = name.indexOf(":");
         if (collinIndex > 0) {
             String attr = name.substring(collinIndex+1);
+            boolean isIcon = attr.equals("i_icon");
             Supplier sup2 = switch (name.substring(0, collinIndex)) {
-                case "o_first" -> () -> new Pair(
-                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getAdjustedFirstBuyItem(),
-                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getAdjustedFirstBuyItem()
-                );
-                case "o_first_base" -> () -> new Pair(
-                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem(),
-                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getOriginalFirstBuyItem()
-                );
-                case "o_second" -> () -> new Pair(
-                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSecondBuyItem(),
-                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getSecondBuyItem()
-                );
-                case "o_result" -> () -> new Pair(
-                        (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem(),
-                        (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer)piece.value).getSellItem()
-                );
+                case "o_first" -> isIcon ?
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getAdjustedFirstBuyItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getAdjustedFirstBuyItem();
+                case "o_first_base" -> isIcon ?
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getOriginalFirstBuyItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem();
+                case "o_second" -> isIcon ?
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSecondBuyItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSecondBuyItem();
+                case "o_result" -> isIcon ?
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSellItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem();
                 default -> null;
             };
             if (sup2 != null)

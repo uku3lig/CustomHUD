@@ -52,8 +52,8 @@ public class ItemSupplierIconElement extends IconElement {
         Object result = supplier.get();
         if (result instanceof ItemStack stack)
             return stack;
-        if (result instanceof Pair pair)
-            return (ItemStack) ((Supplier)pair.getLeft()).get();
+        if (result instanceof Function<?,?> func)
+            return ((Function<RenderPiece, ItemStack>)func).apply(null);
         return ItemStack.EMPTY;
     }
     private ItemStack getStack(RenderPiece piece) {
@@ -62,8 +62,8 @@ public class ItemSupplierIconElement extends IconElement {
         Object result = supplier.get();
         if (result instanceof ItemStack stack)
             return stack;
-        if (result instanceof Pair pair)
-            return (ItemStack) ((Function)pair.getRight()).apply(piece);
+        if (result instanceof Function<?,?> func)
+            return ((Function<RenderPiece, ItemStack>)func).apply(piece);
         return ItemStack.EMPTY;
     }
 
