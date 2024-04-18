@@ -20,7 +20,7 @@ public class ProgressBarIcon extends IconElement {
     private final BarStyle style;
 
     public ProgressBarIcon(Operation numerator, Operation denominator, BarStyle style, Flags flags) {
-        super(flags, 182);
+        super(flags, style instanceof VillagerTextureStyle ? 102 : 182);
         this.numerator = numerator;
         this.denominator = denominator;
         this.style = style == null ? DEFAULT : style;
@@ -46,6 +46,8 @@ public class ProgressBarIcon extends IconElement {
         switch (settings) {
             case "experience", "xp": return XP;
             case "jump", "horse": return JUMP;
+            case "villager_green", "villager": return VILLAGER_GREEN;
+            case "villager_white": return VILLAGER_WHITE;
         }
 
         Color color = null;
@@ -106,6 +108,8 @@ public class ProgressBarIcon extends IconElement {
     public static BarStyle DEFAULT = new BossBarStyle(Color.WHITE, Style.PROGRESS);
     public static BarStyle XP = new TextureStyle(new Identifier("hud/experience_bar_progress"), new Identifier("hud/experience_bar_background"));
     public static BarStyle JUMP = new TextureStyle(new Identifier("hud/jump_bar_progress"), new Identifier("hud/jump_bar_background"));
+    public static BarStyle VILLAGER_GREEN = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_current"));
+    public static BarStyle VILLAGER_WHITE = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_result"));
     public interface BarStyle {
         void render(DrawContext context, float progress);
     }
@@ -130,6 +134,18 @@ public class ProgressBarIcon extends IconElement {
                 context.drawGuiTexture(fg, 182, 5, 0, 0, 0, 0, (int)(progress*182), 5);
 
         }
+    }
+
+    private static final Identifier EXPERIENCE_BAR_BACKGROUND_TEXTURE = new Identifier("container/villager/experience_bar_background");
+    public static class VillagerTextureStyle implements BarStyle {
+        private final Identifier fg;
+        public VillagerTextureStyle(Identifier fg) {this.fg = fg;}
+        public void render(DrawContext context, float progress) {
+            context.drawGuiTexture(EXPERIENCE_BAR_BACKGROUND_TEXTURE, 0, 0, 102, 5);
+            if (progress > 0)
+                context.drawGuiTexture(fg, 102, 5, 0, 0, 0, 0, (int)(progress*102), 5);
+        }
+
     }
 
 }

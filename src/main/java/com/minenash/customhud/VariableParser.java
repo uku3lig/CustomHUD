@@ -659,6 +659,12 @@ public class VariableParser {
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
+            case "target_villager_xp_bar", "tveb": {
+                enabled.targetEntity = enabled.targetVillager = true;
+                return new ProgressBarIcon( new Operation.Element(new NumberSupplierElement(VILLAGER_XP, new Flags())),
+                                            new Operation.Element(new NumberSupplierElement(VILLAGER_XP_NEEDED, new Flags())),
+                                            ProgressBarIcon.VILLAGER_GREEN, flags);
+            }
         }
 
         HudElement element = getSupplierElement(part, enabled, flags);
@@ -765,6 +771,8 @@ public class VariableParser {
             case "target_entity", "te" -> {enabled.targetEntity = true; yield TARGET_ENTITY;}
             case "target_entity_id", "tei" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ID;}
             case "target_entity_uuid", "teu" -> {enabled.targetEntity = true; yield TARGET_ENTITY_UUID;}
+            case "target_villager_biome", "tvb" -> {enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_BIOME;}
+            case "target_villager_level_word", "tvlw" -> {enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_LEVEL_WORD;}
             case "last_hit", "lh" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY;}
             case "last_hit_id", "lhi" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_ID;}
             case "last_hit_uuid", "lhu" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_UUID;}
@@ -872,6 +880,9 @@ public class VariableParser {
             case "target_fluid_z", "tfz" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_Z; }
             case "target_fluid_distance", "tfd" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_DISTANCE; }
             case "target_fluid_color", "tfc" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_COLOR; }
+            case "target_villager_level", "tvl" -> { enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_LEVEL; }
+            case "target_villager_xp", "tve" -> { enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_XP; }
+            case "target_villager_xp_needed", "tven" -> { enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_XP_NEEDED; }
             case "vehicle_entity_armor", "vehicle_armor", "vea" -> VEHICLE_ENTITY_ARMOR;
             case "in_chunk_x", "icx" -> IN_CHUNK_X;
             case "in_chunk_y", "icy" -> IN_CHUNK_Y;

@@ -59,7 +59,7 @@ public class ListSuppliers {
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
         HOOKED_ENTITY_ATTRIBUTES = () -> hooked() == null ? Collections.EMPTY_LIST : getEntityAttributes(hooked()),
         TEAMS = () -> Arrays.asList(CLIENT.world.getScoreboard().getTeams().toArray()),
-        TARGET_VILLAGER_OFFERS = () -> ComplexData.offers,
+        TARGET_VILLAGER_OFFERS = () -> ComplexData.villagerOffers,
 
         ITEMS = () -> AttributeHelpers.compactItems(CLIENT.player.getInventory().main),
         INV_ITEMS = () -> CLIENT.player.getInventory().main.subList(9, CLIENT.player.getInventory().main.size()),

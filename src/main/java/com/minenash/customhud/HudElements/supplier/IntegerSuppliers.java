@@ -5,16 +5,17 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.mixin.accessors.WorldRendererAccess;
 import com.mojang.blaze3d.platform.GLX;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.village.VillagerData;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
 import net.minecraft.world.SpawnHelper;
@@ -233,6 +234,10 @@ public class IntegerSuppliers {
     public static final Supplier<Number> DATA_PACK_VERSION = () -> SharedConstants.getGameVersion().getResourceVersion(ResourceType.SERVER_DATA);
 
     public static final Supplier<Number> MAINHAND_SLOT = () -> CLIENT.player.getInventory().selectedSlot;
+
+    public static final Supplier<Number> VILLAGER_LEVEL = () -> ComplexData.targetEntity instanceof VillagerEntity ve ? ve.getVillagerData().getLevel() : null;
+    public static final Supplier<Number> VILLAGER_XP = () -> ComplexData.targetEntity instanceof VillagerEntity ve ? ComplexData.villagerXP - VillagerData.getLowerLevelExperience(ve.getVillagerData().getLevel()) : null;
+    public static final Supplier<Number> VILLAGER_XP_NEEDED = () -> ComplexData.targetEntity instanceof VillagerEntity ve ? VillagerData.getUpperLevelExperience(ve.getVillagerData().getLevel()) : null;
 
 
 }

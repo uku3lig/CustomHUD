@@ -28,7 +28,8 @@ public class ClientPlayNetworkHandlerMixin {
     public void getTradeOffer(SetTradeOffersS2CPacket packet, CallbackInfo ci) {
         if (ComplexData.fakeVillagerInteract > 0) {
             ComplexData.fakeVillagerInteract--;
-            ComplexData.offers = packet.getOffers();
+            ComplexData.villagerOffers = packet.getOffers();
+            ComplexData.villagerXP = packet.getExperience();
         }
     }
 

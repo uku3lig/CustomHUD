@@ -94,10 +94,12 @@ public class ComplexData {
 
     public static final Map<UUID, BossBar> bossbars = new HashMap<>();
 
-    public static TradeOfferList offers = new TradeOfferList();
+    public static TradeOfferList villagerOffers = new TradeOfferList();
+    public static int villagerXP = 0;
+    public static int villagerProgress = 0;
     public static UUID villagerUUID = null;
     public static int fakeVillagerInteract = 0;
-    public static long villagerLastGot = Long.MAX_VALUE;
+    public static long villagerLastRequested = Long.MAX_VALUE;
 
     @SuppressWarnings("ConstantConditions")
     public static void update(Profile profile) {
@@ -259,16 +261,16 @@ public class ComplexData {
 
         if (profile.enabled.targetVillager) {
             if ( !(targetEntity instanceof VillagerEntity) && villagerUUID != null) {
-                offers.clear();
+                villagerOffers.clear();
                 villagerUUID = null;
-                villagerLastGot = Long.MAX_VALUE;
+                villagerLastRequested = Long.MAX_VALUE;
             }
             else if (targetEntity instanceof VillagerEntity && (villagerUUID == null ||
-                    !targetEntity.getUuid().equals(villagerUUID) || System.currentTimeMillis() - villagerLastGot > 30_000)) {
+                    !targetEntity.getUuid().equals(villagerUUID) || System.currentTimeMillis() - villagerLastRequested > 30_000)) {
                 villagerUUID = targetEntity.getUuid();
                 fakeVillagerInteract = 2;
                 CLIENT.getNetworkHandler().sendPacket(PlayerInteractEntityC2SPacket.interact(targetEntity, false, Hand.OFF_HAND));
-                villagerLastGot = System.currentTimeMillis();
+                villagerLastRequested = System.currentTimeMillis();
             }
 
         }
