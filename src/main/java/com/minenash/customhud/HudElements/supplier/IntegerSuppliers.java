@@ -139,7 +139,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> AXOLOTLS = () -> spawnGroup(SpawnGroup.AXOLOTLS);
     public static final Supplier<Number> MISC_MOBS = () -> spawnGroup(SpawnGroup.MISC);
 
-    public static final Supplier<Number> JAVA_BIT = () -> client.is64Bit() ? 64 : 32;
+    @Deprecated public static final Supplier<Number> JAVA_BIT = () -> 64;
     public static final Supplier<Number> CPU_CORES = () -> ComplexData.cpu.getPhysicalProcessorCount();
     public static final Supplier<Number> CPU_THREADS = () -> ComplexData.cpu.getLogicalProcessorCount();
 

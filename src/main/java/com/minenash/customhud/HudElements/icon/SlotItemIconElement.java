@@ -51,7 +51,7 @@ public class SlotItemIconElement extends IconElement {
         x += shiftX;
         y += shiftY;
 
-        renderItemStack(x, y, profileScale, stack);
+        renderItemStack(context, x, y, profileScale, stack);
         if (showCount)
             renderCount(context, stack.getCount(), x, y, profileScale);
         if (showDur)

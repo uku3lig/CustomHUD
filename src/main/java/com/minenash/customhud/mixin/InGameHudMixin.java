@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -20,23 +21,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = InGameHud.class, priority = 900)
 public abstract class InGameHudMixin {
 
-    @Shadow protected abstract void renderCrosshair(DrawContext context);
+    @Shadow protected abstract void renderCrosshair(DrawContext context, float tickDelta);
 
     @Shadow @Final private MinecraftClient client;
-    boolean renderAttackIndicator = false;
+    @Unique boolean renderAttackIndicator = false;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
-    private void renderAttackIndicatorForDebugScreen2(DrawContext context, float _tickDelta, CallbackInfo _info) {
+    @Inject(method = "renderCrosshair", at = @At(value = "HEAD"))
+    private void renderAttackIndicatorForDebugScreen2(DrawContext context, float tickDelta, CallbackInfo _info) {
         if (CustomHud.getCrosshair() == Crosshairs.DEBUG && MinecraftClient.getInstance().options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
             renderAttackIndicator = true;
-            renderCrosshair(context);
+            renderCrosshair(context, tickDelta);
             renderAttackIndicator = false;
         }
     }
 
     @ModifyExpressionValue(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
     private boolean getDebugCrosshairEnable(boolean original) {
-        return client.getDebugHud().shouldShowDebugHud() ? original : !renderAttackIndicator && CustomHud.getCrosshair() == Crosshairs.DEBUG;
+        return client.getDebugHud().shouldShowDebugHud() || ( !renderAttackIndicator && CustomHud.getCrosshair() == Crosshairs.DEBUG);
     }
 
     @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lnet/minecraft/util/Identifier;IIII)V"))

@@ -24,9 +24,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.profiler.PerformanceLog;
+import net.minecraft.util.profiler.MultiValueDebugSampleLogImpl;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import oshi.SystemInfo;
@@ -104,7 +105,8 @@ public class ComplexData {
         if (profile.enabled.serverChunk) {
             if (chunkFuture == null) {
                 if (serverWorld != null)
-                    chunkFuture = serverWorld.getChunkManager().getChunkFutureSyncOnMainThread(pos.x, pos.z, ChunkStatus.FULL, false).thenApply((either) -> either.map((chunk) -> (WorldChunk)chunk, (unloaded) -> null));
+                    chunkFuture = serverWorld.getChunkManager().getChunkFutureSyncOnMainThread(pos.x, pos.z, ChunkStatus.FULL, false)
+                            .thenApply( opt -> opt.orElse(null) instanceof WorldChunk wc ? wc : null);
 
                 if (chunkFuture == null)
                     chunkFuture = CompletableFuture.completedFuture(clientChunk);
@@ -244,8 +246,8 @@ public class ComplexData {
 
     }
 
-    public static void processLog(PerformanceLog log, double multiplier, int samples, double[] metrics) {
-        if (log.getMaxIndex() == 0) {
+    public static void processLog(MultiValueDebugSampleLogImpl log, double multiplier, int samples, double[] metrics) {
+        if (log.getLength() == 0) {
             metrics[0] = metrics[1] = metrics[2] = metrics[3] = Double.NaN;
             return;
         }
@@ -253,7 +255,7 @@ public class ComplexData {
         metrics[0] = 0; //AVG
         metrics[1] = Integer.MAX_VALUE; //MIN
         metrics[2] = Integer.MIN_VALUE; //MAX
-        metrics[3] = Math.min(samples, log.getMaxIndex()); //SAMPLES
+        metrics[3] = Math.min(samples, log.getLength()-1); //SAMPLES
 
         double avg = 0L;
         for (int r = 0; r <  metrics[3]; ++r) {
@@ -265,8 +267,8 @@ public class ComplexData {
         metrics[0] = avg / metrics[3];
     }
 
-    public static void processTPSLog(PerformanceLog log, double[] metrics) {
-        if (log.getMaxIndex() == 0) {
+    public static void processTPSLog(MultiValueDebugSampleLogImpl log, double[] metrics) {
+        if (log.getLength() == 0) {
             metrics[0] = metrics[1] = metrics[2] = metrics[3] = Double.NaN;
             return;
         }
@@ -274,7 +276,7 @@ public class ComplexData {
         metrics[0] = 0; //AVG
         metrics[1] = Integer.MAX_VALUE; //MIN
         metrics[2] = Integer.MIN_VALUE; //MAX
-        metrics[3] = Math.min(120, log.getMaxIndex()); //SAMPLES
+        metrics[3] = Math.min(120, log.getLength()-1); //SAMPLES
 
         double avg = 0L;
         for (int r = 0; r <  metrics[3]; ++r) {

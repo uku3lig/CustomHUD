@@ -38,7 +38,7 @@ public class SlotItemElement implements HudElement {
     public static final Function<Integer, Number> DURABILITY_NUM = (slot) -> stack(slot).getMaxDamage() - stack(slot).getDamage();
     public static final Function<Integer, Number> MAX_DURABILITY_NUM = (slot) -> stack(slot).getMaxDamage();
     public static final Function<Integer, String> DURABILITY_STR = (slot) -> Integer.toString( stack(slot).getMaxDamage() - stack(slot).getDamage() );
-    public static final Function<Integer, String> MAX_DURABILITY_STR = (slot) -> Integer.toString( item(slot).getMaxDamage() );
+    public static final Function<Integer, String> MAX_DURABILITY_STR = (slot) -> Integer.toString( stack(slot).getMaxDamage() );
     public static final Function<Integer, Number> DURABILITY_PERCENT_NUM = (slot) -> 100 - stack(slot).getDamage() / (float) stack(slot).getMaxDamage() * 100;
     public static final Function<Integer, String> DURABILITY_PERCENT_STR = (slotAndPrecision) -> {
         int slot = slotAndPrecision & 0x000000FF;
@@ -52,8 +52,8 @@ public class SlotItemElement implements HudElement {
         return Float.toString( 100 - (int)(stack(slot).getDamage() / (float) maxDamage * 100 * exponent) / exponent );
     };
 
-    public static final Function<Integer, Boolean> HAS_DURABILITY = (slot) ->  item(slot).getMaxDamage() - client.player.getMainHandStack().getDamage() > 0;
-    public static final Function<Integer, Boolean> HAS_MAX_DURABILITY = (slot) ->  item(slot).getMaxDamage() > 0;
+    public static final Function<Integer, Boolean> HAS_DURABILITY = (slot) ->  stack(slot).getMaxDamage() - client.player.getMainHandStack().getDamage() > 0;
+    public static final Function<Integer, Boolean> HAS_MAX_DURABILITY = (slot) ->  stack(slot).getMaxDamage() > 0;
 
     public static Pair<HudElement, ErrorType> create(String slotString, String method, Flags flags) {
         int slot = getSlotNumber(slotString);

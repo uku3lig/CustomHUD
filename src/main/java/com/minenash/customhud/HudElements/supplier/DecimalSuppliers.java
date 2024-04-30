@@ -4,18 +4,17 @@ import com.minenash.customhud.ComplexData;
 import com.minenash.customhud.MusicAndRecordTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.biome.source.util.VanillaBiomeParameters;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
 import net.minecraft.world.gen.densityfunction.DensityFunctions;
 import net.minecraft.world.gen.noise.NoiseRouter;
-
-import java.util.function.Supplier;
 
 import static com.minenash.customhud.HudElements.supplier.NumberSupplierElement.*;
 
@@ -48,7 +47,14 @@ public class DecimalSuppliers {
     public static final Entry TARGET_ENTITY_Z = of( () -> ComplexData.targetEntity == null ? null : ComplexData.targetEntity.getZ(), 0);
     public static final Entry TARGET_ENTITY_DISTANCE = of( () -> ComplexData.targetEntity == null ? null : ComplexData.targetEntity.getPos().distanceTo(client.cameraEntity.getPos()), 1);
 
-    public static final Entry REACH_DISTANCE = of ( () -> client.interactionManager.getReachDistance(), 1);
+    public static final Entry ENTITY_REACH_DISTANCE = of ( () -> {
+        EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+        return instance == null ? 0 : instance.getValue();
+    }, 1);
+    public static final Entry BLOCK_REACH_DISTANCE = of ( () -> {
+        EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE);
+        return instance == null ? 0 : instance.getValue();
+    }, 1);
     public static final Entry FISHING_HOOK_DISTANCE = of ( () -> client.player.fishHook.distanceTo(client.player), 1);
     public static final Entry HOOKED_ENTITY_X = of ( () -> hooked() == null ? null : hooked().getX(), 0);
     public static final Entry HOOKED_ENTITY_Y = of ( () -> hooked() == null ? null : hooked().getY(), 0);

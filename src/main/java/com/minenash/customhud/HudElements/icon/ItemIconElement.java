@@ -32,6 +32,6 @@ public class ItemIconElement extends IconElement {
     }
 
     public void render(DrawContext context, int x, int y, float profileScale) {
-        renderItemStack(x+shiftX, y+shiftY, profileScale, stack);
+        renderItemStack(context, x+shiftX, y+shiftY, profileScale, stack);
     }
 }

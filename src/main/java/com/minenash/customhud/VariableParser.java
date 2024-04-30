@@ -541,7 +541,8 @@ public class VariableParser {
             case "hooked_entity_y", "hey" -> HOOKED_ENTITY_Y;
             case "hooked_entity_z", "hez" -> HOOKED_ENTITY_Z;
             case "hooked_entity_distance", "hed" -> HOOKED_ENTITY_DISTANCE;
-            case "reach_distance", "reach" -> REACH_DISTANCE;
+            case "entity_reach_distance", "reach_distance", "entity_reach", "reach" -> ENTITY_REACH_DISTANCE;
+            case "block_reach_distance", "block_reach" -> BLOCK_REACH_DISTANCE;
             case "fishing_hook_distance" -> FISHING_HOOK_DISTANCE;
             case "velocity_xz" -> VELOCITY_XZ;
             case "velocity_y" -> VELOCITY_Y;

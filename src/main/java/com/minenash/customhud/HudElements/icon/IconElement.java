@@ -37,37 +37,20 @@ public abstract class IconElement extends FunctionalElement {
         return "\uFFFE";
     }
 
-    public void renderItemStack(int x, int y, float profileScale, ItemStack stack) {
-        BakedModel model = client.getItemRenderer().getModel(stack, null, null, 0);
-        client.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).setFilter(false, false);
-        RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        MatrixStack matrixStack = RenderSystem.getModelViewStack();
+    public void renderItemStack(DrawContext context, int x, int y, float profileScale, ItemStack stack) {
+        //TODO: FINISH 1.20.5
+        MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
         matrixStack.scale(profileScale, profileScale, 1);
-
-        matrixStack.translate(x+(5.5*scale), y+3.5, 100.0f); //+ client.getItemRenderer().zOffset
-
+        matrixStack.translate(x+(5.5*scale-5.5), y+(5.5*scale-5.5)-2, 100.0); //+ client.getItemRenderer().zOffset
         if (referenceCorner)
-            matrixStack.translate(0, (10*scale-10)/2, 0);
+            matrixStack.translate(0, (11*scale-11)/2, 0);
+        matrixStack.scale(11 * scale / 16, 11 * scale / 16, 1);
+//
+//        RenderSystem.disableBlend();
 
-        matrixStack.scale(10 * scale, -10 * scale, 1);
-
-        if (!model.isSideLit())
-            DiffuseLighting.disableGuiDepthLighting();
-
-        RenderSystem.applyModelViewMatrix();
-        VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
-        client.getItemRenderer().renderItem(stack, ModelTransformationMode.GUI, false, new MatrixStack(), immediate, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
-        immediate.draw();
-        RenderSystem.enableDepthTest();
-
-        if (!model.isSideLit())
-            DiffuseLighting.enableGuiDepthLighting();
-
+        context.drawItem(stack, 0, 0);
+//        RenderSystem.enableBlend();
         matrixStack.pop();
-        RenderSystem.applyModelViewMatrix();
     }
 }

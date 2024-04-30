@@ -1,10 +1,10 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -40,20 +40,9 @@ dependencies {
 	implementation include("com.github.LlamaLad7:MixinExtras:0.1.1")
 	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
 
-//	modImplementation "maven.modrinth:sodium:${project.sodium_version}"
-//	modImplementation "maven.modrinth:iris:${project.iris_version}"
-
-//	modImplementation files("run/mods/iris.jar")
-//	modImplementation files("run/mods/sodium.jar")
-
 	modImplementation ("com.terraformersmc:modmenu:${project.modmenu_version}") {
 		exclude module: "fabric-api"
 	}
-
-	implementation "org.joml:joml:1.10.2" //sodium
-	modImplementation "org.anarres:jcpp:1.4.14" //iris
-	modImplementation "io.github.douira:glsl-transformer:2.0.0-pre13" //iris
-	modImplementation "org.antlr:antlr4-runtime:4.11.1" //iris
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
@@ -75,7 +64,7 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
 	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+	it.options.release = 21
 }
 
 java {

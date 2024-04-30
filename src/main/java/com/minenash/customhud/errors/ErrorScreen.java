@@ -110,7 +110,7 @@ public class ErrorScreen extends Screen {
         protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {}
 
         @Override
-        protected int getScrollbarPositionX() {
+        protected int getScrollbarX() {
             return width - 8;
         }
 
