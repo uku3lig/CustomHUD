@@ -210,44 +210,6 @@ public class ConditionalParser {
         return new Operation.Comparison(left, right, (Comparison) tokens.get(1).value(), checkBool, checkNum);
     }
 
-    //TODO
-    private static Operation getMathOperation(List<Token> tokens) throws ErrorException {
-        if (tokens.size() == 1) {
-            Token token = tokens.get(0);
-            switch (token.type) {
-                case FULL_PREN: return getConditional( (List<Token>) token.value());
-                case BOOLEAN: return new Operation.Literal( (Integer) token.value());
-                case VARIABLE: return new Operation.BooleanVariable( (HudElement) token.value());
-            }
-            throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, tokens.get(0).type().toString());
-        }
-
-        if (tokens.size() != 3 || tokens.get(1).type() != TokenType.COMPARISON) {
-            if (tokens.size() != 3)
-                throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "" + tokens.size());
-            throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, tokens.get(1).type().toString());
-        }
-
-        boolean checkBool = false;
-        boolean checkNum = false;
-        HudElement left = switch (tokens.get(0).type()) {
-            case VARIABLE -> (HudElement) tokens.get(0).value();
-            case STRING -> new StringElement((String)tokens.get(0).value());
-            case NUMBER -> { checkNum = true; yield new SudoHudElements.Num((Number)tokens.get(0).value()); }
-            case BOOLEAN -> {checkBool = true; yield new SudoHudElements.Bool((Boolean)tokens.get(0).value());}
-            default -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, tokens.get(0).type().toString());
-        };
-        HudElement right = switch (tokens.get(2).type()) {
-            case VARIABLE -> (HudElement) tokens.get(2).value();
-            case STRING -> new StringElement((String)tokens.get(2).value());
-            case NUMBER -> { checkNum = true; yield new SudoHudElements.Num((Number)tokens.get(2).value()); }
-            case BOOLEAN -> {checkBool = true; yield new SudoHudElements.Bool((Boolean)tokens.get(2).value());}
-            default -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, tokens.get(2).type().toString());
-        };
-
-        return new Operation.Comparison(left, right, (Comparison) tokens.get(1).value(), checkBool, checkNum);
-    }
-
     private static List<List<Token>> split(List<Token> tokens, TokenType type) {
         List<List<Token>> sections = new ArrayList<>();
         List<Token> current = new ArrayList<>();

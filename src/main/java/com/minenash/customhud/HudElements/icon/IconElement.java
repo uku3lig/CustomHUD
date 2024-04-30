@@ -38,19 +38,14 @@ public abstract class IconElement extends FunctionalElement {
     }
 
     public void renderItemStack(DrawContext context, int x, int y, float profileScale, ItemStack stack) {
-        //TODO: FINISH 1.20.5
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
-        matrixStack.scale(profileScale, profileScale, 1);
-        matrixStack.translate(x+(5.5*scale-5.5), y+(5.5*scale-5.5)-2, 100.0); //+ client.getItemRenderer().zOffset
-        if (referenceCorner)
-            matrixStack.translate(0, (11*scale-11)/2, 0);
+        matrixStack.translate(x, y-2, 0); //+ client.getItemRenderer().zOffset
+        if (!referenceCorner)
+            matrixStack.translate(0, -(11*scale-11)/2, 0);
         matrixStack.scale(11 * scale / 16, 11 * scale / 16, 1);
-//
-//        RenderSystem.disableBlend();
 
         context.drawItem(stack, 0, 0);
-//        RenderSystem.enableBlend();
         matrixStack.pop();
     }
 }

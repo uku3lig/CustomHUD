@@ -4,9 +4,11 @@ import com.minenash.customhud.data.Flags;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 
 public class SlotItemIconElement extends IconElement {
@@ -52,71 +54,39 @@ public class SlotItemIconElement extends IconElement {
         y += shiftY;
 
         renderItemStack(context, x, y, profileScale, stack);
-        if (showCount)
-            renderCount(context, stack.getCount(), x, y, profileScale);
-        if (showDur)
-            renderDur(context, stack, x, y, profileScale);
-        if (showCooldown)
-            renderCooldown(context, stack, x, y, profileScale);
-    }
 
-    private void renderCount(DrawContext context, int count, int x, int y, float profileScale) {
-        if (count != 1) {
+        if (showCount || showDur || showCooldown) {
+
             MatrixStack matrixStack = context.getMatrices();
             matrixStack.push();
-            matrixStack.scale(profileScale, profileScale, 1);
-            matrixStack.translate(x + (scale-1)/4,y + (scale-1)/4,200);
-            if (referenceCorner)
-                matrixStack.translate(0, (10*scale-10)/2, 0);
-            matrixStack.scale(10/16F * scale, 10/16F * scale, 1);
+            matrixStack.translate(x, y - 2, 200);
+            if (!referenceCorner)
+                matrixStack.translate(0, -(11 * scale - 11) / 2, 0);
+            matrixStack.scale(11 * scale / 16, 11 * scale / 16, 1);
 
-            String string = String.valueOf(count);
-            context.drawTextWithShadow(client.textRenderer, string,
-                    (int) (7.5F - client.textRenderer.getWidth(string)),
-                    (int) (6 / scale + 0.5F),
-                    0xFFFFFF);
+            if (showCount && stack.getCount() != 1) {
+                matrixStack.push();
+                String count = Integer.toString(stack.getCount());
+                context.drawText(client.textRenderer, count, 19 - 2 - client.textRenderer.getWidth(count), 6 + 3, 0xFFFFFF, true);
+                matrixStack.pop();
+            }
+
+            if (showDur && stack.isItemBarVisible()) {
+                context.fill(RenderLayer.getGuiOverlay(), 2, 13, 2 + 13, 13 + 2, Colors.BLACK);
+                context.fill(RenderLayer.getGuiOverlay(), 2, 13, 2 + stack.getItemBarStep(), 13 + 1, stack.getItemBarColor() | Colors.BLACK);
+            }
+
+            if (showCooldown) {
+                float f = client.player == null ? 0.0F : client.player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getTickDelta());
+                if (f > 0.0F) {
+                    int k = MathHelper.floor(16.0F * (1.0F - f));
+                    int l = k + MathHelper.ceil(16.0F * f);
+                    context.fill(RenderLayer.getGuiOverlay(), 0, k, 16, l, Integer.MAX_VALUE);
+                }
+            }
             matrixStack.pop();
         }
-    }
 
-    public void renderDur(DrawContext context, ItemStack stack, int x, int y, float profileScale) {
-        if (stack.isItemBarVisible()) {
-            //TODO: CHECK
-//            RenderSystem.disableDepthTest();
-//            RenderSystem.disableBlend();
-            int i = stack.getItemBarStep();
-            int j = stack.getItemBarColor();
-            this.renderGuiQuad(context, profileScale, x + scale, y + 0.5 + 6*(1+(scale-1)/2), 9, 2*11/16F, 0xFF000000);
-            this.renderGuiQuad(context, profileScale, x + scale, y + 0.5 + 6*(1+(scale-1)/2), i-4, 11/16F, 0xFF000000 | j);
-//            RenderSystem.enableBlend();
-//            RenderSystem.enableDepthTest();
-        }
-    }
-
-    public void renderCooldown(DrawContext context, ItemStack stack, int x, int y, float profileScale) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-
-        float f = player == null ? 0.0f : player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getTickDelta());
-        if (f > 0.0f) {
-//            RenderSystem.disableDepthTest();
-//            RenderSystem.enableBlend();
-//            RenderSystem.defaultBlendFunc();
-            this.renderGuiQuad(context, profileScale, x+0.5*scale, y + MathHelper.floor(10 * (1.0f - f))*scale - (9*scale-9)/2 - 1, 10, MathHelper.ceil(10 * f), 0x40FFFFFF);
-//            RenderSystem.enableDepthTest();
-        }
-    }
-
-    private void renderGuiQuad(DrawContext context, float profileScale, double x, double y, double width, double height, int color) {
-        if (referenceCorner)
-            y += (10*scale-10)/2;
-        x *= profileScale;
-        y *= profileScale;
-        width *= profileScale;
-        height *= profileScale;
-        width *= scale;
-        height *= scale;
-
-        context.fill((int) x, (int) y, (int) (x+width), (int) (y+height), color);
     }
 
 }

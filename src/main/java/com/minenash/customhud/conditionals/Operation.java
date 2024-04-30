@@ -73,22 +73,6 @@ public interface Operation {
         }
     }
 
-    record MathOperation(HudElement left, HudElement right, ConditionalParser.MathOperator operation, boolean checkBool, boolean checkNum) implements Operation {
-        public int getValue() {
-            return switch (operation) {
-                default -> 0;
-            };
-        }
-
-
-        @Override
-        public void printTree(int indent) {
-            for (int i = 0; i < indent; i++)
-                System.out.print(" ");
-            //TODO
-        }
-    }
-
     record Literal(int value) implements Operation {
         public int getValue() {
             return value;
