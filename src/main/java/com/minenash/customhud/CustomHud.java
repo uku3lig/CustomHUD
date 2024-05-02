@@ -5,10 +5,8 @@ import com.minenash.customhud.data.DisableElement;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
 import com.minenash.customhud.gui.ErrorsScreen;
-import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
-import com.minenash.customhud.mod_compat.BuiltInModCompat;
 import com.minenash.customhud.render.CustomHudRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -17,12 +15,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -54,8 +50,6 @@ public class CustomHud implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		BuiltInModCompat.register();
-
 		UpdateChecker.check();
 
 		HudRenderCallback.EVENT.register(CustomHudRenderer::render);
