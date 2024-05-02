@@ -24,7 +24,7 @@ public class DebugGizmoElement extends IconElement {
     public void render(DrawContext context, int x, int y, float profileScale) {
         float scale = -1 * this.scale;
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        MatrixStack matrixStack = context.getMatrices();
+        MatrixStack matrixStack = RenderSystem.getModelViewStack();
         matrixStack.push();
         matrixStack.scale(profileScale,profileScale,1);
 
