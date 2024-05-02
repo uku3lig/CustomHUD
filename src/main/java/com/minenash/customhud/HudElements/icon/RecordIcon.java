@@ -33,7 +33,7 @@ public class RecordIcon extends IconElement {
     }
 
     public void render(DrawContext context, int x, int y, float profileScale) {
-        renderItemStack(x+shiftX, y+shiftY, profileScale, MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.recordIcon : NO_RECORD);
+        renderItemStack(context, x+shiftX, y+shiftY, profileScale, MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.recordIcon : NO_RECORD);
     }
 
 }
