@@ -89,15 +89,22 @@ public class ModMenuIntegration implements ModMenuApi {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            this.renderBackground(context, mouseX, mouseY, delta);
-            if (MinecraftClient.getInstance().cameraEntity == null)
-                context.fill(0,36,this.width,this.height - 30-9, 0x88000000);
+            super.render(context,mouseX, mouseY, delta);
 
             context.drawCenteredTextWithShadow(font, Text.translatable("config.custom_hud.title"), this.width / 2, 13, 0xFFFFFF);
             context.drawTextWithShadow(font, Text.translatable("config.custom_hud.enable.label"), 20, OPTION_START + 5, 0xFFFFFF);
             context.drawTextWithShadow(font,  Text.translatable("config.custom_hud.active_profile.label"), 20, OPTION_START + OPTION_BUFFER + 5, 0xFFFFFF);
+        }
 
-            super.render(context,mouseX, mouseY, delta);
+        @Override
+        public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+            if (client.world == null) {
+                this.renderPanoramaBackground(context, delta);
+                this.applyBlur(delta);
+            }
+            else
+                context.fill(0,0,this.width,this.height, 0x88000000);
+            this.renderDarkening(context);
         }
 
     }
