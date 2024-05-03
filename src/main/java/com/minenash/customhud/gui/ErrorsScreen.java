@@ -68,7 +68,8 @@ public class ErrorsScreen extends Screen {
 
         if (openedFromNullScreen) {
             this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                    .position(this.width / 2 - 155, this.height - 26).size(100, 20).build() );
+                    .position(this.width / 2 - 155, this.height - 26).size(100, 20)
+                    .tooltip(ProfileManager.openTooltip).build() );
 
             this.addDrawableChild( ButtonWidget.builder(Text.literal("Profiles"), button -> CLIENT.setScreen( new NewConfigScreen(null) ))
                     .position(this.width / 2 - 155 + 100 + 5, this.height - 26).size(100, 20).build() );
@@ -78,7 +79,8 @@ public class ErrorsScreen extends Screen {
         }
         else {
             this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                    .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+                    .position(this.width / 2 - 155, this.height - 26).size(150, 20)
+                    .tooltip(ProfileManager.openTooltip).build() );
 
 
             this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))

@@ -2,6 +2,11 @@ package com.minenash.customhud;
 
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
+import com.minenash.customhud.gui.editor.EditorWindow;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
 import java.io.IOException;
@@ -75,9 +80,17 @@ public class ProfileManager {
             active = profiles.get(0);
     }
 
+    public static final String openTooltipStr = MinecraftClient.IS_SYSTEM_MAC ?
+            "Open in your text editor" :
+            "Open in your text editor\n\nNot opening? Shift-click to edit using the backup editor";
+    public static final Tooltip openTooltip = Tooltip.of(Text.literal(openTooltipStr));
     public static void open(Profile profile) {
         if (profile != null)
-            new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.resolve(profile.name).toFile())).start();
+            if (Screen.hasShiftDown() && !MinecraftClient.IS_SYSTEM_MAC)
+                EditorWindow.open(profile);
+            else
+                new Thread(() -> Util.getOperatingSystem().open(CustomHud.PROFILE_FOLDER.resolve(profile.name + ".txt").toFile())).start();
+
     }
 
     public static List<Profile> getProfiles() {

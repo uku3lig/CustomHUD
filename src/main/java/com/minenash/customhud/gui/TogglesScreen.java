@@ -51,7 +51,8 @@ public class TogglesScreen extends Screen {
         this.addSelectableChild(listWidget);
 
         this.addDrawableChild( ButtonWidget.builder(Text.literal("Open Profile"), button -> ProfileManager.open(profile))
-                .position(this.width / 2 - 155, this.height - 26).size(150, 20).build() );
+                .position(this.width / 2 - 155, this.height - 26).size(150, 20)
+                .tooltip(ProfileManager.openTooltip).build() );
 
         this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> CLIENT.setScreen(parent))
                 .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
