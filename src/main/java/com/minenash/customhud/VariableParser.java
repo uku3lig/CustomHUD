@@ -5,7 +5,7 @@ import com.minenash.customhud.HudElements.functional.GetValueElement;
 import com.minenash.customhud.HudElements.functional.SetValueElement;
 import com.minenash.customhud.HudElements.list.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.HudElements.list.Attributers.Attributer;
 import com.minenash.customhud.HudElements.stats.CustomStatElement;
@@ -62,6 +62,7 @@ import static com.minenash.customhud.HudElements.supplier.EntitySuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.*;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
+import static com.minenash.customhud.HudElements.supplier.SpecialIdSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
 import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
@@ -75,7 +76,7 @@ public class VariableParser {
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
 
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProvider listProvider) {
-//        System.out.println("[Line " + debugLine+ "] '" + str + "'");
+//        System.out.println("[Line " + debugLine+ "] '" + id + "'");
 
         List<HudElement> elements = new ArrayList<>();
 
@@ -722,9 +723,17 @@ public class VariableParser {
         if (entry2 != null)
             return new SpecialSupplierElement(entry2);
 
+        SpecialIdSupplierElement.Entry entry3 = getSpecialIdSupplierElements(name, enabled);
+        if (entry3 != null)
+            return new SpecialIdSupplierElement(entry3);
+
         supplier = getTextSupplier(name, enabled);
         if (supplier != null)
             return new TextSupplierElement(supplier, flags);
+
+        supplier = getIdentifierSupplier(name, enabled);
+        if (supplier != null)
+            return new IdentifierSupplierElement(supplier, flags);
 
         Integer color = HudTheme.parseColorName(name);
         if (color != null)
@@ -750,6 +759,21 @@ public class VariableParser {
         };
     }
 
+    private static Supplier<Identifier> getIdentifierSupplier(String element, ComplexData.Enabled enabled) {
+        return switch (element) {
+            case "target_entity_id", "tei" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ID;}
+            case "last_hit_id", "lhi" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_ID;}
+            case "hooked_entity_id", "hei" -> HOOKED_ENTITY_ID;
+            case "vehicle_entity_id", "vehicle_id", "vei" -> VEHICLE_ENTITY_ID;
+
+            case "dimension_id" -> DIMENSION_ID;
+            case "biome_id" -> BIOME_ID;
+            case "music_id" -> {enabled.music = true; yield MUSIC_ID;}
+            case "record_id" -> {enabled.music = true; yield RECORD_ID;}
+            default -> null;
+        };
+    }
+
     private static Supplier<String> getStringSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
             case "profile_name" -> PROFILE_NAME;
@@ -761,26 +785,20 @@ public class VariableParser {
             case "uuid" -> UUID;
             case "team" -> PLAYER_TEAM;
             case "dimension" -> DIMENSION;
-            case "dimension_id" -> DIMENSION_ID;
             case "facing" -> FACING;
             case "facing_short" -> FACING_SHORT;
             case "facing_towards_xz" -> FACING_TOWARDS_XZ;
             case "biome" -> BIOME;
-            case "biome_id" -> BIOME_ID;
             case "moon_phase_word" -> { enabled.clientChunk = true; yield MOON_PHASE_WORD; }
             case "target_entity", "te" -> {enabled.targetEntity = true; yield TARGET_ENTITY;}
-            case "target_entity_id", "tei" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ID;}
             case "target_entity_uuid", "teu" -> {enabled.targetEntity = true; yield TARGET_ENTITY_UUID;}
             case "target_villager_biome", "tvb" -> {enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_BIOME;}
             case "target_villager_level_word", "tvlw" -> {enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_LEVEL_WORD;}
             case "last_hit", "lh" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY;}
-            case "last_hit_id", "lhi" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_ID;}
             case "last_hit_uuid", "lhu" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_UUID;}
             case "hooked_entity", "he" -> HOOKED_ENTITY;
-            case "hooked_entity_id", "hei" -> HOOKED_ENTITY_ID;
             case "hooked_entity_uuid", "heu" -> HOOKED_ENTITY_UUID;
             case "vehicle_entity", "vehicle", "ve" -> VEHICLE_ENTITY;
-            case "vehicle_entity_id", "vehicle_id", "vei" -> VEHICLE_ENTITY_ID;
             case "vehicle_entity_uuid", "vehicle_uuid", "veu" -> VEHICLE_ENTITY_UUID;
             case "vehicle_horse_armor", "horse_armor", "vha" -> VEHICLE_HORSE_ARMOR;
             case "world_name", "world" -> WORLD_NAME;
@@ -791,9 +809,7 @@ public class VariableParser {
             case "gpu_name" -> GPU_NAME;
             case "server_brand" -> SERVER_BRAND;
 
-            case "music_id" -> {enabled.music = true; yield MUSIC_ID;}
             case "music_name" -> {enabled.music = true; yield MUSIC_NAME;}
-            case "record_id" -> {enabled.music = true; yield RECORD_ID;}
 
             case "bb_peaks","biome_builder_peaks" -> {enabled.serverWorld = true; yield BIOME_BUILDER_PEAKS;}
             case "bb_cont","biome_builder_continents" -> {enabled.serverWorld = true; yield BIOME_BUILDER_CONTINENTS;}
@@ -1110,20 +1126,26 @@ public class VariableParser {
             case "minute", "minutes" -> { enabled.time = true; yield TIME_MINUTES; }
             case "second", "seconds" -> { enabled.time = true; yield TIME_SECONDS; }
             case "target_block", "tb" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK;}
-            case "target_block_id", "tbi" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_ID;}
             case "target_fluid", "tf" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID;}
-            case "target_fluid_id", "tfi" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_ID;}
             case "item" -> ITEM_OLD;
             case "item_name" -> ITEM_NAME;
-            case "item_id" -> ITEM_ID;
             case "offhand_item", "oitem" -> OFFHAND_ITEM;
             case "offhand_item_name" -> OFFHAND_ITEM_NAME;
-            case "offhand_item_id", "oitem_id" -> OFFHAND_ITEM_ID;
             case "clouds" -> CLOUDS;
             case "graphics_mode" -> GRAPHICS_MODE;
             case "facing_towards_pn_word" -> FACING_TOWARDS_PN_WORD;
             case "facing_towards_pn_sign" -> FACING_TOWARDS_PN_SIGN;
             case "gamemode" -> GAMEMODE;
+            default -> null;
+        };
+    }
+
+    private static SpecialIdSupplierElement.Entry getSpecialIdSupplierElements(String element, ComplexData.Enabled enabled) {
+        return switch (element) {
+            case "target_block_id", "tbi" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_ID;}
+            case "target_fluid_id", "tfi" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_ID;}
+            case "item_id" -> ITEM_ID;
+            case "offhand_item_id", "oitem_id" -> OFFHAND_ITEM_ID;
             default -> null;
         };
     }

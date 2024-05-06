@@ -2,7 +2,7 @@ package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.mixin.accessors.PlayerListHudAccess;
 import net.minecraft.client.MinecraftClient;
@@ -37,8 +37,6 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> CREATIVE = () -> client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE;
     public static final Supplier<Boolean> ADVENTURE = () -> client.interactionManager.getCurrentGameMode() == GameMode.ADVENTURE;
     public static final Supplier<Boolean> SPECTATOR = () -> client.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR;
-
-//    public static final Supplier<Boolean> INVULNERABLE = () -> client.player.getAbilities().invulnerable;
 
     public static final Supplier<Boolean> CHUNK_CULLING = () -> client.chunkCullingEnabled;
     public static final Supplier<Boolean> IN_OVERWORLD = () -> isInDim(World.OVERWORLD.getValue());

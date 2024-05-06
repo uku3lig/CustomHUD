@@ -2,7 +2,7 @@ package com.minenash.customhud.conditionals;
 
 import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.complex.ComplexData;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.VariableParser;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.ErrorException;

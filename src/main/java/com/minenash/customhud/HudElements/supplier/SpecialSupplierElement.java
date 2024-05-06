@@ -1,7 +1,7 @@
 package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.complex.ComplexData;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.CloudRenderMode;
@@ -45,17 +45,9 @@ public class SpecialSupplierElement implements HudElement {
                                                  () -> Block.getRawIdFromState(ComplexData.targetBlock),
                                                  () -> !ComplexData.targetBlock.isAir());
 
-    public static final Entry TARGET_BLOCK_ID = of( () -> Registries.BLOCK.getId(ComplexData.targetBlock.getBlock()).toString(),
-                                                    () -> Block.getRawIdFromState(ComplexData.targetBlock),
-                                                    () -> !ComplexData.targetBlock.isAir());
-
     public static final Entry TARGET_FLUID = of( () -> WordUtils.capitalize(Registries.FLUID.getId(ComplexData.targetFluid.getFluid()).getPath().replace('_',' ')),
                                                  () -> Fluid.STATE_IDS.getRawId(ComplexData.targetFluid),
                                                  () -> !ComplexData.targetFluid.isEmpty());
-
-    public static final Entry TARGET_FLUID_ID = of( () -> Registries.FLUID.getId(ComplexData.targetFluid.getFluid()).toString(),
-                                                    () -> Fluid.STATE_IDS.getRawId(ComplexData.targetFluid),
-                                                    () -> !ComplexData.targetFluid.isEmpty());
 
     public static final Entry ITEM_OLD = of( () -> I18n.translate(client.player.getMainHandStack().getItem().getTranslationKey()),
                                          () -> Item.getRawId(client.player.getMainHandStack().getItem()),
@@ -66,10 +58,6 @@ public class SpecialSupplierElement implements HudElement {
             () -> !client.player.getMainHandStack().isEmpty());
 
     @Deprecated
-    public static final Entry ITEM_ID = of( () -> Registries.ITEM.getId(client.player.getMainHandStack().getItem()).toString(),
-                                            () -> Item.getRawId(client.player.getMainHandStack().getItem()),
-                                            () -> !client.player.getMainHandStack().isEmpty());
-    @Deprecated
     public static final Entry OFFHAND_ITEM = of( () -> I18n.translate(client.player.getOffHandStack().getItem().getTranslationKey()),
                                                  () -> Item.getRawId(client.player.getOffHandStack().getItem()),
                                                  () -> !client.player.getOffHandStack().isEmpty());
@@ -77,10 +65,6 @@ public class SpecialSupplierElement implements HudElement {
     public static final Entry OFFHAND_ITEM_NAME = of( () -> client.player.getOffHandStack().getName().getString(),
                                                       () -> client.player.getOffHandStack().getName().getString().length(),
                                                       () -> !client.player.getOffHandStack().isEmpty());
-    @Deprecated
-    public static final Entry OFFHAND_ITEM_ID = of( () -> Registries.ITEM.getId(client.player.getOffHandStack().getItem()).toString(),
-                                                    () -> Item.getRawId(client.player.getOffHandStack().getItem()),
-                                                    () -> !client.player.getOffHandStack().isEmpty());
 
     public static final Entry GRAPHICS_MODE = of( () -> client.options.getGraphicsMode().getValue().toString(),
                                                   () -> client.options.getGraphicsMode().getValue() == GraphicsMode.FAST ? 0 : (client.options.getGraphicsMode().getValue() == GraphicsMode.FANCY ? 1 : 2),

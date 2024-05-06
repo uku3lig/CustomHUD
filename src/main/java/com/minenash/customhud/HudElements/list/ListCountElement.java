@@ -1,6 +1,6 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 
 public class ListCountElement implements HudElement {
     private final ListProvider provider;

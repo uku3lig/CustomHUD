@@ -1,6 +1,6 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
 import com.minenash.customhud.HudElements.icon.*;
@@ -9,7 +9,6 @@ import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Pair;
 import net.minecraft.village.TradeOffer;
 
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class Attributers {
     //TODO: IS ONLY LIST ONLY
     public static final Attributer EFFECT = (sup, name, flags) -> switch (name) {
         case "e_name" -> new Str(sup,STATUS_NAME);
-        case "e_id" -> new Str(sup,STATUS_ID);
+        case "e_id" -> new Id(sup,STATUS_ID);
         case "e_duration", "e_dur" -> new Num(sup, STATUS_DURATION, flags);
         case "e_infinite", "e_inf" -> new Bool(sup, STATUS_INFINITE);
         case "e_amplification", "e_amp" -> new Num(sup, STATUS_AMPLIFICATION, flags);
@@ -63,7 +62,7 @@ public class Attributers {
     };
 
     public static final Attributer SUBTITLE = (sup, name, flags) -> switch (name) {
-        case "s_id" -> new Str(sup, SUBTITLE_ID);
+        case "s_id" -> new Id(sup, SUBTITLE_ID);
         case "s_name" -> new Str(sup, SUBTITLE_NAME);
 
         case "s_age" -> new Num(sup, SUBTITLE_AGE, flags);
@@ -92,7 +91,7 @@ public class Attributers {
 
     public static final Attributer BLOCK_TAG = (sup, name, flags) -> switch (name) {
         case "b_name" -> new Str(sup,BLOCK_TAG_NAME);
-        case "b_id" -> new Str(sup,BLOCK_TAG_ID);
+        case "b_id" -> new Id(sup,BLOCK_TAG_ID);
         default -> null;
     };
 
@@ -112,7 +111,7 @@ public class Attributers {
     public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
         case "m_slot" -> new Str(sup,ITEM_ATTR_SLOT);
         case "m_attribute","m_attr" -> new Str(sup,ITEM_ATTR_NAME);
-        case "m_attribute_id","m_attr_id" -> new Str(sup,ITEM_ATTR_ID);
+        case "m_attribute_id","m_attr_id" -> new Id(sup,ITEM_ATTR_ID);
         case "m_tracked" -> new Bool(sup,ITEM_ATTR_TRACKED);
         case "m_default_value" -> new Num(sup,ITEM_ATTR_VALUE_DEFAULT, flags);
         case "m_attribute_value","m_attr_value" -> new Num(sup,ITEM_ATTR_VALUE, flags);
@@ -126,13 +125,13 @@ public class Attributers {
 
     public static final Attributer ITEM_CAN_X = (sup, name, flags) -> switch (name) {
         case "x_name" -> new Str(sup,BLOCK_NAME);
-        case "x_id" -> new Str(sup,BLOCK_ID);
+        case "x_id" -> new Id(sup,BLOCK_ID);
         default -> null;
     };
 
     public static final Attributer ITEM = (sup, name, flags) -> switch (name) {
         case "", "i_item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
-        case "i_id" -> new Special(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
+        case "i_id" -> new SpecialId(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
         case "i_name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
         case "i_count" -> new NumBool(sup, ITEM_COUNT, ITEM_IS_NOT_EMPTY, flags);
         case "i_max_count" -> new NumBool(sup, ITEM_MAX_COUNT, ITEM_IS_STACKABLE, flags);
@@ -167,7 +166,7 @@ public class Attributers {
 
     public static final Attributer ATTRIBUTE = (sup, name, flags) -> switch (name) {
         case "a_name" -> new Str(sup,ATTRIBUTE_NAME);
-        case "a_id" -> new Str(sup,ATTRIBUTE_ID);
+        case "a_id" -> new Id(sup,ATTRIBUTE_ID);
         case "a_tracked" -> new Bool(sup,ATTRIBUTE_TRACKED);
         case "a_default_value" -> new Num(sup,ATTRIBUTE_VALUE_DEFAULT, flags);
         case "a_base_value" -> new Num(sup,ATTRIBUTE_VALUE_BASE, flags);
@@ -222,7 +221,7 @@ public class Attributers {
     public static final Attributer BOSSBAR = (sup, name, flags) -> switch (name) {
         case "b_name" -> new Tex(sup, BOSSBAR_NAME);
         case "b_uuid" -> new Str(sup, BOSSBAR_UUID);
-        case "b_id" -> new Str(sup, BOSSBAR_ID); //SP Only
+        case "b_id" -> new Id(sup, BOSSBAR_ID); //SP Only
         case "b_percent","b_per","b_value","" -> new Num(sup, BOSSBAR_PERCENT, flags);
         case "b_darken_sky" -> new Bool(sup, BOSSBAR_DARKEN_SKY);
         case "b_dragon_music" -> new Bool(sup, BOSSBAR_DRAGON_MUSIC);
@@ -302,7 +301,7 @@ public class Attributers {
 
     public static final Attributer RECORD = (sup, name, flags) -> switch (name) {
         case "","r_name" -> new Tex(sup, RECORD_NAME);
-        case "r_id" -> new Str(sup, RECORD_ID);
+        case "r_id" -> new Id(sup, RECORD_ID);
         case "r_length" -> new Num(sup, RECORD_LENGTH, flags);
         case "r_elapsed" -> new Num(sup, RECORD_ELAPSED, flags);
         case "r_remaining" -> new Num(sup, RECORD_REMAINING, flags);

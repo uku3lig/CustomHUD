@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.conditionals.Operation;
 
 import java.util.ArrayList;

@@ -2,10 +2,9 @@ package com.minenash.customhud.data;
 
 import com.minenash.customhud.HudElements.FormattedElement;
 import com.minenash.customhud.HudElements.FrequencyElement;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.RomanNumeralElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
-import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 

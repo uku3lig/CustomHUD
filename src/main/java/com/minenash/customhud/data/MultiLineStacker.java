@@ -1,8 +1,7 @@
 package com.minenash.customhud.data;
 
-import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.ConditionalElement;
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.list.Attributers;
 import com.minenash.customhud.HudElements.list.ListElement;

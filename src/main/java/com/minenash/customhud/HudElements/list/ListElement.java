@@ -1,14 +1,11 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.HudElement;
-import com.minenash.customhud.HudElements.MultiElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
-import com.minenash.customhud.HudElements.icon.IconElement;
-import com.minenash.customhud.render.CustomHudRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 public class ListElement implements HudElement, MultiElement {

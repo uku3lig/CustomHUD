@@ -43,7 +43,7 @@ public class SubtitleTracker implements SoundInstanceListener {
                 }
             }
             SubtitlesHud.SubtitleEntry entry = new SubtitlesHud.SubtitleEntry(text, range, new Vec3d(sound.getX(), sound.getY(), sound.getZ()));
-            ((SubtitleEntryDuck)entry).customhud$setSoundID(sound.getId().toString());
+            ((SubtitleEntryDuck)entry).customhud$setSoundID(sound.getId());
             this.entries.add(entry);
         }
     }

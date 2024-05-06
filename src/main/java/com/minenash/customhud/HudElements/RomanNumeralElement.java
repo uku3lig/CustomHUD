@@ -1,6 +1,9 @@
 package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.MultiElement;
+import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.data.HudTheme;
 import com.minenash.customhud.render.CustomHudRenderer;
 import net.minecraft.util.Identifier;

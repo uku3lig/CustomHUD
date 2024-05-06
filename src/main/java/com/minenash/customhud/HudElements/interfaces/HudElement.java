@@ -1,4 +1,4 @@
-package com.minenash.customhud.HudElements;
+package com.minenash.customhud.HudElements.interfaces;
 
 import java.util.function.Supplier;
 

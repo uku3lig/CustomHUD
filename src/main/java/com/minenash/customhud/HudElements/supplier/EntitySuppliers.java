@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.function.Supplier;
 
@@ -19,7 +20,7 @@ public class EntitySuppliers {
     private static Entity veh() { return CLIENT.player.getVehicle(); }
 
     public static final Supplier<String> TARGET_ENTITY = () -> type(ComplexData.targetEntity);
-    public static final Supplier<String> TARGET_ENTITY_ID = () -> id(ComplexData.targetEntity);
+    public static final Supplier<Identifier> TARGET_ENTITY_ID = () -> id(ComplexData.targetEntity);
     public static final Supplier<Text> TARGET_ENTITY_NAME = () -> name(ComplexData.targetEntity);
     public static final Supplier<String> TARGET_ENTITY_UUID = () -> uuid(ComplexData.targetEntity);
     public static final NumberSupplierElement.Entry TARGET_ENTITY_X = of( () -> x(ComplexData.targetEntity), 0);
@@ -28,7 +29,7 @@ public class EntitySuppliers {
     public static final NumberSupplierElement.Entry TARGET_ENTITY_DISTANCE = of( () -> dist(ComplexData.targetEntity), 1);
 
     public static final Supplier<String> HOOKED_ENTITY = () -> type(hooked());
-    public static final Supplier<String> HOOKED_ENTITY_ID = () -> id(hooked());
+    public static final Supplier<Identifier> HOOKED_ENTITY_ID = () -> id(hooked());
     public static final Supplier<Text> HOOKED_ENTITY_NAME = () -> name(hooked());
     public static final Supplier<String> HOOKED_ENTITY_UUID = () -> uuid(hooked());
     public static final NumberSupplierElement.Entry HOOKED_ENTITY_X = of ( () -> x(hooked()), 0);
@@ -40,13 +41,13 @@ public class EntitySuppliers {
 
 
     public static final Supplier<String> LAST_HIT_ENTITY = () -> type(ComplexData.lastHitEntity);
-    public static final Supplier<String> LAST_HIT_ENTITY_ID = () -> id(ComplexData.lastHitEntity);
+    public static final Supplier<Identifier> LAST_HIT_ENTITY_ID = () -> id(ComplexData.lastHitEntity);
     public static final Supplier<Text> LAST_HIT_ENTITY_NAME = () -> name(ComplexData.lastHitEntity);
     public static final Supplier<String> LAST_HIT_ENTITY_UUID = () -> uuid(ComplexData.lastHitEntity);
     public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_DISTANCE = of( () -> ComplexData.lastHitEntityDist, 1);
 
     public static final Supplier<String> VEHICLE_ENTITY = () -> type(veh());
-    public static final Supplier<String> VEHICLE_ENTITY_ID = () -> id(veh());
+    public static final Supplier<Identifier> VEHICLE_ENTITY_ID = () -> id(veh());
     public static final Supplier<Text> VEHICLE_ENTITY_NAME = () -> name(veh());
     public static final Supplier<String> VEHICLE_ENTITY_UUID = () -> uuid(veh());
     public static final NumberSupplierElement.Entry VEHICLE_ENTITY_HEALTH = of ( () -> !(veh() instanceof LivingEntity le)? null : le.getHealth(), 0);
@@ -57,7 +58,7 @@ public class EntitySuppliers {
 
 
     private static String type(Entity e) { return e == null ? null : I18n.translate(e.getType().getTranslationKey()); }
-    private static String id(Entity e) { return e == null ? null : Registries.ENTITY_TYPE.getId(e.getType()).toString(); }
+    private static Identifier id(Entity e) { return e == null ? null : Registries.ENTITY_TYPE.getId(e.getType()); }
     private static Text name(Entity e) { return e == null ? null : e.getDisplayName(); }
     private static String uuid(Entity e) { return e == null ? null : e.getUuidAsString(); }
 

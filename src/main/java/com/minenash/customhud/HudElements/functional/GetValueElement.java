@@ -1,7 +1,7 @@
 package com.minenash.customhud.HudElements.functional;
 
-import com.minenash.customhud.HudElements.HudElement;
-import com.minenash.customhud.HudElements.NumElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Flags;

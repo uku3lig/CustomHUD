@@ -1,8 +1,10 @@
 package com.minenash.customhud.ducks;
 
+import net.minecraft.util.Identifier;
+
 public interface SubtitleEntryDuck {
 
-    String customhud$getSoundID();
-    void customhud$setSoundID(String id);
+    Identifier customhud$getSoundID();
+    void customhud$setSoundID(Identifier id);
 
 }

@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+
 public class StringElement implements HudElement {
 
     private final String str;

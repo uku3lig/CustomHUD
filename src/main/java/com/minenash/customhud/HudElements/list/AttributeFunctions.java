@@ -30,6 +30,7 @@ import net.minecraft.stat.StatFormatter;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -62,7 +63,7 @@ public class AttributeFunctions {
 
     // STATUS EFFECTS
     public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> I18n.translate(status.getTranslationKey());
-    public static final Function<StatusEffectInstance,String> STATUS_ID = (status) -> Registries.STATUS_EFFECT.getId(status.getEffectType()).toString();
+    public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> Registries.STATUS_EFFECT.getId(status.getEffectType());
     public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(HMS, StatusEffectInstance::getDuration);
     public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status.getDuration() == -1;
     public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = StatusEffectInstance::getAmplifier;
@@ -97,7 +98,7 @@ public class AttributeFunctions {
     };
 
     // SUBTITLES TODO: ADD ALPHA COLOR
-    public static final Function<SubtitleEntry,String> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
+    public static final Function<SubtitleEntry,Identifier> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
     public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
     public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
     public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
@@ -135,7 +136,7 @@ public class AttributeFunctions {
 
 
     // BLOCK TAGS
-    public static final Function<TagKey<Block>,String> BLOCK_TAG_ID = (tag) -> tag.id().toString();
+    public static final Function<TagKey<Block>,Identifier> BLOCK_TAG_ID = (tag) -> tag.id();
     public static final Function<TagKey<Block>,String> BLOCK_TAG_NAME = (tag) -> tag.id().getNamespace().equals("minecraft") ?
             tag.id().getPath() : tag.id().toString();
 
@@ -153,7 +154,7 @@ public class AttributeFunctions {
 
 
     // ITEMS
-    public static final Function<ItemStack, String> ITEM_ID = (stack) -> Registries.ITEM.getId(stack.getItem()).toString();
+    public static final Function<ItemStack, Identifier> ITEM_ID = (stack) -> Registries.ITEM.getId(stack.getItem());
     public static final Function<ItemStack, String> ITEM_NAME = (stack) -> stack.getItem().getName().getString();
     public static final Function<ItemStack, Number> ITEM_RAW_ID = (stack) -> Item.getRawId(stack.getItem());
     public static final Function<ItemStack, Boolean> ITEM_IS_NOT_EMPTY = (stack) -> !stack.isEmpty();
@@ -181,12 +182,12 @@ public class AttributeFunctions {
     );
 
     // CAN X
-    public static final Function<Block, String> BLOCK_ID = (block) -> Registries.BLOCK.getId(block).toString();
+    public static final Function<Block, Identifier> BLOCK_ID = (block) -> Registries.BLOCK.getId(block);
     public static final Function<Block, String> BLOCK_NAME = (block) -> I18n.translate(block.getTranslationKey());
 
     // ATTRIBUTES
     public static final Function<EntityAttributeInstance,String> ATTRIBUTE_NAME = (attr) -> I18n.translate(attr.getAttribute().getTranslationKey());
-    public static final Function<EntityAttributeInstance,String> ATTRIBUTE_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.getAttribute()).toString();
+    public static final Function<EntityAttributeInstance,Identifier> ATTRIBUTE_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.getAttribute());
     public static final Function<EntityAttributeInstance,Boolean> ATTRIBUTE_TRACKED = (attr) -> attr.getAttribute().isTracked();
     public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE_DEFAULT = (attr) -> attr.getAttribute().getDefaultValue();
     public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE_BASE = EntityAttributeInstance::getBaseValue;
@@ -210,7 +211,7 @@ public class AttributeFunctions {
     // ITEM ATTRIBUTE MODIFIERS
     public static final Function<ItemAttribute,String> ITEM_ATTR_SLOT = (attr) -> attr.slot();
     public static final Function<ItemAttribute,String> ITEM_ATTR_NAME = (attr) -> I18n.translate(attr.attribute().getTranslationKey());
-    public static final Function<ItemAttribute,String> ITEM_ATTR_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.attribute()).toString();
+    public static final Function<ItemAttribute,Identifier> ITEM_ATTR_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.attribute());
     public static final Function<ItemAttribute,Boolean> ITEM_ATTR_TRACKED = (attr) -> attr.attribute().isTracked();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_DEFAULT = (attr) -> attr.attribute().getDefaultValue();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_BASE = (attr) -> CLIENT.player.getAttributeBaseValue(attr.attribute());
@@ -316,10 +317,10 @@ public class AttributeFunctions {
             (bar) -> bar.getStyle().ordinal(),
             (bar) -> bar.getStyle().ordinal() != 0
     );
-    public static final Function<BossBar,String> BOSSBAR_ID = (bar) -> {
+    public static final Function<BossBar,Identifier> BOSSBAR_ID = (bar) -> {
         if (CLIENT.getServer() == null) return null;
         for (var entry : CLIENT.getServer().getBossBarManager().commandBossBars.entrySet())
-            if (entry.getValue() == bar) return entry.getKey().toString();
+            if (entry.getValue() == bar) return entry.getKey();
         return null;
     };
     public static final Function<BossBar,Boolean> BOSSBAR_IS_VISIBLE = (bar) -> bar instanceof CommandBossBar cbb ? cbb.isVisible() : null;
@@ -361,7 +362,7 @@ public class AttributeFunctions {
 
     // RECORDS
     public static final Function<MusicAndRecordTracker.RecordInstance,Text> RECORD_NAME = (rec) -> rec.name;
-    public static final Function<MusicAndRecordTracker.RecordInstance,String> RECORD_ID = (rec) -> rec.id;
+    public static final Function<MusicAndRecordTracker.RecordInstance, Identifier> RECORD_ID = (rec) -> rec.id;
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_LENGTH = (rec) -> rec.length / 20F;
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED = (rec) -> rec.elapsed / 20F;
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_REMAINING = (rec) -> (rec.length - rec.elapsed) / 20F;

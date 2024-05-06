@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

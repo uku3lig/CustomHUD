@@ -1,6 +1,6 @@
 package com.minenash.customhud.data;
 
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.MathHelper;
 

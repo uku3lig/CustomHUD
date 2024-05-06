@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;

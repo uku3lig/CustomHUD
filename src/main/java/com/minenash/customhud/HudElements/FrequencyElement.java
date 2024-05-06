@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+
 public class FrequencyElement implements HudElement {
 
     private final HudElement element;

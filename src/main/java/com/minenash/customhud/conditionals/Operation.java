@@ -1,7 +1,7 @@
 package com.minenash.customhud.conditionals;
 
-import com.minenash.customhud.HudElements.HudElement;
-import com.minenash.customhud.HudElements.MultiElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.complex.ListManager;

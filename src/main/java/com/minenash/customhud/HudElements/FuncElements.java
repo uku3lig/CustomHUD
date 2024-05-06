@@ -1,10 +1,14 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.IdElement;
+import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.data.Flags;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -37,6 +41,16 @@ public abstract class FuncElements<T> implements HudElement {
             try { return function.apply(supplier.get()).length(); }
             catch (Exception ignored) { return 0; }
         }
+    }
+
+    public static class Id<T> extends FuncElements<T> implements IdElement {
+        private final Function<T, Identifier> function;
+        public Id(Supplier<T> supplier, Function<T,Identifier> func) { super(supplier); function = func;}
+
+        public Identifier getIdentifier() { return sanitize(supplier, function, null); }
+        @Override public String getString() { Identifier id = getIdentifier(); return id == null ? "-" : id.toString(); }
+        @Override public Number getNumber() { Identifier id = getIdentifier(); return id == null ? 0 : id.toString().length(); }
+        @Override public boolean getBoolean() { Identifier id = getIdentifier(); return id != null && !id.toString().isEmpty(); }
     }
 
     public static class Tex<T> extends TextElement {
@@ -113,16 +127,26 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public boolean getBoolean() { return sanitize(supplier, entry.bool, false); }
     }
 
+    public static class SpecialId<T> extends Id<T> {
+        public record Entry<T>(Function<T,Identifier> id, Function<T,Number> num, Function<T,Boolean> bool) {}
+
+        private final Entry<T> entry;
+        public SpecialId(Supplier<T> supplier, Entry<T> entry) { super(supplier, entry.id); this.entry = entry; }
+        public SpecialId(Supplier<T> supplier, Function<T,Identifier> id, Function<T,Number> num, Function<T,Boolean> bool) {
+            super(supplier, id);
+            this.entry = new Entry<>(id,num,bool);
+        }
+
+        @Override public Number getNumber() { return sanitize(supplier, entry.num, Double.NaN); }
+        @Override public boolean getBoolean() { return sanitize(supplier, entry.bool, false); }
+    }
+
     public static class SpecialText<T> extends TextElement {
         public record TextEntry<T>(Function<T,Text> text, Function<T,Number> num, Function<T,Boolean> bool) {}
 
         private final Supplier<T> supplier;
         private final TextEntry<T> entry;
         public SpecialText(Supplier<T> supplier, TextEntry<T> entry) { this.supplier = supplier; this.entry = entry; }
-        public SpecialText(Supplier<T> supplier, Function<T,Text> text, Function<T,Number> num, Function<T,Boolean> bool) {
-            this.supplier = supplier;
-            this.entry = new TextEntry<>(text,num,bool);
-        }
 
         @Override public String getString() { return getText().getString(); }
         @Override public Number getNumber() { return FuncElements.sanitize(supplier, entry.num, Double.NaN); }

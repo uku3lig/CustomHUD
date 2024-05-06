@@ -1,6 +1,6 @@
 package com.minenash.customhud.conditionals;
 
-import com.minenash.customhud.HudElements.HudElement;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 
 public class SudoElements {
 

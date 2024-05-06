@@ -1,6 +1,6 @@
 package com.minenash.customhud.HudElements;
 
-import com.minenash.customhud.ProfileManager;
+import com.minenash.customhud.HudElements.interfaces.HudElement;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
