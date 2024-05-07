@@ -14,11 +14,13 @@ import java.util.regex.Pattern;
 public class Flags {
 
     public enum TextCase {UPPER, LOWER, TITLE}
+    public enum IdPart {NAMESPACE, PATH, FULL}
 
     public TextCase textCase = null;
     public boolean smallCaps = false;
     public int numSize = 0;
     public boolean noDelimiters = false;
+    public IdPart idPart = IdPart.FULL;
 
     public int precision = -1;
     public double scale = 1;
@@ -65,6 +67,9 @@ public class Flags {
                 case "-sup", "-supnums" -> flags.numSize = 2;
                 case "-hex" -> flags.hex = true;
                 case "-nd", "-nodashes" -> flags.noDelimiters = true;
+                // ID
+                case "-ns", "-namespace" -> flags.idPart = IdPart.NAMESPACE;
+                case "-path" -> flags.idPart = IdPart.PATH;
                 // Stat
                 case "-f", "-formatted" -> flags.formatted = true;
                 //Numbers

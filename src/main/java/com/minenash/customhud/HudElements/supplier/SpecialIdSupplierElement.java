@@ -40,8 +40,8 @@ public class SpecialIdSupplierElement extends IdentifierSupplierElement {
 
     private final Entry entry;
 
-    public SpecialIdSupplierElement(Entry entry) {
-        super(entry.identifierSupplier, new Flags());
+    public SpecialIdSupplierElement(Entry entry, Flags flags) {
+        super(entry.identifierSupplier, flags);
         this.entry = entry;
     }
 

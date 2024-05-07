@@ -725,7 +725,7 @@ public class VariableParser {
 
         SpecialIdSupplierElement.Entry entry3 = getSpecialIdSupplierElements(name, enabled);
         if (entry3 != null)
-            return new SpecialIdSupplierElement(entry3);
+            return new SpecialIdSupplierElement(entry3, flags);
 
         supplier = getTextSupplier(name, enabled);
         if (supplier != null)

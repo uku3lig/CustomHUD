@@ -45,10 +45,11 @@ public abstract class FuncElements<T> implements HudElement {
 
     public static class Id<T> extends FuncElements<T> implements IdElement {
         private final Function<T, Identifier> function;
-        public Id(Supplier<T> supplier, Function<T,Identifier> func) { super(supplier); function = func;}
+        private final Flags.IdPart idPart;
+        public Id(Supplier<T> supplier, Function<T,Identifier> func, Flags flags) { super(supplier); function = func; idPart = flags.idPart;}
 
         public Identifier getIdentifier() { return sanitize(supplier, function, null); }
-        @Override public String getString() { Identifier id = getIdentifier(); return id == null ? "-" : id.toString(); }
+        @Override public String getString() { return IdElement.getString(getIdentifier(), idPart); }
         @Override public Number getNumber() { Identifier id = getIdentifier(); return id == null ? 0 : id.toString().length(); }
         @Override public boolean getBoolean() { Identifier id = getIdentifier(); return id != null && !id.toString().isEmpty(); }
     }
@@ -131,9 +132,8 @@ public abstract class FuncElements<T> implements HudElement {
         public record Entry<T>(Function<T,Identifier> id, Function<T,Number> num, Function<T,Boolean> bool) {}
 
         private final Entry<T> entry;
-        public SpecialId(Supplier<T> supplier, Entry<T> entry) { super(supplier, entry.id); this.entry = entry; }
-        public SpecialId(Supplier<T> supplier, Function<T,Identifier> id, Function<T,Number> num, Function<T,Boolean> bool) {
-            super(supplier, id);
+        public SpecialId(Supplier<T> supplier, Function<T,Identifier> id, Function<T,Number> num, Function<T,Boolean> bool, Flags flags) {
+            super(supplier, id, flags);
             this.entry = new Entry<>(id,num,bool);
         }
 

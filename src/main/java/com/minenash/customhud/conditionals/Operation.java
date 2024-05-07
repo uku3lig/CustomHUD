@@ -1,12 +1,15 @@
 package com.minenash.customhud.conditionals;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.complex.ListManager;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -121,7 +124,7 @@ public interface Operation {
 
     class Comparison implements Operation {
         public final HudElement left, right;
-        public final boolean checkBool, checkNum;
+        public final boolean checkBool, checkNum, checkId;
         public final ExpressionParser.Comparison comparison;
 
         Comparison(HudElement left, HudElement right, ExpressionParser.Comparison comparison) {
@@ -131,6 +134,7 @@ public interface Operation {
             this.checkBool = left instanceof SudoElements.Bool || right instanceof SudoElements.Bool;
             this.checkNum = left instanceof SudoElements.Num || right instanceof SudoElements.Num
                          || left instanceof SudoElements.Op || right instanceof SudoElements.Op;
+            this.checkId = left instanceof IdElement || right instanceof IdElement;
         }
 
         public double getValue() {
@@ -141,14 +145,20 @@ public interface Operation {
             if (left == null || right == null)
                 return false;
             return switch (comparison) {
-                case EQUALS -> checkBool ? left.getBoolean() == right.getBoolean() : checkNum ? left.getNumber().doubleValue() == right.getNumber().doubleValue() : left.getString().equals(right.getString());
-                case NOT_EQUALS -> checkBool ? left.getBoolean() != right.getBoolean() : checkNum ? left.getNumber().doubleValue() != right.getNumber().doubleValue() : !left.getString().equals(right.getString());
+                case EQUALS -> checkBool ? left.getBoolean() == right.getBoolean() : checkNum ? left.getNumber().doubleValue() == right.getNumber().doubleValue() : checkId ? compareID(left,right) : left.getString().equals(right.getString());
+                case NOT_EQUALS -> checkBool ? left.getBoolean() != right.getBoolean() : checkNum ? left.getNumber().doubleValue() != right.getNumber().doubleValue() : checkId ? !compareID(left,right) : !left.getString().equals(right.getString());
 
                 case LESS_THAN -> left.getNumber().doubleValue() < right.getNumber().doubleValue();
                 case GREATER_THAN -> left.getNumber().doubleValue() > right.getNumber().doubleValue();
                 case LESS_THAN_OR_EQUAL -> left.getNumber().doubleValue() <= right.getNumber().doubleValue();
                 case GREATER_THAN_OR_EQUALS -> left.getNumber().doubleValue() >= right.getNumber().doubleValue();
             };
+        }
+
+        public boolean compareID(HudElement left, HudElement right) {
+            Identifier l = left instanceof IdElement ide ? ide.getIdentifier() : Identifier.tryParse(left.getString());
+            Identifier r = right instanceof IdElement ide ? ide.getIdentifier() : Identifier.tryParse(right.getString());
+            return l != null && l.equals(r);
         }
 
 

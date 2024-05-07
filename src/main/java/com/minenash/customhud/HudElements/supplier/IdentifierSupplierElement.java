@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.data.Flags;
 import net.minecraft.util.Identifier;
@@ -10,7 +11,7 @@ import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-public class IdentifierSupplierElement implements HudElement {
+public class IdentifierSupplierElement implements HudElement, IdElement {
     private static BlockPos blockPos() { return CLIENT.getCameraEntity().getBlockPos(); }
 
     public static final Supplier<Identifier> DIMENSION_ID = () -> CLIENT.world.getRegistryKey().getValue();
@@ -21,9 +22,11 @@ public class IdentifierSupplierElement implements HudElement {
 
 
     private final Supplier<Identifier> supplier;
+    private final Flags.IdPart idPart;
 
     public IdentifierSupplierElement(Supplier<Identifier> supplier, Flags flags) {
         this.supplier = supplier;
+        this.idPart = flags.idPart;
     }
 
     public Identifier getIdentifier() {
@@ -33,8 +36,7 @@ public class IdentifierSupplierElement implements HudElement {
 
     @Override
     public String getString() {
-        Identifier id = getIdentifier();
-        return id == null ? "-" : id.toString();
+        return IdElement.getString(getIdentifier(), idPart);
     }
 
     @Override
