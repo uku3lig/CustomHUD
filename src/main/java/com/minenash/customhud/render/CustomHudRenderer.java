@@ -1,5 +1,6 @@
 package com.minenash.customhud.render;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.ExecuteElement;
@@ -185,7 +186,7 @@ public class CustomHudRenderer {
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
                 catch (Exception e){
-                    e.printStackTrace();
+                    CustomHud.logStackTrace(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);

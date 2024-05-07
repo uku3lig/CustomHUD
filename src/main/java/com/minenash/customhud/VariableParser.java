@@ -80,9 +80,9 @@ public class VariableParser {
 
         List<HudElement> elements = new ArrayList<>();
 
-        System.out.println("PARTITION:");
+        CustomHud.logInDebugMode("PARTITION:");
         for (String part : partition(str)) {
-            System.out.println("`" + part + "`");
+            CustomHud.logInDebugMode("`" + part + "`");
             HudElement element = parseElement(part, profile, debugLine, enabled, listProvider);
             if (element != null)
                 elements.add(element);
@@ -253,10 +253,10 @@ public class VariableParser {
         if (part.startsWith("{") && part.length() > 1) {
             part = part.substring(1, part.length() - 1);
 
-            System.out.println("COND:");
+            CustomHud.logInDebugMode("COND:");
             List<String> ps = partitionConditional(part);
             for (String p : ps)
-                System.out.println("`" + p + "`");
+                CustomHud.logInDebugMode("`" + p + "`");
 
             if (ps.size() < 2) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, null);
@@ -303,7 +303,7 @@ public class VariableParser {
                 return new ExpressionElement( ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProvider), precision );
             }
             catch (Exception e) {
-                e.printStackTrace();
+                CustomHud.logStackTrace(e);;
                 return null;
             }
         }
@@ -1182,7 +1182,7 @@ public class VariableParser {
             return null;
         }
         format = format.substring(1, format.length()-1);
-        System.out.println("Format: " + format);
+        CustomHud.logInDebugMode("Format: " + format);
 
         return new ListElement(provider, addElements(format, profile, debugLine, enabled, false, provider));
     }
@@ -1277,9 +1277,9 @@ public class VariableParser {
         }
 
         List<String> parts = partitionConditional(part);
-        System.out.println("SUPPLIER");
+        CustomHud.logInDebugMode("SUPPLIER");
         for (String p : parts) {
-            System.out.println("`" + p + "`");
+            CustomHud.logInDebugMode("`" + p + "`");
         }
         if (parts.size() < 3) {
             Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_BAR, null);
@@ -1313,9 +1313,9 @@ public class VariableParser {
             return new ListCountElement(provider, Attributers.get(provider, ListManager.SUPPLIER, "", new Flags()));
 
         List<String> parts = partitionConditional(part);
-        System.out.println("SUPPLIER");
+        CustomHud.logInDebugMode("SUPPLIER");
         for (String p : parts) {
-            System.out.println("`" + p + "`");
+            CustomHud.logInDebugMode("`" + p + "`");
         }
         if (parts.size() < 2)
             return null;
@@ -1326,7 +1326,7 @@ public class VariableParser {
             return null;
         }
         format = format.substring(1, format.length()-1);
-        System.out.println("Format: " + format);
+        CustomHud.logInDebugMode("Format: " + format);
 
         return new ListElement(provider, addElements(format, profile, debugLine, enabled, false, provider));
     }

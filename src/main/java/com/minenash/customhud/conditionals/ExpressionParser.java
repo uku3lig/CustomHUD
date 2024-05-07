@@ -1,5 +1,6 @@
 package com.minenash.customhud.conditionals;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
@@ -36,15 +37,15 @@ public class ExpressionParser {
         try {
             List<Token> tokens = getTokens(input, profile, debugLine, enabled, listSupplier);
             Operation c = getConditional(tokens);
-            System.out.println("Tree for Conditional on line " + debugLine + ":");
+            CustomHud.logInDebugMode("Tree for Conditional on line " + debugLine + ":");
             c.printTree(0);
-            System.out.println();
+            CustomHud.logInDebugMode("");
             return c;
         }
         catch (ErrorException e) {
             Errors.addError(profile.name, debugLine, source, e.type, e.context);
-            System.out.println("[Line: " + debugLine + "] Conditional Couldn't Be Parsed: " + e.getMessage());
-            System.out.println("Input: \"" + input + "\"");
+            CustomHud.LOGGER.warn("[Line: {}] Conditional Couldn't Be Parsed: {}", debugLine, e.getMessage());
+            CustomHud.LOGGER.warn("Input: \"{}\"", input);
             return new Operation.Literal(1);
         }
     }

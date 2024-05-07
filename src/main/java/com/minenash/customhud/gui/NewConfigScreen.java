@@ -53,6 +53,7 @@ public class NewConfigScreen extends Screen {
 
     @Override
     public void init() {
+        clearChildren();
         profiles = new ProfileLinesWidget(this,30, height-32);
         addSelectableChild(profiles);
 
@@ -62,6 +63,13 @@ public class NewConfigScreen extends Screen {
 
         this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
                 .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
+
+        this.addDrawableChild( ButtonWidget.builder(Text.literal("Debug Mode: " + CustomHud.DEBUG_MODE),
+               (ButtonWidget button) -> {
+                    CustomHud.DEBUG_MODE = !CustomHud.DEBUG_MODE;
+                    button.setMessage( Text.literal("Debug Mode: " + CustomHud.DEBUG_MODE) );
+                })
+                .position(6, 6).size(100, 20).build() );
 
         this.addDrawableChild( ButtonWidget.builder(linkText("D", " Support"),
                 button -> Util.getOperatingSystem().open("https://jakobt.dev/discord"))
@@ -186,7 +194,7 @@ public class NewConfigScreen extends Screen {
 
     @Override
     public void filesDragged(List<Path> paths) {
-        System.out.println("Path's: " + paths);
+        CustomHud.logInDebugMode("Path's: " + paths);
 
         for (Path path : paths) {
             if (!path.getFileName().toString().endsWith(".txt"))

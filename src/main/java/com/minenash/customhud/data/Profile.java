@@ -1,5 +1,6 @@
 package com.minenash.customhud.data;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.errors.ErrorType;
@@ -62,11 +63,11 @@ public class Profile {
         Profile profile = parseProfileInner(path, profileName);
 
         if (!Errors.getErrors(profileName).isEmpty()) {
-            System.out.println("\n");
-            System.out.println("Errors Found in profile '" + profileName + "'");
+            CustomHud.LOGGER.warn("");
+            CustomHud.LOGGER.warn("Errors Found in profile '{}'", profileName);
             for (var e : Errors.getErrors(profileName))
-                System.out.println(e.line() + " | " + e.type() + " | " + e.source() + " | " + e.context());
-            System.out.println();
+                CustomHud.LOGGER.warn("{} | {} | {} | {}", e.line(), e.type(), e.source(), e.context());
+            CustomHud.LOGGER.warn("");
         }
 
         if (profile != null)
@@ -94,7 +95,7 @@ public class Profile {
             lines = Files.readAllLines(path);
             dateTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
-            e.printStackTrace();
+            CustomHud.logStackTrace(e);;
             Errors.addError(profileName, "N/A", path.relativize(FabricLoader.getInstance().getGameDir().getParent()).toString(), ErrorType.IO, e.getMessage());
             return null;
         }

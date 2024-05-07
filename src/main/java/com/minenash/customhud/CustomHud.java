@@ -27,6 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +40,8 @@ public class CustomHud implements ModInitializer {
 	public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public static final Logger LOGGER = LogManager.getLogger("CustomHud");
 	public static boolean MODMENU_INSTALLED = false;
+
+	public static boolean DEBUG_MODE = true;
 
 	public static final Path CONFIG_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud");
 	public static final Path PROFILE_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud/profiles");
@@ -67,17 +71,18 @@ public class CustomHud implements ModInitializer {
 
 	public static void delayedInitialize() {
 		MODMENU_INSTALLED = FabricLoader.getInstance().isModLoaded("modmenu");
+		ConfigManager.load();
+
 		readProfiles();
 		updateCrosshairObjectShare();
 
-		ConfigManager.load();
 		ConfigManager.save();
 
 		try {
 			profileWatcher = FileSystems.getDefault().newWatchService();
 			PROFILE_FOLDER.register(profileWatcher, StandardWatchEventKinds.ENTRY_CREATE,StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 		} catch (IOException e) {
-			e.printStackTrace();
+			CustomHud.logStackTrace(e);
 		}
 	}
 
@@ -90,7 +95,7 @@ public class CustomHud implements ModInitializer {
 						ProfileManager.add(Profile.parseProfile(path, name.substring(0, name.length()-4)));
 				}
 		} catch (IOException e) {
-			e.printStackTrace();
+			CustomHud.logStackTrace(e);
 		}
 	}
 
@@ -158,7 +163,7 @@ public class CustomHud implements ModInitializer {
 		for (WatchEvent<?> event : key.pollEvents()) {
 			Path path = CustomHud.PROFILE_FOLDER.resolve((Path) event.context());
 			String fileName = path.getFileName().toString();
-			System.out.println("Filename: `" + fileName + "`");
+			CustomHud.logInDebugMode("Filename: `" + fileName + "`");
 			if (!fileName.endsWith(".txt"))
 				continue;
 			fileName = fileName.substring(0, fileName.length()-4);
@@ -179,7 +184,7 @@ public class CustomHud implements ModInitializer {
 			}
 			if (event.kind().name().equals("ENTRY_MODIFY")) {
 				if (profile == null) {
-					System.out.println("CustomHud ENTRY MODIFY: You Don't Exist?");
+					logInDebugMode("CustomHud ENTRY MODIFY: You Don't Exist?");
 					continue;
 				}
 				else {
@@ -194,7 +199,7 @@ public class CustomHud implements ModInitializer {
 				}
 			}
 
-			LOGGER.info("Updated Profile " + fileName);
+            LOGGER.info("Updated Profile {}", fileName);
 			if (!ignoreFirstToast)
 				showToast(fileName);
 			ignoreFirstToast = false;
@@ -225,6 +230,18 @@ public class CustomHud implements ModInitializer {
 				Text.literal("§fAll Profiles Updated"),
 				Text.literal("§aNo errors found")
 		));
+	}
+
+	public static void logInDebugMode(String msg) {
+		if (DEBUG_MODE)
+			LOGGER.info(msg);
+	}
+	public static void logStackTrace(Exception e) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		pw.close();
+		LOGGER.error(sw.toString());
 	}
 
 

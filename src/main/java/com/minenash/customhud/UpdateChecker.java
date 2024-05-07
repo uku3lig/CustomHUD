@@ -41,7 +41,7 @@ public class UpdateChecker {
         if (updateInfo == null)
             return;
 
-        System.out.println("VERSION: " + mcVersion);
+        CustomHud.logInDebugMode("VERSION: " + mcVersion);
 
         JsonObject info = updateInfo.getAsJsonObject(mcVersion);
         if (info == null)
@@ -90,8 +90,8 @@ public class UpdateChecker {
             return JsonParser.parseString(new String(conn.getInputStream().readAllBytes())).getAsJsonObject();
         }
         catch (Exception e) {
-            System.out.println("[CustomHUD] Could not get update info");
-            e.printStackTrace();
+            CustomHud.LOGGER.error("[CustomHUD] Could not get update info");
+            CustomHud.logStackTrace(e);
             return null;
         }
     }

@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.list;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
@@ -395,7 +396,7 @@ public class Attributers {
     public static HudElement get(ListProvider list, Supplier<?> value, String name, Flags flags) {
         Attributer attributer = ATTRIBUTER_MAP.get(list);
         if (attributer == null) {
-            System.out.println("[FIX ME]: Attributer not in Map!");
+            CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
             return null;
         }
         return attributer.get(value, name, flags);

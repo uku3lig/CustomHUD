@@ -46,7 +46,7 @@ public class ProfileManager {
                 Files.delete(CustomHud.PROFILE_FOLDER.resolve(profile.name + ".txt"));
             }
             catch (Exception e) {
-                System.out.println("Couldn't delete profile, IO Error");
+                CustomHud.LOGGER.error("Couldn't delete profile, IO Error");
             }
         }
     }
@@ -114,7 +114,7 @@ public class ProfileManager {
             Files.move(oldPath,newPath);
             ConfigManager.save();
         } catch (IOException e) {
-            System.out.println("Can't rename profile, IO Exception");
+            CustomHud.LOGGER.error("Can't rename profile, IO Exception");
             //TODO: GUI Errors
         }
     }
@@ -133,7 +133,7 @@ public class ProfileManager {
             Files.createFile(CustomHud.PROFILE_FOLDER.resolve(name + ".txt"));
         }
         catch (Exception e) {
-            System.out.println("Can't create profile file, IO Error");
+            CustomHud.LOGGER.error("Can't create profile file, IO Error");
             return null;
         }
 

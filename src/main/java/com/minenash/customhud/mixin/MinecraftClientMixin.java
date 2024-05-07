@@ -100,7 +100,7 @@ public abstract class MinecraftClientMixin {
                 CustomHud.showAllUpdatedToast();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            CustomHud.logStackTrace(e);
         }
     }
 

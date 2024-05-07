@@ -28,7 +28,7 @@ public class EditorWindow {
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
         } catch (Exception ex) {
-            System.err.println("Failed to initialize LaF");
+            CustomHud.LOGGER.error("Failed to initialize LaF");
         }
         SwingUtilities.invokeLater(() -> {
             EditorWindow window = new EditorWindow(profile);

@@ -58,13 +58,13 @@ public class ConfigManager {
         int version = json.get("configVersion").getAsInt();
         if (version != 2) {
             //TODO: Do Toast
-            System.out.println("Unknown Config Version. Not loading it");
+            CustomHud.LOGGER.warn("Unknown Config Version. Not loading it");
         }
         readV2(json);
     }
 
     public static void readV1AndConvert(JsonObject json) {
-        System.out.println("Config Version Not Found, Assuming Version 1, Converting");
+        CustomHud.LOGGER.info("Config Version Not Found, Assuming Version 1, Converting");
         ProfileManager.enabled = json.get("enabled").getAsBoolean();
 
         try(Stream<Path> pathsStream = Files.list(CustomHud.CONFIG_FOLDER)) {
@@ -82,7 +82,7 @@ public class ConfigManager {
                     }
                 }
         } catch (IOException e) {
-            e.printStackTrace();
+            CustomHud.logStackTrace(e);
         }
         CustomHud.readProfiles();
         ProfileManager.fallback();
@@ -95,6 +95,9 @@ public class ConfigManager {
             UpdateChecker.latestKnownVersion = lastVersion.getAsString().split("\\.");
 
         var profiles = ProfileManager.getProfiles().stream().collect(Collectors.toMap(p -> p.name, p -> p));
+
+        if (json.has("debugMode"))
+            CustomHud.DEBUG_MODE = json.get("debugMode").getAsBoolean();
 
         ProfileManager.enabled = json.get("enabled").getAsBoolean();
         String activeProfileName = json.get("activeProfile").getAsString();
@@ -153,6 +156,7 @@ public class ConfigManager {
         }
         JsonObject config = new JsonObject();
         config.addProperty("configVersion", 2);
+        config.addProperty("debugMode", CustomHud.DEBUG_MODE);
         config.addProperty("enabled", ProfileManager.enabled);
         config.addProperty("activeProfile", ProfileManager.getActive() == null ? "" : ProfileManager.getActive().name);
         config.addProperty("latestKnownVersion", UpdateChecker.getLatestKnownVersionAsString());

@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.MinecraftClient;
@@ -35,7 +36,7 @@ public class SimpleTextureIconElement extends IconElement {
             if (resource.isPresent())
                 img = NativeImage.read(resource.get().getInputStream());
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException e) { CustomHud.logStackTrace(e); }
 
 
         iconAvailable = img != null;

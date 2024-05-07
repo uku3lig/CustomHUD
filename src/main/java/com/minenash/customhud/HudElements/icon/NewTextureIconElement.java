@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
@@ -43,7 +44,7 @@ public class NewTextureIconElement extends IconElement {
             if (resource.isPresent())
                 img = NativeImage.read(resource.get().getInputStream());
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException e) { CustomHud.logStackTrace(e); }
 
 
         iconAvailable = img != null;

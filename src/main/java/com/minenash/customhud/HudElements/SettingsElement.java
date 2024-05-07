@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.HudElements.supplier.*;
@@ -123,7 +124,7 @@ public class SettingsElement {
     }
 
     private static HudElement getSimpleOptionElement(SimpleOption<?> option, Flags flags) {
-        System.out.println("Option: " + option.toString() + " | " + option.getValue().getClass().getName());
+        CustomHud.logInDebugMode("Option: " + option.toString() + " | " + option.getValue().getClass().getName());
         if (option.getValue() instanceof Boolean)
             return new BooleanSupplierElement(() -> (Boolean) option.getValue());
         if (option.getValue() instanceof Number)

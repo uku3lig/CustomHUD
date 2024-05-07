@@ -1,5 +1,6 @@
 package com.minenash.customhud.conditionals;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
@@ -54,9 +55,9 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Length: ");
+            CustomHud.logInDebugMode(indent(indent) + "- Length: ");
             for (HudElement elem : elements)
-                System.out.println(indent(indent+1) + elem.toString());
+                CustomHud.logInDebugMode(indent(indent+1) + elem.toString());
         }
     }
 
@@ -69,7 +70,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Ternary: ");
+            CustomHud.logInDebugMode(indent(indent) + "- Ternary: ");
             conditional.printTree(indent+2);
             left.printTree(indent+2);
             right.printTree(indent+2);
@@ -87,7 +88,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Or: ");
+            CustomHud.logInDebugMode(indent(indent) + "- Or: ");
             for (Operation elem : elements)
                 elem.printTree(indent + 2);
         }
@@ -103,7 +104,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- And:");
+            CustomHud.logInDebugMode(indent(indent) + "- And:");
             for (Operation elem : elements)
                 elem.printTree(indent+2);
         }
@@ -117,7 +118,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Negate: " + element.getString());
+            CustomHud.logInDebugMode(indent(indent) + "- Negate: " + element.getString());
 
         }
     }
@@ -188,7 +189,7 @@ public interface Operation {
         @Override
         public void printTree(int indent) {
             String bool = (comparison == ExpressionParser.Comparison.EQUALS || comparison == ExpressionParser.Comparison.NOT_EQUALS) && checkBool ? "BOOL_" : "";
-            System.out.println(indent(indent) + "- Conditional(" + bool + comparison + "): " + left.getClass().getName() + ", " + right.getClass().getName());
+            CustomHud.logInDebugMode(indent(indent) + "- Conditional(" + bool + comparison + "): " + left.getClass().getName() + ", " + right.getClass().getName());
             if (left instanceof SudoElements.Op op) {
                 op.op().printTree(indent + 2);
             }
@@ -207,7 +208,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Operations(" + op.name()+ ")");
+            CustomHud.logInDebugMode(indent(indent) + "- Operations(" + op.name()+ ")");
             left.printTree(indent + 2);
             right.printTree(indent + 2);
         }
@@ -236,9 +237,9 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Operations: " + operations.toString());
+            CustomHud.logInDebugMode(indent(indent) + "- Operations: " + operations.toString());
             for (HudElement element : elements) {
-                System.out.println(indent(indent) + "- " + element.getString());
+                CustomHud.logInDebugMode(indent(indent) + "- " + element.getString());
             }
         }
     }
@@ -254,7 +255,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Operations: " + operations.toString());
+            CustomHud.logInDebugMode(indent(indent) + "- Operations: " + operations.toString());
             for (Operation op : elements)
                 op.printTree(indent + 2);
         }
@@ -267,7 +268,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Function: " + func.toString());
+            CustomHud.logInDebugMode(indent(indent) + "- Function: " + func.toString());
             op.printTree(indent + 2);
         }
     }
@@ -279,7 +280,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Literal: " + value);
+            CustomHud.logInDebugMode(indent(indent) + "- Literal: " + value);
         }
     }
 
@@ -295,7 +296,7 @@ public interface Operation {
 
         @Override
         public void printTree(int indent) {
-            System.out.println(indent(indent) + "- Element: " + element);
+            CustomHud.logInDebugMode(indent(indent) + "- Element: " + element);
         }
     }
 

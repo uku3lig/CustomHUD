@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -44,7 +45,7 @@ public class TextureIconElement extends IconElement {
             if (resource.isPresent())
                 img = NativeImage.read(resource.get().getInputStream());
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException e) { CustomHud.logStackTrace(e); }
 
 
         iconAvailable = img != null;
