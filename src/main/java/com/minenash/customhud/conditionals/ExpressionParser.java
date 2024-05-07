@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class ExpressionParser {
 
     public enum TokenType { START_PREN, END_PREN, FULL_PREN, FUNCTION, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE, NEGATED_VARIABLE, IF, ELSE, TERNARY }
-    public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS }
+    public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS, HAS, IS_IN, NOT_HAS, NOT_IS_IN }
     public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
     public record TernaryTokens(List<Token> conditional, List<Token> left, List<Token> right) {}
 
@@ -64,6 +64,8 @@ public class ExpressionParser {
             else if (c == ')') tokens.add(new Token(TokenType.END_PREN, null));
             else if (c == '?') tokens.add(new Token(TokenType.IF, null));
             else if (c == ';') tokens.add(new Token(TokenType.ELSE, null));
+            else if (c == '∧' || c == '⋀') tokens.add(new Token(TokenType.AND, null));
+            else if (c == '∨' || c == '⋁') tokens.add(new Token(TokenType.OR, null));
             else if (c == '|') {
                 if (i + 1 != chars.length && chars[i + 1] == '|') i++;
                 tokens.add(new Token(TokenType.OR, null));
@@ -94,6 +96,11 @@ public class ExpressionParser {
                     tokens.add(new Token(TokenType.START_PREN, NEGATE));
                     i++;
                 }
+                else if (chars[i + 1] == 'h' && i + 1 + 2 < chars.length && (original.startsWith("has ", i+1) || original.startsWith("has(", i+1))) {
+                    tokens.add(new Token(TokenType.COMPARISON, Comparison.NOT_HAS));
+                    i+=4;
+                    continue;
+                }
                 else if (isVar(chars[i + 1])) {
                     i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSupplier) - 1;
                 }
@@ -111,6 +118,19 @@ public class ExpressionParser {
                 tokens.add(new Token(TokenType.COMPARISON, hasEqual ? Comparison.LESS_THAN_OR_EQUAL : Comparison.LESS_THAN));
                 i += hasEqual ? 2 : 1;
                 continue;
+            }
+            else if (c == 'h' && i + 2 < chars.length && (original.startsWith("has ", i) || original.startsWith("has(", i))) {
+                tokens.add(new Token(TokenType.COMPARISON, Comparison.HAS));
+                i+=3;
+                continue;
+            }
+            else if (c == '∈' || c == '∊') tokens.add(new Token(TokenType.COMPARISON, Comparison.IS_IN));
+            else if (c == '∉') tokens.add(new Token(TokenType.COMPARISON, Comparison.NOT_IS_IN));
+            else if (c == '∋' || c == '∍') tokens.add(new Token(TokenType.COMPARISON, Comparison.HAS));
+            else if (c == '∌') tokens.add(new Token(TokenType.COMPARISON, Comparison.NOT_HAS));
+            else if (c == '√' && i+1 != chars.length && chars[i+1] == '(') {
+                tokens.add(new Token(TokenType.START_PREN, (Function<Double,Double>)Math::sqrt));
+                i++;
             }
             else if (c == 'f' && i + 4 < chars.length && original.startsWith("false", i)) {
                 tokens.add(new Token(TokenType.BOOLEAN, false));

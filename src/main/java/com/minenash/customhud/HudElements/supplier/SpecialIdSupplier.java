@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-public class SpecialIdSupplierElement extends IdentifierSupplierElement {
+public class SpecialIdSupplier extends IdentifierSupplier {
 
     public static final Entry TARGET_BLOCK_ID = of( () -> Registries.BLOCK.getId(ComplexData.targetBlock.getBlock()),
             () -> Block.getRawIdFromState(ComplexData.targetBlock),
@@ -40,7 +40,7 @@ public class SpecialIdSupplierElement extends IdentifierSupplierElement {
 
     private final Entry entry;
 
-    public SpecialIdSupplierElement(Entry entry, Flags flags) {
+    public SpecialIdSupplier(Entry entry, Flags flags) {
         super(entry.identifierSupplier, flags);
         this.entry = entry;
     }

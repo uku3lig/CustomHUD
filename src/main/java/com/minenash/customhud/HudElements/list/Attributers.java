@@ -31,7 +31,7 @@ public class Attributers {
     //TODO: IS ONLY LIST ONLY
     public static final Attributer EFFECT = (sup, name, flags) -> switch (name) {
         case "e_name" -> new Str(sup,STATUS_NAME);
-        case "e_id" -> new Id(sup,STATUS_ID,flags);
+        case "", "e_id" -> new Id(sup,STATUS_ID,flags);
         case "e_duration", "e_dur" -> new Num(sup, STATUS_DURATION, flags);
         case "e_infinite", "e_inf" -> new Bool(sup, STATUS_INFINITE);
         case "e_amplification", "e_amp" -> new Num(sup, STATUS_AMPLIFICATION, flags);
@@ -47,7 +47,7 @@ public class Attributers {
     };
 
     public static final Attributer PLAYER = (sup, name, flags) -> switch (name) {
-        case "p_name" -> new Str(sup,PLAYER_ENTRY_NAME);
+        case "", "p_name" -> new Str(sup,PLAYER_ENTRY_NAME);
         case "p_id" -> new Str(sup,PLAYER_ENTRY_UUID);
         case "p_team" -> new Str(sup, PLAYER_ENTRY_TEAM);
         case "p_latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
@@ -62,7 +62,7 @@ public class Attributers {
     };
 
     public static final Attributer SUBTITLE = (sup, name, flags) -> switch (name) {
-        case "s_id" -> new Id(sup, SUBTITLE_ID,flags);
+        case "", "s_id" -> new Id(sup, SUBTITLE_ID,flags);
         case "s_name" -> new Str(sup, SUBTITLE_NAME);
 
         case "s_age" -> new Num(sup, SUBTITLE_AGE, flags);
@@ -82,7 +82,7 @@ public class Attributers {
     };
 
     public static final Attributer BLOCK_STATE = (sup, name, flags) -> switch (name) {
-        case "b_name" -> new Str(sup, BLOCK_STATE_NAME);
+        case "", "b_name" -> new Str(sup, BLOCK_STATE_NAME);
         case "b_type" -> new Special(sup, BLOCK_STATE_TYPE);
         case "b_full_type" -> new Str(sup,BLOCK_STATE_FULL_TYPE);
         case "b_value" -> new Str(sup, BLOCK_STATE_VALUE);
@@ -91,12 +91,12 @@ public class Attributers {
 
     public static final Attributer BLOCK_TAG = (sup, name, flags) -> switch (name) {
         case "b_name" -> new Str(sup,BLOCK_TAG_NAME);
-        case "b_id" -> new Id(sup,BLOCK_TAG_ID,flags);
+        case "", "b_id" -> new Id(sup,BLOCK_TAG_ID,flags);
         default -> null;
     };
 
     public static final Attributer ENCHANTMENT = (sup, name, flags) -> switch (name) {
-        case "e_name" -> new Str(sup,ENCHANT_NAME);
+        case "", "e_name" -> new Str(sup,ENCHANT_NAME);
         case "e_full" -> new Str(sup,ENCHANT_FULL);
         case "e_level" -> new Special(sup,ENCHANT_LEVEL);
         case "e_num", "e_number" -> new Num(sup,ENCHANT_NUM, flags);
@@ -104,9 +104,9 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ITEM_LORE_LINE = (sup, name, f) -> name.equals("line") ? new Tex(sup, DIRECT) : null;
-    public static final Attributer ITEM_INFO_INFO = (sup, name, f) -> name.equals("info") ? new Str(sup, DIRECT) : null;
-    public static final Attributer LOOP_ITEM = (sup, name, flags) -> name.equals("value") ? new Num(sup, DIRECT, flags) : null;
+    public static final Attributer ITEM_LORE_LINE = (sup, name, f) -> name.isEmpty() || name.equals("line") ? new Tex(sup, DIRECT) : null;
+    public static final Attributer ITEM_INFO_INFO = (sup, name, f) -> name.isEmpty() || name.equals("info") ? new Str(sup, DIRECT) : null;
+    public static final Attributer LOOP_ITEM = (sup, name, flags) -> name.isEmpty() || name.equals("value") ? new Num(sup, DIRECT, flags) : null;
 
     public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
         case "m_slot" -> new Str(sup,ITEM_ATTR_SLOT);
@@ -115,7 +115,7 @@ public class Attributers {
         case "m_tracked" -> new Bool(sup,ITEM_ATTR_TRACKED);
         case "m_default_value" -> new Num(sup,ITEM_ATTR_VALUE_DEFAULT, flags);
         case "m_attribute_value","m_attr_value" -> new Num(sup,ITEM_ATTR_VALUE, flags);
-        case "m_modifier_name","m_mod_name" -> new Str(sup,ITEM_ATTR_MODIFIER_NAME);
+        case "", "m_modifier_name","m_mod_name" -> new Str(sup,ITEM_ATTR_MODIFIER_NAME);
         case "m_modifier_id","m_mod_id" -> new Str(sup,ITEM_ATTR_MODIFIER_ID);
         case "m_mod_amount","m_amount" -> new Num(sup,ITEM_ATTR_MODIFIER_VALUE, flags);
         case "m_op", "m_operation" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION);
@@ -125,7 +125,7 @@ public class Attributers {
 
     public static final Attributer ITEM_CAN_X = (sup, name, flags) -> switch (name) {
         case "x_name" -> new Str(sup,BLOCK_NAME);
-        case "x_id" -> new Id(sup,BLOCK_ID,flags);
+        case "", "x_id" -> new Id(sup,BLOCK_ID,flags);
         default -> null;
     };
 
@@ -156,7 +156,7 @@ public class Attributers {
     };
 
     public static final Attributer ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
-        case "m_name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
+        case "", "m_name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
         case "m_id" -> new Str(sup,ATTRIBUTE_MODIFIER_ID);
         case "m_value" -> new Num(sup,ATTRIBUTE_MODIFIER_VALUE, flags);
         case "m_op", "m_operation" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION);
@@ -166,7 +166,7 @@ public class Attributers {
 
     public static final Attributer ATTRIBUTE = (sup, name, flags) -> switch (name) {
         case "a_name" -> new Str(sup,ATTRIBUTE_NAME);
-        case "a_id" -> new Id(sup,ATTRIBUTE_ID,flags);
+        case "", "a_id" -> new Id(sup,ATTRIBUTE_ID,flags);
         case "a_tracked" -> new Bool(sup,ATTRIBUTE_TRACKED);
         case "a_default_value" -> new Num(sup,ATTRIBUTE_VALUE_DEFAULT, flags);
         case "a_base_value" -> new Num(sup,ATTRIBUTE_VALUE_BASE, flags);
@@ -175,11 +175,11 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer TEAM_MEMBER = (sup, name, f) -> name.equals("member") ? new Str(sup, DIRECT) : null;
+    public static final Attributer TEAM_MEMBER = (sup, name, f) -> name.isEmpty() || name.equals("member") ? new Str(sup, DIRECT) : null;
 
     public static final Attributer TEAM = (sup, name, flags) -> switch (name) {
-        case "", "t_name" -> new Tex(sup, TEAM_NAME);
-        case "t_id" -> new Str(sup, TEAM_ID);
+        case "t_name" -> new Tex(sup, TEAM_NAME);
+        case "", "t_id" -> new Str(sup, TEAM_ID);
         case "t_friendly_fire" -> new Bool(sup, TEAM_FRIENDLY_FIRE);
         case "t_see_friendly_invisibility", "t_friendly_invis" -> new Bool(sup, TEAM_FRIENDLY_INVIS);
         case "t_name_tag_visibility", "t_name_tag" -> new Special(sup, TEAM_NAME_TAG_VISIBILITY);
@@ -192,7 +192,7 @@ public class Attributers {
     };
 
     public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sup, name, flags) -> switch (name) {
-        case "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
+        case "", "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
         case "s_display_name", "s_display" -> new Tex(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
         case "s_score", "s_value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
         default -> null;
@@ -211,7 +211,7 @@ public class Attributers {
 
     public static final Attributer SCOREBOARD_SCORE = (sup, name, flags) -> switch (name) {
         case "ss_name" -> new Tex(sup, SCORES_OBJECTIVE_NAME);
-        case "ss_id" -> new Str(sup, SCORES_OBJECTIVE_ID);
+        case "", "ss_id" -> new Str(sup, SCORES_OBJECTIVE_ID);
         case "ss_criteria","ss_criterion" -> new Str(sup, SCORES_OBJECTIVE_CRITIERIA);
         case "ss_display_slot" -> new Str(sup, SCORES_OBJECTIVE_DISPLAY_SLOT);
         case "ss_score","ss_value" -> new Num(sup, SCORES_VALUE, flags);
@@ -235,10 +235,10 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer MOD_AUTHOR = (sup, name, f) -> name.equals("author") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CONTRIBUTOR = (sup, name, f) -> name.equals("contributor") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CREDIT = (sup, name, f) -> name.equals("credit") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_LICENSE = (sup, name, f) -> name.equals("license") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_AUTHOR = (sup, name, f) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CONTRIBUTOR = (sup, name, f) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CREDIT = (sup, name, f) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_LICENSE = (sup, name, f) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
 
     public static final Attributer MOD_BADGE = (sup, name, flags) -> switch (name) {
         case "", "b_name" -> new Str(sup, BADGE_NAME);
@@ -345,7 +345,7 @@ public class Attributers {
             case "o_first" -> new CreateListElement(sup, OFFER_FIRST_ADJUSTED, ITEM);
             case "o_first_base" -> new CreateListElement(sup, OFFER_FIRST_BASE, ITEM);
             case "o_second" -> new CreateListElement(sup, OFFER_SECOND, ITEM);
-            case "o_result" -> new CreateListElement(sup, OFFER_RESULT, ITEM);
+            case "", "o_result" -> new CreateListElement(sup, OFFER_RESULT, ITEM);
             default -> null;
         };
     };

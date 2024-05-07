@@ -5,11 +5,11 @@ import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
+import com.minenash.customhud.HudElements.list.ListCountElement;
 import com.minenash.customhud.complex.ListManager;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
@@ -138,20 +138,25 @@ public interface Operation {
         }
 
         public double getValue() {
-            return getValueInternal() ? 1 : 0;
+            return getBooleanValue() ? 1 : 0;
         }
 
-        public boolean getValueInternal() {
+        public boolean getBooleanValue() {
             if (left == null || right == null)
                 return false;
             return switch (comparison) {
-                case EQUALS -> checkBool ? left.getBoolean() == right.getBoolean() : checkNum ? left.getNumber().doubleValue() == right.getNumber().doubleValue() : checkId ? compareID(left,right) : left.getString().equals(right.getString());
-                case NOT_EQUALS -> checkBool ? left.getBoolean() != right.getBoolean() : checkNum ? left.getNumber().doubleValue() != right.getNumber().doubleValue() : checkId ? !compareID(left,right) : !left.getString().equals(right.getString());
+                case EQUALS -> checkBool ? left.getBoolean() == right.getBoolean() : checkNum ? left.getNumber().doubleValue() == right.getNumber().doubleValue() : checkId ? compareID(left,right) : left.getString().equalsIgnoreCase(right.getString());
+                case NOT_EQUALS -> checkBool ? left.getBoolean() != right.getBoolean() : checkNum ? left.getNumber().doubleValue() != right.getNumber().doubleValue() : checkId ? !compareID(left,right) : !left.getString().equalsIgnoreCase(right.getString());
 
                 case LESS_THAN -> left.getNumber().doubleValue() < right.getNumber().doubleValue();
                 case GREATER_THAN -> left.getNumber().doubleValue() > right.getNumber().doubleValue();
                 case LESS_THAN_OR_EQUAL -> left.getNumber().doubleValue() <= right.getNumber().doubleValue();
                 case GREATER_THAN_OR_EQUALS -> left.getNumber().doubleValue() >= right.getNumber().doubleValue();
+
+                case HAS -> has(left, right);
+                case NOT_HAS -> !has(left, right);
+                case IS_IN -> has(right, left);
+                case NOT_IS_IN -> !has(right, left);
             };
         }
 
@@ -161,11 +166,29 @@ public interface Operation {
             return l != null && l.equals(r);
         }
 
+        public boolean has(HudElement left, HudElement right) {
+            if (left instanceof ListCountElement lce) {
+                ListManager.push(lce.provider.get());
+
+                while (ListManager.getIndex() < ListManager.getCount()) {
+                    if (new Comparison(lce.attribute, right, ExpressionParser.Comparison.EQUALS).getBooleanValue()) {
+                        ListManager.pop();
+                        return true;
+                    }
+                    ListManager.advance();
+                }
+                ListManager.pop();
+                return false;
+            }
+
+            return left.getString().contains(right.getString());
+        }
+
 
         @Override
         public void printTree(int indent) {
             String bool = (comparison == ExpressionParser.Comparison.EQUALS || comparison == ExpressionParser.Comparison.NOT_EQUALS) && checkBool ? "BOOL_" : "";
-            System.out.println(indent(indent) + "- Conditional(" + bool + comparison + "): " + left.getString() + ", " + right.getString());
+            System.out.println(indent(indent) + "- Conditional(" + bool + comparison + "): " + left.getClass().getName() + ", " + right.getClass().getName());
             if (left instanceof SudoElements.Op op) {
                 op.op().printTree(indent + 2);
             }

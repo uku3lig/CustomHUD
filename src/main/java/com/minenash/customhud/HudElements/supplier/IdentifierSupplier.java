@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-public class IdentifierSupplierElement implements HudElement, IdElement {
+public class IdentifierSupplier implements HudElement, IdElement {
     private static BlockPos blockPos() { return CLIENT.getCameraEntity().getBlockPos(); }
 
     public static final Supplier<Identifier> DIMENSION_ID = () -> CLIENT.world.getRegistryKey().getValue();
@@ -24,7 +24,7 @@ public class IdentifierSupplierElement implements HudElement, IdElement {
     private final Supplier<Identifier> supplier;
     private final Flags.IdPart idPart;
 
-    public IdentifierSupplierElement(Supplier<Identifier> supplier, Flags flags) {
+    public IdentifierSupplier(Supplier<Identifier> supplier, Flags flags) {
         this.supplier = supplier;
         this.idPart = flags.idPart;
     }

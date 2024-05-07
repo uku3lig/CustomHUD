@@ -3,10 +3,12 @@ package com.minenash.customhud.HudElements.list;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 
 public class ListCountElement implements HudElement {
-    private final ListProvider provider;
+    public final ListProvider provider;
+    public final HudElement attribute;
 
-    public ListCountElement(ListProvider provider) {
+    public ListCountElement(ListProvider provider, HudElement attribute) {
         this.provider = provider;
+        this.attribute = attribute;
     }
 
     @Override

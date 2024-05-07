@@ -17,14 +17,14 @@ public class ResourcePackProfileMixin {
 
     @Unique private static int temp = 0;
 
-    @Inject(method = "loadMetadata", locals = LocalCapture.CAPTURE_FAILSOFT, at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/metadata/PackFeatureSetMetadata;flags()Lnet/minecraft/resource/featuretoggle/FeatureSet;"))
-    private static void setPackVersionPart1(String name, ResourcePackProfile.PackFactory packFactory, int currentPackFormat, CallbackInfoReturnable<ResourcePackProfile.Metadata> cir, ResourcePack resourcePack, PackResourceMetadata packResourceMetadata, PackFeatureSetMetadata packFeatureSetMetadata) {
+    @Inject(method = "loadMetadata", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/resource/ResourcePack;parseMetadata(Lnet/minecraft/resource/metadata/ResourceMetadataReader;)Ljava/lang/Object;"))
+    private static void setPackVersionPart1(String name, ResourcePackProfile.PackFactory packFactory, int currentPackFormat, CallbackInfoReturnable<ResourcePackProfile.Metadata> cir, ResourcePack resourcePack, PackResourceMetadata packResourceMetadata) {
         temp = packResourceMetadata.packFormat();
     }
 
     @Inject(method = "loadMetadata", at = @At("RETURN"))
     private static void setPackVersionPart2(String name, ResourcePackProfile.PackFactory packFactory, int currentPackFormat, CallbackInfoReturnable<ResourcePackProfile.Metadata> cir) {
-        var value = ((ResourcePackProfileMetadataDuck)(Object)cir.getReturnValue());
+        ResourcePackProfileMetadataDuck value = ((ResourcePackProfileMetadataDuck)(Object)cir.getReturnValue());
         if (value != null)
             value.customhud$setPackVersion( temp );
     }

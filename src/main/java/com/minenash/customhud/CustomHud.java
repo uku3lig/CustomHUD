@@ -4,6 +4,7 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.data.DisableElement;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
+import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
@@ -15,10 +16,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -205,18 +208,17 @@ public class CustomHud implements ModInitializer {
 	}
 
 	public static void showToast(String profileName) {
-		return;
-//		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
-//				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
-//				Errors.hasErrors(profileName) ?
-//						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
-//							.append(CLIENT.currentScreen instanceof TitleScreen ?
-//								Text.literal("§7, view in config screen via modmenu ")
-//								: Text.literal("§7, press ")
-//									.append(((MutableText)kb_showErrors.getBoundKeyLocalizedText()).formatted(Formatting.AQUA))
-//									.append("§7 to view"))
-//						: Text.literal("§aNo errors found")
-//		));
+		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
+				Text.translatable("gui.custom_hud.profile_updated", profileName).formatted(Formatting.WHITE),
+				Errors.hasErrors(profileName) ?
+						Text.literal("§cFound " + Errors.getErrors(profileName).size() + " errors")
+							.append(CLIENT.currentScreen instanceof TitleScreen ?
+								Text.literal("§7, view in config screen via modmenu ")
+								: Text.literal("§7, press ")
+									.append(((MutableText)kb_showErrors.getBoundKeyLocalizedText()).formatted(Formatting.AQUA))
+									.append("§7 to view"))
+						: Text.literal("§aNo errors found")
+		));
 	}
 	public static void showAllUpdatedToast() {
 		CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,

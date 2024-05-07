@@ -62,7 +62,7 @@ import static com.minenash.customhud.HudElements.supplier.EntitySuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.*;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
-import static com.minenash.customhud.HudElements.supplier.SpecialIdSupplierElement.*;
+import static com.minenash.customhud.HudElements.supplier.SpecialIdSupplier.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
 import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
@@ -723,9 +723,9 @@ public class VariableParser {
         if (entry2 != null)
             return new SpecialSupplierElement(entry2);
 
-        SpecialIdSupplierElement.Entry entry3 = getSpecialIdSupplierElements(name, enabled);
+        SpecialIdSupplier.Entry entry3 = getSpecialIdSupplierElements(name, enabled);
         if (entry3 != null)
-            return new SpecialIdSupplierElement(entry3, flags);
+            return new SpecialIdSupplier(entry3, flags);
 
         supplier = getTextSupplier(name, enabled);
         if (supplier != null)
@@ -733,7 +733,7 @@ public class VariableParser {
 
         supplier = getIdentifierSupplier(name, enabled);
         if (supplier != null)
-            return new IdentifierSupplierElement(supplier, flags);
+            return new IdentifierSupplier(supplier, flags);
 
         Integer color = HudTheme.parseColorName(name);
         if (color != null)
@@ -1140,7 +1140,7 @@ public class VariableParser {
         };
     }
 
-    private static SpecialIdSupplierElement.Entry getSpecialIdSupplierElements(String element, ComplexData.Enabled enabled) {
+    private static SpecialIdSupplier.Entry getSpecialIdSupplierElements(String element, ComplexData.Enabled enabled) {
         return switch (element) {
             case "target_block_id", "tbi" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_ID;}
             case "target_fluid_id", "tfi" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_ID;}
@@ -1158,7 +1158,11 @@ public class VariableParser {
             Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_SLOT, "WHY U EMPTY");
             return null;
         }
-        ListProvider provider = getListProvider(parts.get(0), profile, debugLine, enabled, original, listProvider);
+        String providerName = parts.get(0);
+        int dotIndex = providerName.indexOf(".");
+        if (dotIndex != -1)
+            providerName = providerName.substring(0, dotIndex);
+        ListProvider provider = getListProvider(providerName, profile, debugLine, enabled, original, listProvider);
 
         if (provider == null)
             return null;
@@ -1166,8 +1170,11 @@ public class VariableParser {
             Errors.addError(profile.name, debugLine, original, ErrorType.REQUIRES_MODMENU, "");
             return new FunctionalElement.IgnoreErrorElement();
         }
-        if (parts.size() == 1)
-            return new ListCountElement(provider);
+        if (parts.size() == 1) {
+            HudElement attribute = Attributers.get(provider, ListManager.SUPPLIER, dotIndex == -1 ? "" : parts.get(0).substring(dotIndex+1), new Flags());
+            return new ListCountElement(provider, attribute);
+        }
+
 
         String format = parts.get(1).trim();
         if (!format.startsWith("\"") || !format.endsWith("\"")) {
@@ -1303,7 +1310,7 @@ public class VariableParser {
 
     public static HudElement listElement(ListProvider provider, String part, int commaIndex, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         if (commaIndex == -1)
-            return new ListCountElement(provider);
+            return new ListCountElement(provider, Attributers.get(provider, ListManager.SUPPLIER, "", new Flags()));
 
         List<String> parts = partitionConditional(part);
         System.out.println("SUPPLIER");
