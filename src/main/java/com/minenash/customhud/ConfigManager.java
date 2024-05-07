@@ -79,10 +79,11 @@ public class ConfigManager {
                             default -> fileName;
                         };
                         Files.move(path, CustomHud.PROFILE_FOLDER.resolve(outName));
+                        throw new IOException();
                     }
                 }
         } catch (IOException e) {
-            CustomHud.logStackTrace(e);
+            CustomHud.LOGGER.catching(e);
         }
         CustomHud.readProfiles();
         ProfileManager.fallback();

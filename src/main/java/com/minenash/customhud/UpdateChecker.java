@@ -91,7 +91,7 @@ public class UpdateChecker {
         }
         catch (Exception e) {
             CustomHud.LOGGER.error("[CustomHUD] Could not get update info");
-            CustomHud.logStackTrace(e);
+            CustomHud.LOGGER.catching(e);
             return null;
         }
     }

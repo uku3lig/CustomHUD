@@ -303,7 +303,7 @@ public class VariableParser {
                 return new ExpressionElement( ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProvider), precision );
             }
             catch (Exception e) {
-                CustomHud.logStackTrace(e);;
+                CustomHud.LOGGER.catching(e);
                 return null;
             }
         }

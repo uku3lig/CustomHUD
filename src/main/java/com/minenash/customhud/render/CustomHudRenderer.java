@@ -186,7 +186,7 @@ public class CustomHudRenderer {
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
                 catch (Exception e){
-                    CustomHud.logStackTrace(e);
+                    CustomHud.LOGGER.catching(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);

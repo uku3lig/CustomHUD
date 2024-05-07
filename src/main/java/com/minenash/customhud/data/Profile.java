@@ -95,7 +95,7 @@ public class Profile {
             lines = Files.readAllLines(path);
             dateTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
-            CustomHud.logStackTrace(e);;
+            CustomHud.LOGGER.catching(e);;
             Errors.addError(profileName, "N/A", path.relativize(FabricLoader.getInstance().getGameDir().getParent()).toString(), ErrorType.IO, e.getMessage());
             return null;
         }

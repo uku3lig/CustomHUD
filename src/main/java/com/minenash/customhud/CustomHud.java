@@ -82,7 +82,7 @@ public class CustomHud implements ModInitializer {
 			profileWatcher = FileSystems.getDefault().newWatchService();
 			PROFILE_FOLDER.register(profileWatcher, StandardWatchEventKinds.ENTRY_CREATE,StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 		} catch (IOException e) {
-			CustomHud.logStackTrace(e);
+			CustomHud.LOGGER.catching(e);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class CustomHud implements ModInitializer {
 						ProfileManager.add(Profile.parseProfile(path, name.substring(0, name.length()-4)));
 				}
 		} catch (IOException e) {
-			CustomHud.logStackTrace(e);
+			CustomHud.LOGGER.catching(e);
 		}
 	}
 
@@ -235,13 +235,6 @@ public class CustomHud implements ModInitializer {
 	public static void logInDebugMode(String msg) {
 		if (DEBUG_MODE)
 			LOGGER.info(msg);
-	}
-	public static void logStackTrace(Exception e) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		e.printStackTrace(pw);
-		pw.close();
-		LOGGER.error(sw.toString());
 	}
 
 

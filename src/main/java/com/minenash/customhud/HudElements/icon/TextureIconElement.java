@@ -45,7 +45,7 @@ public class TextureIconElement extends IconElement {
             if (resource.isPresent())
                 img = NativeImage.read(resource.get().getInputStream());
         }
-        catch (IOException e) { CustomHud.logStackTrace(e); }
+        catch (IOException e) { CustomHud.LOGGER.catching(e); }
 
 
         iconAvailable = img != null;
