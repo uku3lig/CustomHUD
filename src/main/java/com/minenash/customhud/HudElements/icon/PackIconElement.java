@@ -45,6 +45,7 @@ public class PackIconElement extends IconElement {
         if (!referenceCorner)
             matrices.translate(0, -(11*scale-11)/2F, 0);
 //        matrices.scale(scale, scale, 0);
+        int width = (int) (11*scale);
         rotate(matrices, width, width);
 
         context.drawTexture(getPackIconTexture(pack), 0, 0, 0, 0, width, width, width, width);

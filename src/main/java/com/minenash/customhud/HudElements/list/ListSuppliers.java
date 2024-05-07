@@ -85,10 +85,16 @@ public class ListSuppliers {
         ALL_ROOT_MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>)ALL_ROOT_MODS_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
         ALL_MODS = () -> ModMenu.MODS.values().stream().sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
 
-        RESOURCE_PACKS = () -> Arrays.asList(CLIENT.getResourcePackManager().getEnabledProfiles().toArray()),
+        RESOURCE_PACKS = () -> {
+            List<ResourcePackProfile> packs = new ArrayList<>(CLIENT.getResourcePackManager().getEnabledProfiles());
+            packs.removeIf(pack -> pack.getName().equals("fabric") || pack.getName().equals("vanilla"));
+            Collections.reverse(packs);
+            return packs;
+        },
         DISABLED_RESOURCE_PACKS = () -> {
             List<ResourcePackProfile> profiles = Lists.newArrayList(CLIENT.getResourcePackManager().getProfiles());
             profiles.removeAll(CLIENT.getResourcePackManager().getEnabledProfiles());
+            Collections.reverse(profiles);
             return profiles;
         },
         DATA_PACKS = () -> CLIENT.getServer() == null ? Collections.EMPTY_LIST : Arrays.asList(CLIENT.getServer().getDataPackManager().getEnabledProfiles().toArray()),

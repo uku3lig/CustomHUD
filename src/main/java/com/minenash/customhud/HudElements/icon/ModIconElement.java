@@ -56,9 +56,11 @@ public class ModIconElement extends IconElement {
         if (!referenceCorner)
             matrices.translate(0, -(11*scale-11)/2F, 0);
 //        matrices.scale(scale, scale, 0);
-        rotate(matrices, width, width);
+        int w = (int) (11 * scale);
+        rotate(matrices, w, w);
 
-        context.drawTexture(id, 0, 0, 0, 0, width, width, width, width);
+
+        context.drawTexture(id, 0, 0, 0, 0, w, w, w, w);
         matrices.pop();
     }
 
