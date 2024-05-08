@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.biome.source.util.VanillaBiomeParameters;
@@ -57,7 +58,7 @@ public class StringSupplierElement implements HudElement {
 
     public static final Supplier<String> JAVA_VERSION = () -> System.getProperty("java.version");
     public static final Supplier<String> CPU_NAME = () -> ComplexData.cpu.getProcessorIdentifier().getName();
-    public static final Supplier<String> GPU_NAME = () -> GlDebugInfo.getRenderer().substring(0, GlDebugInfo.getRenderer().indexOf('/'));
+    public static final Supplier<String> GPU_NAME = () -> GlDebugInfo.getRenderer();
 
     public static final Supplier<String> MUSIC_NAME = () -> MusicAndRecordTracker.isMusicPlaying ? MusicAndRecordTracker.musicName : null;
 
