@@ -9,7 +9,6 @@ public class EstimatedTick {
     private static long lastTime = -1;
 
     public static void record() {
-        System.out.println(Arrays.toString(tickRates));
         long time = System.currentTimeMillis();
         tickRates[nextIndex] = (time - lastTime) / 20F;
         nextIndex = (nextIndex+1) % tickRates.length;

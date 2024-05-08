@@ -96,7 +96,6 @@ public class ComplexData {
 
     public static TradeOfferList villagerOffers = new TradeOfferList();
     public static int villagerXP = 0;
-    public static int villagerProgress = 0;
     public static UUID villagerUUID = null;
     public static int fakeVillagerInteract = 0;
     public static long villagerLastRequested = Long.MAX_VALUE;

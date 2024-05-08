@@ -1354,49 +1354,50 @@ public class VariableParser {
 
     public static HudElement getAttributeElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         if (part.startsWith("item:"))
-            return attrElement(part, SLOT_READER, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
+            return attrElement(part, SLOT_READER, false, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
                     ITEM, ErrorType.UNKNOWN_ITEM_ID, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("attribute:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
+            return attrElement(part, ENTITY_ATTR_READER, true, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
                     ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("target_entity_attribute:") || part.startsWith("target_entity_attr:") || part.startsWith("tea:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(ComplexData.targetEntity, attr),
+            return attrElement(part, ENTITY_ATTR_READER, true, (attr) -> () -> getEntityAttr(ComplexData.targetEntity, attr),
                     ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("hooked_entity_attribute:") || part.startsWith("hooked_entity_attr:") || part.startsWith("hea:"))
-            return attrElement(part, ENTITY_ATTR_READER, (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
+            return attrElement(part, ENTITY_ATTR_READER, true,
+                    (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
                     ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("team:"))
-            return attrElement(part, src -> src, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
+            return attrElement(part, src -> src, false, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
                     TEAM, null, ErrorType.UNKNOWN_TEAM_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("objective:"))
-            return attrElement(part, src -> src, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
+            return attrElement(part, src -> src, false, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
                     SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("bossbar:"))
-            return attrElement(part, src -> src, (name) -> () -> AttributeHelpers.getBossBar(name),
+            return attrElement(part, src -> src, true, (name) -> () -> AttributeHelpers.getBossBar(name),
                     BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("mod:"))
-            return attrElement(part, ModMenu.MODS::get, (mod) -> () -> mod,
+            return attrElement(part, ModMenu.MODS::get, false, (mod) -> () -> mod,
                     MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_PROPERTY, profile, debugLine, enabled, original );
 
         if (part.startsWith("resource_pack:"))
-            return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), (pack) -> () -> pack,
+            return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), false, (pack) -> () -> pack,
                     PACK, ErrorType.UNKNOWN_RESOURCE_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
 
         if (part.startsWith("data_pack:") || part.startsWith("datapack:"))
-            return attrElement(part, DATA_PACK_READER, (pack) -> () -> pack,
+            return attrElement(part, DATA_PACK_READER, false, (pack) -> () -> pack,
                     PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
 
         return null;
     }
 
-    public static <T> HudElement attrElement(String part, Function<String,T> reader, Function<T,Supplier<?>> supplier,
+    public static <T> HudElement attrElement(String part, Function<String,T> reader, boolean tryWithNamespace, Function<T,Supplier<?>> supplier,
                                               Attributer attributer, ErrorType unknownX, ErrorType unknownAttribute,
                                               Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         Matcher matcher = ITEM_VARIABLE_PATTERN.matcher(part.substring(part.indexOf(':')+1));
@@ -1405,13 +1406,23 @@ public class VariableParser {
 
         String src = matcher.group(1) == null ? "" : matcher.group(1);
         String method = matcher.group(2) == null ? "" : matcher.group(2);
-        int dotIndex = method.indexOf(".");
-        if (dotIndex != -1)
+        int dotIndex = method.lastIndexOf(".");
+        if (dotIndex != -1 && dotIndex > method.lastIndexOf(":"))
             method = method.substring(0, dotIndex);
 
+        String src2 = src;
         T value = reader.apply(src);
+        if (value == null && tryWithNamespace) {
+            int collinIndex = method.indexOf(":");
+            if (collinIndex != -1) {
+                src2 += ":" + method.substring(0,collinIndex);
+                value = reader.apply(src2);
+                method = method.substring(collinIndex+1);
+            }
+        }
         if (value == null) {
-            Errors.addError(profile.name, debugLine, original, unknownX, src);
+            String s = src.equals(src2) ? src : src + "§f or §e" + src2;
+            Errors.addError(profile.name, debugLine, original, unknownX, s);
             return new IgnoreErrorElement();
         }
 
@@ -1429,6 +1440,5 @@ public class VariableParser {
         return element;
 
     }
-
 
 }
