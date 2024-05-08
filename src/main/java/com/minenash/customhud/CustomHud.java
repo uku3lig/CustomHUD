@@ -5,7 +5,6 @@ import com.minenash.customhud.data.Crosshairs;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.errors.ErrorScreen;
 import com.minenash.customhud.errors.Errors;
-import com.minenash.customhud.mod_compat.BuiltInModCompat;
 import com.minenash.customhud.render.CustomHudRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -58,8 +57,6 @@ public class CustomHud implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		BuiltInModCompat.register();
-
 		UpdateChecker.check();
 
 		HudRenderCallback.EVENT.register(CustomHudRenderer::render);
