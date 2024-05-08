@@ -1,6 +1,7 @@
 package com.minenash.customhud;
 
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.complex.EstimatedTick;
 import com.minenash.customhud.data.DisableElement;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
@@ -63,7 +64,10 @@ public class CustomHud implements ModInitializer {
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (UpdateChecker.updateMessage != null)
 				client.getMessageHandler().onGameMessage(UpdateChecker.updateMessage, false);
+			EstimatedTick.reset();
 		});
+
+
 
 	}
 

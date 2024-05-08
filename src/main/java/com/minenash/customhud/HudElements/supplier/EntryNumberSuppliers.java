@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.complex.EstimatedTick;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -68,7 +69,7 @@ public class EntryNumberSuppliers {
     public static final Entry FPS_MAX = of( () -> 1000 / ComplexData.frameTimeMetrics[1], 0);
     public static final Entry FPS_AVG = of( () -> 1000 / ComplexData.frameTimeMetrics[0], 1);
 
-    public static final Entry TICK_MS = of( () -> client.getServer() == null ? null : client.getServer().getAverageTickTime(), 0);
+    public static final Entry TICK_MS = of( () -> Math.max(client.getServer() == null ? EstimatedTick.get() : client.getServer().getAverageTickTime(), 50), 0);
     public static final Entry TICK_MS_MIN = of( () -> ComplexData.tickTimeMetrics[1], 0);
     public static final Entry TICK_MS_MAX = of( () -> ComplexData.tickTimeMetrics[2], 0);
     public static final Entry TICK_MS_AVG = of( () -> ComplexData.tickTimeMetrics[0], 1);
@@ -116,9 +117,8 @@ public class EntryNumberSuppliers {
 
     public static final Entry TPS = of( () -> {
         IntegratedServer server = client.getServer();
-        if (server == null) return null;
-        float ms_tics = client.getServer().getAverageTickTime();
-        return ms_tics < 50 ? 20 : 1000/ms_tics;
+        float ms_ticks = server == null ? EstimatedTick.get() : server.getAverageTickTime();
+        return ms_ticks < 50 ? 20 : 1000/ms_ticks;
     }, 0);
 
     public static final Entry CPU_USAGE = of( () -> ComplexData.cpuLoad, 0);
