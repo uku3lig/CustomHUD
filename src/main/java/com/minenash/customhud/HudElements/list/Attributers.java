@@ -97,7 +97,8 @@ public class Attributers {
     };
 
     public static final Attributer ENCHANTMENT = (sup, name, flags) -> switch (name) {
-        case "", "e_name" -> new Str(sup,ENCHANT_NAME);
+        case "e_name" -> new Str(sup,ENCHANT_NAME);
+        case "", "e_id" -> new Id(sup,ENCHANT_ID, flags);
         case "e_full" -> new Str(sup,ENCHANT_FULL);
         case "e_level" -> new Special(sup,ENCHANT_LEVEL);
         case "e_num", "e_number" -> new Num(sup,ENCHANT_NUM, flags);

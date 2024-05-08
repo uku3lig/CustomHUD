@@ -1171,7 +1171,10 @@ public class VariableParser {
             return new FunctionalElement.IgnoreErrorElement();
         }
         if (parts.size() == 1) {
-            HudElement attribute = Attributers.get(provider, ListManager.SUPPLIER, dotIndex == -1 ? "" : parts.get(0).substring(dotIndex+1), new Flags());
+            String attr = dotIndex == -1 ? "" : parts.get(0).substring(dotIndex+1);
+            HudElement attribute = Attributers.get(provider, ListManager.SUPPLIER, attr, new Flags());
+            if (attribute == null)
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
             return new ListCountElement(provider, attribute);
         }
 
@@ -1309,8 +1312,14 @@ public class VariableParser {
 
 
     public static HudElement listElement(ListProvider provider, String part, int commaIndex, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
-        if (commaIndex == -1)
-            return new ListCountElement(provider, Attributers.get(provider, ListManager.SUPPLIER, "", new Flags()));
+        if (commaIndex == -1) {
+            int dotIndex = part.indexOf('.');
+            String attr = dotIndex == -1 ? "" : part.substring(dotIndex+1);
+            HudElement attribute = Attributers.get(provider, ListManager.SUPPLIER, attr, new Flags());
+            if (attribute == null)
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
+            return new ListCountElement(provider, attribute);
+        }
 
         List<String> parts = partitionConditional(part);
         CustomHud.logInDebugMode("SUPPLIER");
@@ -1396,6 +1405,9 @@ public class VariableParser {
 
         String src = matcher.group(1) == null ? "" : matcher.group(1);
         String method = matcher.group(2) == null ? "" : matcher.group(2);
+        int dotIndex = method.indexOf(".");
+        if (dotIndex != -1)
+            method = method.substring(0, dotIndex);
 
         T value = reader.apply(src);
         if (value == null) {

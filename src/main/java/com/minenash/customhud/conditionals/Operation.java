@@ -169,6 +169,8 @@ public interface Operation {
 
         public boolean has(HudElement left, HudElement right) {
             if (left instanceof ListCountElement lce) {
+                if (lce.attribute == null)
+                    return false;
                 ListManager.push(lce.provider.get());
 
                 while (ListManager.getIndex() < ListManager.getCount()) {

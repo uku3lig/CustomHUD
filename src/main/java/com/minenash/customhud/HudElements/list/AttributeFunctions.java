@@ -143,6 +143,7 @@ public class AttributeFunctions {
 
     // ENCHANTMENTS
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_NAME = (enchant) -> I18n.translate(enchant.getKey().getTranslationKey());
+    public static final Function<Map.Entry<Enchantment,Integer>,Identifier> ENCHANT_ID = (enchant) -> Registries.ENCHANTMENT.getId(enchant.getKey());
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant.getKey().getRarity().toString().toLowerCase();
     public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant.getValue();
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL =
