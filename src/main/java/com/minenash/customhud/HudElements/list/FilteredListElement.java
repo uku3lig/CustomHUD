@@ -1,16 +1,16 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.ConditionalElement;
+import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
-import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.Operation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ListElement implements HudElement, MultiElement {
+public class FilteredListElement implements HudElement, MultiElement {
 
     private static final HudElement POP_LIST_ELEMENT = new FunctionalElement.PopList();
     private static final HudElement ADVANCE_LIST_ELEMENT = new FunctionalElement.AdvanceList();
@@ -18,9 +18,11 @@ public class ListElement implements HudElement, MultiElement {
     private final ListProvider provider;
     private final List<HudElement> main;
     private final List<HudElement> last;
+    private final Operation operation;
 
-    public ListElement(ListProvider provider, List<HudElement> format, List<HudElement> separator) {
+    public FilteredListElement(ListProvider provider, List<HudElement> format, List<HudElement> separator, Operation operation) {
         this.provider = provider;
+        this.operation = operation;
         last = format;
 
         if (format == null)
@@ -33,10 +35,6 @@ public class ListElement implements HudElement, MultiElement {
 
     }
 
-    public static HudElement of(ListProvider provider, List<HudElement> format, List<HudElement> separator, Operation operation) {
-        return operation == null ? new ListElement(provider, format, separator) : new FilteredListElement(provider, format, separator, operation);
-    }
-
     public List<HudElement> expand() {
         if (main == null)
             return Collections.EMPTY_LIST;
@@ -44,11 +42,23 @@ public class ListElement implements HudElement, MultiElement {
         if (values.isEmpty())
             return Collections.emptyList();
 
-        List<HudElement> expanded = new ArrayList<>();
-        expanded.add(new FunctionalElement.PushList(values));
+        List notFiltered = new ArrayList<>(values.size());
+        ListManager.push(values);
+        for (Object value : values) {
+            if (operation.getBooleanValue())
+                notFiltered.add(value);
+            ListManager.advance();
+        }
+        ListManager.pop();
 
-        for (int i = 0; i < values.size(); i++) {
-            expanded.addAll(i < values.size() - 1 ? main : last);
+        if (notFiltered.isEmpty())
+            return Collections.EMPTY_LIST;
+
+        List<HudElement> expanded = new ArrayList<>();
+        expanded.add(new FunctionalElement.PushList(notFiltered));
+
+        for (int i = 0; i < notFiltered.size(); i++) {
+            expanded.addAll(i < notFiltered.size() - 1 ? main : last);
             expanded.add(ADVANCE_LIST_ELEMENT);
         }
 
@@ -95,8 +105,8 @@ public class ListElement implements HudElement, MultiElement {
             this.separatorMode = true;
         }
 
-        public ListElement build() {
-            return new ListElement(provider, elements, Collections.EMPTY_LIST);
+        public FilteredListElement build() {
+            return new FilteredListElement(provider, elements, Collections.EMPTY_LIST, new Operation.Literal(1));
         }
 
     }

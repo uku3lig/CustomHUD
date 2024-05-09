@@ -1177,20 +1177,37 @@ public class VariableParser {
         format = format.substring(1, format.length()-1);
         CustomHud.logInDebugMode("Format: " + format);
 
+        Operation operation = null;
         String seperator = "";
+
         if (parts.size() > 2) {
-            seperator = parts.get(2).trim();
-            if (!seperator.startsWith("\"") || !seperator.endsWith("\"")) {
-                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
-                return null;
+            if ( parts.size() > 3 ) {
+                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, provider);
+                CustomHud.logInDebugMode( "Filter:");
+                operation.printTree(2);
             }
-            seperator = seperator.substring(1, seperator.length()-1);
-            CustomHud.logInDebugMode("Separator: " + seperator);
+
+            String sep = parts.get(2).trim();
+
+            if (sep.startsWith("\"") && sep.endsWith("\"")) {
+                seperator = sep.substring(1, sep.length()-1);
+                CustomHud.logInDebugMode("Separator: " + sep);
+            }
+            else if ( parts.size() == 3 ) {
+                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, provider);
+                CustomHud.logInDebugMode( "Filter:");
+                operation.printTree(2);
+            }
+            else {
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
+                return new IgnoreErrorElement();
+            }
+
         }
 
-        return new ListElement(provider,
+        return ListElement.of(provider,
                 addElements(format, profile, debugLine, enabled, false, provider),
-                addElements(seperator, profile, debugLine, enabled, false, provider));
+                addElements(seperator, profile, debugLine, enabled, false, provider), operation);
     }
 
     public static ListProvider getListProvider(String variable, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProvider listProvider) {
@@ -1340,20 +1357,33 @@ public class VariableParser {
         format = format.substring(1, format.length()-1);
         CustomHud.logInDebugMode("Format: " + format);
 
+        Operation operation = null;
         String seperator = "";
+
         if (parts.size() > 2) {
-            seperator = parts.get(2).trim();
-            if (!seperator.startsWith("\"") || !seperator.endsWith("\"")) {
-                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
-                return null;
+            if ( parts.size() > 3 )
+                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, provider);
+
+            String sep = parts.get(2).trim();
+
+            if (sep.startsWith("\"") && sep.endsWith("\"")) {
+                seperator = sep.substring(1, sep.length()-1);
+                CustomHud.logInDebugMode("Separator: " + sep);
             }
-            seperator = seperator.substring(1, format.length()-1);
-            CustomHud.logInDebugMode("Separator: " + seperator);
+            else if ( parts.size() == 3 ) {
+                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, provider);
+            }
+            else {
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
+                return new IgnoreErrorElement();
+            }
+
         }
 
-        return new ListElement(provider,
+        return ListElement.of(provider,
                 addElements(format, profile, debugLine, enabled, false, provider),
-                addElements(seperator, profile, debugLine, enabled, false, provider));
+                addElements(seperator, profile, debugLine, enabled, false, provider), operation);
+
     }
 
     private static final Supplier<String> RAW = () -> ListManager.getValue().toString();
