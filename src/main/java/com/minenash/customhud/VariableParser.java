@@ -504,31 +504,13 @@ public class VariableParser {
             return null;
         }
 
-//        if (part.startsWith("icon:")) {
-//            part = part.substring(part.indexOf(':')+1);
-//
-//            Item item = Registries.ITEM.get(Identifier.tryParse(part));
-//            if (item != Items.AIR)
-//                return Flags.wrap(new ItemIconElement(new ItemStack(item), flags), flags);
-//
-//            Matcher matcher = TEXTURE_ICON_PATTERN.matcher(part);
-//            if (!matcher.matches()) {
-//                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, part);
-//                return null;
-//            }
-//
-//            Identifier id = new Identifier(matcher.group(1) + ".png");
-//            int u = matcher.group(2) == null ? 0 : Integer.parseInt(matcher.group(2));
-//            int v = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
-//            int w = matcher.group(4) == null ? -1 : Integer.parseInt(matcher.group(4));
-//            int h = matcher.group(5) == null ? -1 : Integer.parseInt(matcher.group(5));
-//
-//            TextureIconElement element = new TextureIconElement(id, u, v, w, h, flags);
-//            if (element.isIconAvailable())
-//                return Flags.wrap(element, flags);
-//            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
-//            return null;
-//        }
+        if (part.startsWith("pteam:") || part.startsWith("player_team:")) {
+            String method = part.substring(part.indexOf(':')+1);
+            HudElement element = Attributers.get( TEAMS, () -> CLIENT.player.getScoreboardTeam(), method, flags);
+            if (element == null)
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, method);
+            return element;
+        }
 
         if (part.startsWith("itemcount:")) {
             part = part.substring(part.indexOf(':')+1);
@@ -755,6 +737,7 @@ public class VariableParser {
             case "vehicle_entity_name", "vehicle_name", "ven" -> VEHICLE_ENTITY_NAME;
             case "team_name" -> PLAYER_TEAM_NAME;
             case "record_name" -> {enabled.music = true; yield RECORD_NAME;}
+            case "team", "pteam", "player_team" -> PLAYER_TEAM;
             default -> null;
         };
     }
@@ -770,6 +753,7 @@ public class VariableParser {
             case "biome_id" -> BIOME_ID;
             case "music_id" -> {enabled.music = true; yield MUSIC_ID;}
             case "record_id" -> {enabled.music = true; yield RECORD_ID;}
+
             default -> null;
         };
     }
@@ -783,7 +767,6 @@ public class VariableParser {
 //            case "display_name", "name" -> DISPLAY_NAME; TODO: remove
             case "username" -> USERNAME;
             case "uuid" -> UUID;
-            case "team" -> PLAYER_TEAM;
             case "dimension" -> DIMENSION;
             case "facing" -> FACING;
             case "facing_short" -> FACING_SHORT;
@@ -1158,10 +1141,17 @@ public class VariableParser {
             Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_SLOT, "WHY U EMPTY");
             return null;
         }
-        String providerName = parts.get(0);
+
+        String[] flagParts = parts.get(0).split(" ");
+//        Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
+
+        String providerName = flagParts[0];
         int dotIndex = providerName.indexOf(".");
         if (dotIndex != -1)
             providerName = providerName.substring(0, dotIndex);
+
+
+
         ListProvider provider = getListProvider(providerName, profile, debugLine, enabled, original, listProvider);
 
         if (provider == null)
@@ -1181,13 +1171,26 @@ public class VariableParser {
 
         String format = parts.get(1).trim();
         if (!format.startsWith("\"") || !format.endsWith("\"")) {
-            Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, null);
+            Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "format part not in quotations");
             return null;
         }
         format = format.substring(1, format.length()-1);
         CustomHud.logInDebugMode("Format: " + format);
 
-        return new ListElement(provider, addElements(format, profile, debugLine, enabled, false, provider));
+        String seperator = "";
+        if (parts.size() > 2) {
+            seperator = parts.get(2).trim();
+            if (!seperator.startsWith("\"") || !seperator.endsWith("\"")) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
+                return null;
+            }
+            seperator = seperator.substring(1, seperator.length()-1);
+            CustomHud.logInDebugMode("Separator: " + seperator);
+        }
+
+        return new ListElement(provider,
+                addElements(format, profile, debugLine, enabled, false, provider),
+                addElements(seperator, profile, debugLine, enabled, false, provider));
     }
 
     public static ListProvider getListProvider(String variable, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProvider listProvider) {
@@ -1331,13 +1334,26 @@ public class VariableParser {
 
         String format = parts.get(1).trim();
         if (!format.startsWith("\"") || !format.endsWith("\"")) {
-            Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, null);
+            Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "format part not in quotations");
             return null;
         }
         format = format.substring(1, format.length()-1);
         CustomHud.logInDebugMode("Format: " + format);
 
-        return new ListElement(provider, addElements(format, profile, debugLine, enabled, false, provider));
+        String seperator = "";
+        if (parts.size() > 2) {
+            seperator = parts.get(2).trim();
+            if (!seperator.startsWith("\"") || !seperator.endsWith("\"")) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
+                return null;
+            }
+            seperator = seperator.substring(1, format.length()-1);
+            CustomHud.logInDebugMode("Separator: " + seperator);
+        }
+
+        return new ListElement(provider,
+                addElements(format, profile, debugLine, enabled, false, provider),
+                addElements(seperator, profile, debugLine, enabled, false, provider));
     }
 
     private static final Supplier<String> RAW = () -> ListManager.getValue().toString();

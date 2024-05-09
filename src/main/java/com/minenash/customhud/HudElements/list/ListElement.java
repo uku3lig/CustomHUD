@@ -15,13 +15,15 @@ public class ListElement implements HudElement, MultiElement {
 
     private final ListProvider provider;
     private final List<HudElement> elements;
+    private final List<HudElement> separator;
 //    private final boolean removeLastNewLine;
 
-    public ListElement(ListProvider provider, List<HudElement> format) {
+    public ListElement(ListProvider provider, List<HudElement> format, List<HudElement> separator) {
         this.provider = provider;
         this.elements = format;
 //        this.removeLastNewLine = elements.size() > 1 && elements.get(elements.size()-1) instanceof FunctionalElement.NewLine;
-        this.elements.add(ADVANCE_LIST_ELEMENT);
+        this.separator = separator;
+        this.separator.add(ADVANCE_LIST_ELEMENT);
     }
 
     public List<HudElement> expand() {
@@ -43,9 +45,12 @@ public class ListElement implements HudElement, MultiElement {
 //            if (element instanceof IconElement ie)
 //                ie.setList(values);
 
-        for (int i = 0; i < values.size(); i++)
+        for (int i = 0; i < values.size(); i++) {
             expanded.addAll(elements);
-        expanded.set(expanded.size()-1, POP_LIST_ELEMENT);
+            if (i < values.size() - 1)
+                expanded.addAll(separator);
+        }
+        expanded.add(POP_LIST_ELEMENT);
 //        if (removeLastNewLine)
 //            expanded.remove(expanded.size()-2);
         return expanded;
@@ -85,7 +90,7 @@ public class ListElement implements HudElement, MultiElement {
         }
 
         public ListElement build() {
-            return new ListElement(provider, elements);
+            return new ListElement(provider, elements, Collections.EMPTY_LIST);
         }
 
     }

@@ -51,14 +51,14 @@ public enum ErrorType {
     CONDITIONAL_WRONG_NUMBER_OF_TOKENS ("Conditionals", "conditionals", "Expected 4 tokens, found §e"),
     MALFORMED_CONDITIONAL ("Conditionals", "conditionals", "Malformed conditional: "),
     EMPTY_SECTION("Conditionals", "conditionals", "Empty section"),
-    MALFORMED_LIST ("CHANGE ME", "CHANGE ME", "Malformed list variable: "),
-    MALFORMED_BAR ("CHANGE ME", "CHANGE ME", "Malformed bar variable: "),
-    MALFORMED_LOOP ("CHANGE ME", "CHANGE ME", "Malformed loop: "),
-    MALFORMED_TIMER ("CHANGE ME", "CHANGE ME", "Malformed timer: "),
+    MALFORMED_LIST ("CHANGE ME", "CHANGE ME", "Malformed list variable: §e"),
+    MALFORMED_BAR ("CHANGE ME", "CHANGE ME", "Malformed bar variable: §e"),
+    MALFORMED_LOOP ("CHANGE ME", "CHANGE ME", "Malformed loop: §e"),
+    MALFORMED_TIMER ("CHANGE ME", "CHANGE ME", "Malformed timer: §e"),
     EMPTY_TOGGLE ("CHANGE ME", "CHANGE ME", "No toggle name"),
-    UNKNOWN_KEY("CHANGE ME", "CHANGE ME", "Invalid key name: "),
+    UNKNOWN_KEY("CHANGE ME", "CHANGE ME", "Invalid key name: §e"),
 
-    NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: "),
+    NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: §e"),
 
     REQUIRES_MODMENU ("Get Mod Menu", "https://modrinth.com/mod/modmenu", "Requires the mod §aMod Menu");
 

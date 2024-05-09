@@ -17,6 +17,8 @@ public class TextSupplierElement extends TextElement {
     public static final Supplier<Text> PLAYER_TEAM_NAME = () -> CLIENT.player.getScoreboardTeam().getDisplayName();
     public static final Supplier<Text> RECORD_NAME = () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().name : null;
 
+    public static final Supplier<Text> PLAYER_TEAM = () -> CLIENT.player.getScoreboardTeam().getDisplayName();
+
 
 
     private final Supplier<Text> supplier;

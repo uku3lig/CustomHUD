@@ -9,6 +9,7 @@ import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.TradeOffer;
 
@@ -47,20 +48,28 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer PLAYER = (sup, name, flags) -> switch (name) {
-        case "", "p_name" -> new Str(sup,PLAYER_ENTRY_NAME);
-        case "p_id" -> new Str(sup,PLAYER_ENTRY_UUID);
-        case "p_team" -> new Str(sup, PLAYER_ENTRY_TEAM);
-        case "p_latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
-        case "p_list_score" -> new Num(sup,PLAYER_ENTRY_LIST_SCORE, flags);
-        case "p_gamemode" -> new Special(sup,PLAYER_ENTRY_GAMEMODE);
-        case "p_survival" -> new Bool(sup,PLAYER_ENTRY_SURVIVAL);
-        case "p_creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
-        case "p_adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
-        case "p_spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
-        case "p_head" -> new PlayerHeadIconElement(flags); //TODO FIX
+    private static Attributer TEAM2;
+    public static final Attributer PLAYER = (sup, name, flags) -> {
+        if (name.startsWith("p_team:")) {
+            String attr = name.substring(7);
+            Supplier sup2 = () -> ((PlayerListEntry) sup.get()).getScoreboardTeam();
+            return TEAM2.get(sup2, attr, flags);
+        }
+
+        return switch (name) {
+            case "", "p_name" -> new Str(sup,PLAYER_ENTRY_NAME);
+            case "p_id" -> new Str(sup,PLAYER_ENTRY_UUID);
+            case "p_team" -> new Str(sup, PLAYER_ENTRY_TEAM);
+            case "p_latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
+            case "p_list_score" -> new Num(sup,PLAYER_ENTRY_LIST_SCORE, flags);
+            case "p_gamemode" -> new Special(sup,PLAYER_ENTRY_GAMEMODE);
+            case "p_survival" -> new Bool(sup,PLAYER_ENTRY_SURVIVAL);
+            case "p_creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
+            case "p_adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
+            case "p_spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
+            case "p_head" -> new PlayerHeadIconElement(flags); //TODO FIX
         default -> null;
-    };
+    };};
 
     public static final Attributer SUBTITLE = (sup, name, flags) -> switch (name) {
         case "", "s_id" -> new Id(sup, SUBTITLE_ID,flags);
@@ -192,6 +201,7 @@ public class Attributers {
         case "t_online_players", "t_players" -> new CreateListElement(sup, TEAM_PLAYERS, PLAYER);
         default -> null;
     };
+    static { TEAM2 = TEAM; }
 
     public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sup, name, flags) -> switch (name) {
         case "", "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
@@ -250,7 +260,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static Attributer MOD2;
+    private static Attributer MOD2;
     public static final Attributer MOD = (sup, name, flags) -> {
         if (name.startsWith("m_parent:")) {
             String attr = name.substring(9);
@@ -285,9 +295,7 @@ public class Attributers {
             default -> null;
         };
     };
-    static {
-        MOD2 = MOD;
-    }
+    static { MOD2 = MOD; }
 
     public static final Attributer PACK = (sup, name, flags) -> switch (name) {
         case "","p_name" -> new Tex(sup, PACK_NAME);
