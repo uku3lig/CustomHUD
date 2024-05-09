@@ -1,5 +1,6 @@
 package com.minenash.customhud.data;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.ConditionalElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
@@ -85,11 +86,15 @@ public class MultiLineStacker {
 
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
         ListProvider superProvider = listProviders.isEmpty() ? null : listProviders.peek();
+
+        List<String> parts = VariableParser.partitionConditional(list);
+        list = parts.get(0);
+
         ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, superProvider);
         if (provider == ListProvider.REGUIRES_MODMENU) {
             Errors.addError(profile.name, line, source, ErrorType.REQUIRES_MODMENU, "");
             listProviders.push(null);
-            stack.push( new ListElement.MultiLineBuilder(null) );
+            stack.push( new ListElement.MultiLineBuilder(null, null) );
             return;
         }
 
@@ -97,7 +102,7 @@ public class MultiLineStacker {
             HudElement e = VariableParser.getAttributeElement(list, profile, line, enabled, source);
             if (e instanceof FunctionalElement.IgnoreErrorElement) {
                 listProviders.push(null);
-                stack.push( new ListElement.MultiLineBuilder(null) );
+                stack.push( new ListElement.MultiLineBuilder(null, null) );
                 return;
             }
             if (e instanceof FunctionalElement.CreateListElement cle)
@@ -117,7 +122,31 @@ public class MultiLineStacker {
             Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
 
         listProviders.push(provider);
-        stack.push( new ListElement.MultiLineBuilder(provider) );
+
+        Operation filter = null;
+        if (parts.size() > 1) {
+            filter = ExpressionParser.parseExpression(parts.get(1), source, profile, line, enabled, provider);
+            CustomHud.logInDebugMode("Filter:");
+            filter.printTree(2);
+        }
+
+        stack.push( new ListElement.MultiLineBuilder(provider, filter) );
+    }
+
+    public void forSeparator(Profile profile, int line, String source) {
+        if (stack.isEmpty())
+            Errors.addError(profile.name, line, source, ErrorType.LIST_NOT_STARTED, "=separator=");
+        else if (stack.peek() instanceof ListElement.MultiLineBuilder mlb)
+            mlb.separatorMode();
+        else {
+            for (int i = stack.size()-1; i >= 0; i--) {
+                if (stack.get(i) instanceof ListElement.MultiLineBuilder mlb) {
+                    mlb.addAll( finish(i+1, profile, line, false) );
+                    break;
+                }
+            }
+            ( (ListElement.MultiLineBuilder)stack.peek() ).separatorMode();
+        }
     }
 
     public void endFor(Profile profile, int line, String source) {

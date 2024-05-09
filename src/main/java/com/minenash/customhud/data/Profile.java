@@ -206,6 +206,9 @@ public class Profile {
             else if (( matcher = FOR_PATTERN.matcher(lineLC) ).matches())
                 profile.stacker.startFor(matcher.group(1), profile, i, profile.enabled, line);
 
+            else if (line.equalsIgnoreCase("=separator="))
+                profile.stacker.forSeparator(profile, i, line);
+
             else if (line.equalsIgnoreCase("=endfor="))
                 profile.stacker.endFor(profile, i, line);
 

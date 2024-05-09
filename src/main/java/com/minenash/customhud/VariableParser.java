@@ -163,7 +163,7 @@ public class VariableParser {
         return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'u');
     }
 
-    private static List<String> partitionConditional(String str) {
+    public static List<String> partitionConditional(String str) {
         char[] chars = str.toCharArray();
         List<String> parts = new ArrayList<>();
 

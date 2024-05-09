@@ -77,10 +77,12 @@ public class ListElement implements HudElement, MultiElement {
         public final ListProvider provider;
         private final List<HudElement> elements = new ArrayList<>();
         private final List<HudElement> separator = new ArrayList<>();
+        private final Operation filter;
         private boolean separatorMode = false;
 
-        public MultiLineBuilder(ListProvider provider) {
+        public MultiLineBuilder(ListProvider provider, Operation filter) {
             this.provider = provider == null ? EMPTY : provider;
+            this.filter = filter;
         }
 
         public void add(HudElement element) {
@@ -95,8 +97,8 @@ public class ListElement implements HudElement, MultiElement {
             this.separatorMode = true;
         }
 
-        public ListElement build() {
-            return new ListElement(provider, elements, Collections.EMPTY_LIST);
+        public HudElement build() {
+            return filter == null ? new ListElement(provider, elements, separator) : new FilteredListElement(provider, elements, separator, filter);
         }
 
     }

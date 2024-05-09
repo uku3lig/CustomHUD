@@ -184,7 +184,7 @@ public interface Operation {
                 return false;
             }
 
-            return left.getString().contains(right.getString());
+            return left.getString().toLowerCase().contains(right.getString().toLowerCase());
         }
 
 
