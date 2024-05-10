@@ -165,8 +165,9 @@ public class VariableParser {
         List<String> parts = new ArrayList<>();
 
         int nest = 0;
-        int qNest = 0;
+//        int qNest = 0;
         int startIndex = 0;
+        Stack<Character> qStack = new Stack<>();
 
         for (int i = 0; i < str.length(); i++) {
             char c = chars[i];
@@ -187,14 +188,18 @@ public class VariableParser {
                 case '[' -> nest++;
                 case ']' -> nest--;
                 case ',' -> {
-                    if (nest == 0 && qNest == 0) {
+                    if (nest == 0 && qStack.isEmpty()) {
                         parts.add(str.substring(startIndex, i));
                         startIndex = i+1;
                     }
                 }
                 case '"' -> {
-                    if (qNest == nest) qNest++;
-                    else qNest--;
+                    if (qStack.size() == nest) qStack.push('"');
+                    else if (qStack.peek() == '"') qStack.pop();
+                }
+                case '\'' -> {
+                    if (qStack.size() == nest) qStack.push('\'');
+                    else if (qStack.peek() == '\'') qStack.pop();
                 }
             }
         }
@@ -235,6 +240,9 @@ public class VariableParser {
         return parseElement2(part, profile, debugLine, enabled,listProviders);
 
     }
+    public static boolean inQuotes(String part) {
+        return (part.startsWith("\"") && part.endsWith("\"")) || (part.startsWith("'") && part.endsWith("'"));
+    }
     public static HudElement parseElement2(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listProviders) {
         if (!part.startsWith("{") || part.length() < 2)
             return new StringElement(part);
@@ -268,7 +276,7 @@ public class VariableParser {
             for (int i = 0; i < ps.size()-1; i+=2) {
                 String cond = ps.get(i);
                 String result = ps.get(i+1).trim();
-                if (!result.startsWith("\"") || !result.endsWith("\"")) {
+                if (!inQuotes(result)) {
                     Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Section not in quotations");
                     return null;
                 }
@@ -280,7 +288,7 @@ public class VariableParser {
             }
             if (ps.size() % 2 == 1) {
                 String result = ps.get(ps.size()-1).trim();
-                if (result.length() < 2 || !result.startsWith("\"") || !result.endsWith("\"")) {
+                if (result.length() < 2 || !inQuotes(result)) {
                     Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Section not in quotations");
                     return null;
                 }
@@ -1173,7 +1181,7 @@ public class VariableParser {
 
 
         String format = parts.get(1).trim();
-        if (!format.startsWith("\"") || !format.endsWith("\"")) {
+        if (!inQuotes(format)) {
             Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "format part not in quotations");
             return null;
         }
@@ -1192,7 +1200,7 @@ public class VariableParser {
 
             String sep = parts.get(2).trim();
 
-            if (sep.startsWith("\"") && sep.endsWith("\"")) {
+            if (inQuotes(sep)) {
                 seperator = sep.substring(1, sep.length()-1);
                 CustomHud.logInDebugMode("Separator: " + sep);
             }
@@ -1355,7 +1363,7 @@ public class VariableParser {
             return null;
 
         String format = parts.get(1).trim();
-        if (!format.startsWith("\"") || !format.endsWith("\"")) {
+        if (!inQuotes(format)) {
             Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "format part not in quotations");
             return null;
         }
@@ -1371,7 +1379,7 @@ public class VariableParser {
 
             String sep = parts.get(2).trim();
 
-            if (sep.startsWith("\"") && sep.endsWith("\"")) {
+            if (inQuotes(sep)) {
                 seperator = sep.substring(1, sep.length()-1);
                 CustomHud.logInDebugMode("Separator: " + sep);
             }
