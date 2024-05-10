@@ -20,7 +20,8 @@ import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.*;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
-import com.minenash.customhud.mod_compat.CustomHudRegistry;
+import com.minenash.customhud.registry.CustomHudRegistry;
+import com.minenash.customhud.registry.ParseContext;
 import com.terraformersmc.modmenu.ModMenu;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
@@ -308,6 +309,10 @@ public class VariableParser {
             }
         }
 
+        HudElement el = CustomHudRegistry.get(part, new ParseContext(profile, debugLine, enabled, listProviders));
+        if (el != null)
+            return el;
+
         if (listProviders.isEmpty() || !(part.startsWith("scores") && part.contains(","))) { //Fixes naming conflict
             HudElement he = getListSupplierElements(part, profile, debugLine, enabled, original, listProviders);
             if (he instanceof IgnoreErrorElement) return null;
@@ -315,13 +320,13 @@ public class VariableParser {
         }
 
         // ATTRS WERE HERE
-        HudElement ae = getAttributeElement(part, profile, debugLine, enabled, original);
-        if (ae != null) {
-            if (ae instanceof IgnoreErrorElement)
+        el = getAttributeElement(part, profile, debugLine, enabled, original);
+        if (el != null) {
+            if (el instanceof IgnoreErrorElement)
                 return null;
-            if (ae instanceof FunctionalElement.CreateListElement cle)
+            if (el instanceof FunctionalElement.CreateListElement cle)
                 return listElement(cle.provider, part, part.indexOf(','), profile, debugLine, enabled, original, listProviders);
-            return ae;
+            return el;
         }
 
         if (part.startsWith("bar"))
@@ -656,22 +661,11 @@ public class VariableParser {
         HudElement element = getSupplierElement(part, enabled, flags);
         if (element != null)
             return Flags.wrap(element, flags);
-
-        Matcher keyMatcher = registryKey.matcher(part);
-        if (keyMatcher.matches()) {
-            element = CustomHudRegistry.get(keyMatcher.group(1), part);
-            if (element != null)
-                return element;
-
-            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_VARIABLE, part);
-        }
         else
             Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_VARIABLE, part);
         return null;
     }
 
-
-    private static final Pattern registryKey = Pattern.compile("(\\w+).*");
 
     private static HudElement stat(String prefix, StatType<?> type, Registry<?> registry, String stat, Flags flags, ComplexData.Enabled enabled) {
         if (!stat.startsWith(prefix))

@@ -208,7 +208,7 @@ public class Flags {
             return element;
         if (flags.romanNumerals)
             element = new RomanNumeralElement(element);
-        if (flags.anyTextUsed())
+        if (flags.anyTextUsed() && !flags.romanNumerals)
             element = new FormattedElement(element, flags);
         if (flags.frequency > 0)
             element = new FrequencyElement(element, flags.frequency);
