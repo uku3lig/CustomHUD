@@ -5,6 +5,7 @@ import com.minenash.customhud.mixin.music.MusicTrackerAccess;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.MusicDiscItem;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -31,7 +32,7 @@ public class MusicAndRecordTracker {
         public Text name = Text.literal("Unknown Music Disc");
         public int length = 0;
         public int elapsed = 0;
-        public ItemStack icon = ItemStack.EMPTY;
+        public ItemStack icon = new ItemStack(Items.BARRIER);
     }
 
     public static RecordInstance getClosestRecord() {

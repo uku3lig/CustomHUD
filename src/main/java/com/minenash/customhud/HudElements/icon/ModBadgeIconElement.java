@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
@@ -9,12 +10,15 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.UUID;
+
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ModBadgeIconElement extends IconElement{
 
-    public ModBadgeIconElement(Flags flags) {
+    public ModBadgeIconElement(UUID providerID, Flags flags) {
         super(flags, -1);
+        this.providerID = providerID;
     }
 
     @Override
@@ -39,6 +43,6 @@ public class ModBadgeIconElement extends IconElement{
 
     @Override
     public int getTextWidth() {
-        return width >= 0 ? width : MathHelper.ceil(scale*(CLIENT.textRenderer.getWidth( ((Mod.Badge)ListManager.getValue()).getText() ) + 6 + 1));
+        return width >= 0 ? width : MathHelper.ceil(scale*(CLIENT.textRenderer.getWidth( ((Mod.Badge)ListManager.getValue(providerID)).getText() ) + 6 + 1));
     }
 }

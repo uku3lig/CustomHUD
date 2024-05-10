@@ -1,19 +1,17 @@
 package com.minenash.customhud.HudElements.icon;
 
-import com.minenash.customhud.complex.ListManager;
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -24,13 +22,14 @@ public class ItemSupplierIconElement extends IconElement {
     private final boolean showCount, showDur, showCooldown;
     private final int numSize;
 
-    public ItemSupplierIconElement(Supplier<?> supplier, Flags flags) {
+    public ItemSupplierIconElement(UUID providerID, Supplier<?> supplier, Flags flags) {
         super(flags, 11);
         this.supplier = supplier;
         this.showCount = flags.iconShowCount;
         this.showDur = flags.iconShowDur;
         this.showCooldown = flags.iconShowCooldown;
         this.numSize = flags.numSize;
+        this.providerID = providerID;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class ItemSupplierIconElement extends IconElement {
         return ItemStack.EMPTY;
     }
     private ItemStack getStack(RenderPiece piece) {
-        if (supplier == ListManager.SUPPLIER)
+        if (piece.value != null)
             return (ItemStack) piece.value;
         Object result = supplier.get();
         if (result instanceof ItemStack stack)

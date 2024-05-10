@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.HudElements.functional.ExecuteElement;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class NewTextureIconElement extends IconElement {
+public class NewTextureIconElement extends IconElement implements ExecuteElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Identifier TEXTURE_NOT_FOUND = new Identifier("textures/item/barrier.png");
 
@@ -82,19 +83,26 @@ public class NewTextureIconElement extends IconElement {
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
-        int width = (int) (height * (regionWidth.getValue()/regionHeight.getValue()));
+        int width = (int) (height * (calcRegionWidth/calcRegionHeight));
         if (width == 0)
             return;
         context.getMatrices().push();
         context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2, 0);
         rotate(context.getMatrices(), width, height);
-        context.drawTexture(texture, 0, 0, width, height, get(u), get(v), get(regionWidth), get(regionHeight), textureWidth, textureHeight);
+        context.drawTexture(texture, 0, 0, width, height, calcU, calcV, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
         context.getMatrices().pop();
     }
 
-    private int get(Operation op) {
-        return (int) op.getValue();
+    int calcU = 0;
+    int calcV = 0;
+    double calcRegionWidth = 0;
+    double calcRegionHeight = 0;
+
+    @Override
+    public void run() {
+        calcU = (int) u.getValue();
+        calcV = (int) v.getValue();
+        calcRegionWidth = regionWidth.getValue();
+        calcRegionHeight = regionHeight.getValue();
     }
-
-
 }

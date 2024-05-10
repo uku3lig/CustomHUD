@@ -1,21 +1,15 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.render.RenderPiece;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import org.joml.Quaternionf;
 
-import java.util.List;
+import java.util.UUID;
 
 public abstract class IconElement extends FunctionalElement {
 
@@ -26,6 +20,7 @@ public abstract class IconElement extends FunctionalElement {
     protected final Quaternionf rotation;
     protected final Quaternionf rotationInverse;
     protected final boolean referenceCorner;
+    protected UUID providerID = null;
 
     protected IconElement(Flags flags, double defaultWidth) {
         scale = (float) flags.scale;
@@ -41,6 +36,7 @@ public abstract class IconElement extends FunctionalElement {
     public int getTextWidth() {
         return width;
     };
+    public UUID getProviderID() { return providerID; }
 
     @Override
     public String getString() {

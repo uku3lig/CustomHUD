@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,7 +11,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.List;
+import java.util.UUID;
 
 public class StatusEffectIconElement extends IconElement {
     private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = new Identifier("hud/effect_background_ambient");
@@ -19,10 +20,11 @@ public class StatusEffectIconElement extends IconElement {
     private final boolean background;
     private final int effectOffset;
 
-    public StatusEffectIconElement(Flags flags, boolean background) {
+    public StatusEffectIconElement(UUID providerID, Flags flags, boolean background) {
         super(flags, flags.scale == 1 ? 11 : 12);
         this.background = background;
-        effectOffset = scale == 1 ? 1 : Math.round(3F/2*scale);
+        this.effectOffset = scale == 1 ? 1 : Math.round(3F/2*scale);
+        this.providerID = providerID;
     }
 
     @Override

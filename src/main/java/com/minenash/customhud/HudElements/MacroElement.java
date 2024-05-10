@@ -6,7 +6,6 @@ import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.ProfileManager;
-import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.Macro;
@@ -38,12 +37,8 @@ public class MacroElement implements HudElement, MultiElement {
         if (macro.elements() != null) {
             StringBuilder builder = new StringBuilder();
             for (HudElement element : macro.elements()) {
-                if (element instanceof FunctionalElement.PushList pl)
-                    ListManager.push(pl.values);
-                else if (element instanceof FunctionalElement.AdvanceList)
-                    ListManager.advance();
-                else if (element instanceof FunctionalElement.PopList)
-                    ListManager.pop();
+                if (element instanceof FunctionalElement.XList xl)
+                    xl.run();
                 else
                     builder.append(element.getString());
             }

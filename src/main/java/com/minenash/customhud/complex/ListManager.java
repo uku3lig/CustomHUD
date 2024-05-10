@@ -2,49 +2,47 @@ package com.minenash.customhud.complex;
 
 import com.minenash.customhud.data.CHFormatting;
 
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class ListManager {
 
-    private static final Stack<Integer> index = new Stack<>();
-    private static final Stack<List<?>> values = new Stack<>();
-    private static final Stack<CHFormatting> color = new Stack<>();
+    private static final Map<UUID, Integer> index = new HashMap<>();
+    private static final Map<UUID, List<?>> values = new HashMap<>();
 
     //REMOVED: CHFormatting input
-    public static void push(List<?> values) {
-        ListManager.index.push(0);
-        ListManager.values.push(values);
-//        ListManager.color.push(formatting);
+    public static void push(UUID providerID, List<?> values) {
+        ListManager.index.put(providerID, 0);
+        ListManager.values.put(providerID, values);
     }
 
     //REMOVED: RETURNED COLOR
-    public static void pop() {
-        ListManager.index.pop();
-        ListManager.values.pop();
-//        return color.pop();
+    public static void pop(UUID providerID) {
+        ListManager.index.remove(providerID);
+        ListManager.values.remove(providerID);
     }
 
-    public static void advance() {
-        ListManager.index.push(ListManager.index.pop()+1);
+    public static void advance(UUID providerID) {
+        ListManager.index.put(providerID, ListManager.index.get(providerID)+1);
     }
 
-    public static int getCount() {
-        return values.peek().size();
+    public static int getCount(UUID providerID) {
+        return values.get(providerID).size();
     }
 
-    public static int getIndex() {
-        return index.peek();
+    public static int getIndex(UUID providerID) {
+        return index.get(providerID);
     }
 
-    public static Object getValue() {
-        return values.empty() ? null : values.peek().get(index.peek());
+    public static Object getValue(UUID providerID) {
+        return providerID == null ? null : !values.containsKey(providerID) ? null : values.get(providerID).get(index.get(providerID));
     }
-    public static Object getValue(int index) {
-        return values.empty() ? null : values.peek().get(index);
+    public static Object getValue(UUID providerID, int index) {
+        return values.containsKey(providerID) ? null : values.get(providerID).get(index);
     }
 
-    public static final Supplier<?> SUPPLIER = ListManager::getValue;
+    public static Supplier<?> supplier(UUID providerID) {
+        return () -> getValue(providerID);
+    }
 
 }

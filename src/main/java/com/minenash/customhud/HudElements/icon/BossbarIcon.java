@@ -1,6 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
-import com.minenash.customhud.complex.ListManager;
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
@@ -8,11 +8,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.boss.BossBar;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-public class BossbarIcon extends IconElement{
+public class BossbarIcon extends IconElement {
 
     public static class BasicBar extends BossBar {
         public BasicBar(Color color, Style style) {
@@ -20,11 +19,10 @@ public class BossbarIcon extends IconElement{
         }
     }
 
-    private final Supplier<BossBar> supplier;
 
-    public BossbarIcon(Supplier<BossBar> supplier, Flags flags) {
+    public BossbarIcon(UUID providerID, Flags flags) {
         super(flags, 182);
-        this.supplier = supplier;
+        this.providerID = providerID;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class BossbarIcon extends IconElement{
         matrices.scale(scale, scale, 0);
         rotate(matrices, 182, 5);
 
-        BossBar bossBar = supplier == ListManager.SUPPLIER ? (BossBar) piece.value : supplier.get();
+        BossBar bossBar = (BossBar) piece.value;
         if (bossBar != null)
             CLIENT.inGameHud.getBossBarHud().renderBossBar(context, 0, 0, bossBar);
 

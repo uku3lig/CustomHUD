@@ -36,12 +36,8 @@ public interface Operation {
             if (element instanceof IconElement ie)
                 return ie.getTextWidth();
             if (element instanceof FunctionalElement) {
-                if (element instanceof FunctionalElement.PushList pl)
-                    ListManager.push(pl.values);
-                else if (element instanceof FunctionalElement.AdvanceList)
-                    ListManager.advance();
-                else if (element instanceof FunctionalElement.PopList)
-                    ListManager.pop();
+                if (element instanceof FunctionalElement.XList xl)
+                    xl.run();
                 return 0;
             }
             if (!(element instanceof MultiElement me))
@@ -171,16 +167,16 @@ public interface Operation {
             if (left instanceof ListCountElement lce) {
                 if (lce.attribute == null)
                     return false;
-                ListManager.push(lce.provider.get());
+                ListManager.push(lce.providerID, lce.provider.get());
 
-                while (ListManager.getIndex() < ListManager.getCount()) {
+                while (ListManager.getIndex(lce.providerID) < ListManager.getCount(lce.providerID)) {
                     if (new Comparison(lce.attribute, right, ExpressionParser.Comparison.EQUALS).getBooleanValue()) {
-                        ListManager.pop();
+                        ListManager.pop(lce.providerID);
                         return true;
                     }
-                    ListManager.advance();
+                    ListManager.advance(lce.providerID);
                 }
-                ListManager.pop();
+                ListManager.pop(lce.providerID);
                 return false;
             }
 

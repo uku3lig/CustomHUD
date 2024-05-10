@@ -3,11 +3,9 @@ package com.minenash.customhud.HudElements.icon;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import com.minenash.customhud.CustomHud;
-import com.minenash.customhud.complex.ListManager;
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
-import com.terraformersmc.modmenu.util.mod.Mod;
-import com.terraformersmc.modmenu.util.mod.fabric.FabricIconHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -20,25 +18,22 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class PackIconElement extends IconElement {
 
     private final Map<String, Identifier> iconTextures = Maps.newHashMap();
-    private final Supplier<ResourcePackProfile> supplier;
-    public PackIconElement(Supplier<ResourcePackProfile> supplier, Flags flags) {
+    public PackIconElement(UUID providerID, Flags flags) {
         super(flags, 11);
-        this.supplier = supplier;
+        this.providerID = providerID;
     }
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
-        ResourcePackProfile pack = supplier == ListManager.SUPPLIER ? (ResourcePackProfile) piece.value : supplier.get();
+        ResourcePackProfile pack = (ResourcePackProfile) piece.value;
         MatrixStack matrices = context.getMatrices();
         matrices.push();
         matrices.translate(piece.x + shiftX, piece.y + shiftY - 2, 0);

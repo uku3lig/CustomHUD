@@ -1,6 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
-import com.minenash.customhud.complex.ListManager;
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -8,13 +8,11 @@ import com.terraformersmc.modmenu.util.mod.fabric.FabricIconHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.boss.BossBar;
 import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
@@ -22,11 +20,10 @@ public class ModIconElement extends IconElement {
 
     private static Set<Identifier> cached = new HashSet<>();
     private static FabricIconHandler handler = new FabricIconHandler();
-    public final Supplier<Mod> supplier;
 
-    public ModIconElement(Supplier<Mod> supplier, Flags flags) {
+    public ModIconElement(UUID providerID, Flags flags) {
         super(flags, 11);
-        this.supplier = supplier;
+        this.providerID = providerID;
         cached.clear();
         handler.close();
         handler = new FabricIconHandler();
@@ -34,7 +31,7 @@ public class ModIconElement extends IconElement {
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
-        Mod mod = supplier == ListManager.SUPPLIER ? (Mod) piece.value : supplier.get();
+        Mod mod = (Mod) piece.value;
         int size = (int)(10 * scale * CLIENT.options.getGuiScale().getValue());
 
         Identifier id = new Identifier("custom_hud", size + "___" + mod.getId());

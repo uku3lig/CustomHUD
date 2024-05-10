@@ -134,17 +134,13 @@ public class CustomHudRenderer {
                         theme = cte.theme;
                         font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
-                        pieces.add( new RenderPiece(ie, ListManager.getValue(), null, xOffset, y, formatting.getColor(), theme.bgColor, false) );
+                        pieces.add( new RenderPiece(ie, ListManager.getValue(ie.getProviderID()), null, xOffset, y, formatting.getColor(), theme.bgColor, false) );
                         xOffset += ie.getTextWidth();
                     } else if (e instanceof TextElement te) {
                         pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.bgColor, theme.textShadow) );
                         xOffset += te.getTextWidth();
                     }
-                    else if (e instanceof FunctionalElement.AdvanceList)    ListManager.advance();
-                    else if (e instanceof FunctionalElement.PushList push)  ListManager.push(push.values);
-                    else if (e instanceof FunctionalElement.PopList)        ListManager.pop();
-
-                    if (e instanceof ExecuteElement ee)                     ee.run();
+                    if (e instanceof ExecuteElement ee) ee.run();
 
                 } else {
                     builder.append(e.getString());
@@ -215,9 +211,7 @@ public class CustomHudRenderer {
             return nl;
         }
         else {
-            if (element instanceof FunctionalElement.AdvanceList) ListManager.advance();
-            else if (element instanceof FunctionalElement.PushList push) ListManager.push(push.values);
-            else if (element instanceof FunctionalElement.PopList) ListManager.pop();
+            if (element instanceof FunctionalElement.XList xl) xl.run();
             allElements.add(element);
             return element instanceof FunctionalElement.NewLine ? 1 : 0;
         }

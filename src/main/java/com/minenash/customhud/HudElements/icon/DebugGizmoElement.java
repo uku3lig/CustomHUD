@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.icon;
 
-import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
@@ -15,12 +14,10 @@ import net.minecraft.util.math.RotationAxis;
 public class DebugGizmoElement extends IconElement {
 
     private final float size;
-    private final Flags flags;
 
     public DebugGizmoElement(Flags flags) {
         super(flags, 10);
         this.size = (int)(10*scale) / 2F;
-        this.flags = flags;
     }
 
     //TODO: Mark as non-rotatable

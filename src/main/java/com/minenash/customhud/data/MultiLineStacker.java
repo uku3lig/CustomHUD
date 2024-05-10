@@ -7,9 +7,9 @@ import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.list.Attributers;
 import com.minenash.customhud.HudElements.list.ListElement;
 import com.minenash.customhud.HudElements.list.ListProvider;
+import com.minenash.customhud.HudElements.list.ListProviderSet;
 import com.minenash.customhud.VariableParser;
 import com.minenash.customhud.complex.ComplexData;
-import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.errors.ErrorType;
@@ -18,15 +18,16 @@ import com.minenash.customhud.errors.Errors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.UUID;
 
 public class MultiLineStacker {
 
     private final List<HudElement> base = new ArrayList<>();
     private final Stack<Object> stack = new Stack<>();
-    private final Stack<ListProvider> listProviders = new Stack<>();
+    private final ListProviderSet listProviders = new ListProviderSet();
 
     public void startIf(String cond, Profile profile, int line, String source, ComplexData.Enabled enabled) {
-        Operation op = ExpressionParser.parseExpression(cond, source, profile, line+1, enabled, getProvider());
+        Operation op = ExpressionParser.parseExpression(cond, source, profile, line+1, enabled, listProviders);
         stack.push(new ConditionalElement.MultiLineBuilder(op));
     }
 
@@ -34,7 +35,7 @@ public class MultiLineStacker {
         if (stack.isEmpty())
             Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else if");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
-            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, getProvider()));
+            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders));
         else {
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
@@ -42,7 +43,7 @@ public class MultiLineStacker {
                     break;
                 }
             }
-            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, getProvider()));
+            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders));
         }
     }
 
@@ -85,16 +86,15 @@ public class MultiLineStacker {
     }
 
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
-        ListProvider superProvider = listProviders.isEmpty() ? null : listProviders.peek();
 
         List<String> parts = VariableParser.partitionConditional(list);
         list = parts.get(0);
 
-        ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, superProvider);
+        ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, listProviders);
         if (provider == ListProvider.REGUIRES_MODMENU) {
             Errors.addError(profile.name, line, source, ErrorType.REQUIRES_MODMENU, "");
             listProviders.push(null);
-            stack.push( new ListElement.MultiLineBuilder(null, null) );
+            stack.push( new ListElement.MultiLineBuilder(null, null, null) );
             return;
         }
 
@@ -102,35 +102,33 @@ public class MultiLineStacker {
             HudElement e = VariableParser.getAttributeElement(list, profile, line, enabled, source);
             if (e instanceof FunctionalElement.IgnoreErrorElement) {
                 listProviders.push(null);
-                stack.push( new ListElement.MultiLineBuilder(null, null) );
+                stack.push( new ListElement.MultiLineBuilder(null, null, null) );
                 return;
             }
             if (e instanceof FunctionalElement.CreateListElement cle)
                 provider = cle.provider;
         }
 
-        if (provider == null && superProvider != null) {
-            Attributers.Attributer attributer = Attributers.ATTRIBUTER_MAP.get(superProvider);
-            if (attributer != null) {
-                HudElement e = attributer.get(ListManager.SUPPLIER, list, new Flags());
-                if (e instanceof FunctionalElement.CreateListElement cle)
-                    provider = cle.provider;
+        if (provider == null && !listProviders.isEmpty()) {
+            HudElement e = Attributers.get(listProviders, list, new Flags());
+            if (e instanceof FunctionalElement.CreateListElement cle) {
+                provider = cle.provider;
             }
         }
 
         if (provider == null)
             Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
 
-        listProviders.push(provider);
+        UUID providerId = listProviders.push(provider);
 
         Operation filter = null;
         if (parts.size() > 1) {
-            filter = ExpressionParser.parseExpression(parts.get(1), source, profile, line, enabled, provider);
+            filter = ExpressionParser.parseExpression(parts.get(1), source, profile, line, enabled, listProviders);
             CustomHud.logInDebugMode("Filter:");
             filter.printTree(2);
         }
 
-        stack.push( new ListElement.MultiLineBuilder(provider, filter) );
+        stack.push( new ListElement.MultiLineBuilder(provider, providerId, filter) );
     }
 
     public void forSeparator(Profile profile, int line, String source) {
@@ -183,7 +181,7 @@ public class MultiLineStacker {
     }
 
     public void addElements(String source, Profile profile, int line, ComplexData.Enabled enabled) {
-        List<HudElement> elements = VariableParser.addElements(source, profile, line, enabled, true, getProvider());
+        List<HudElement> elements = VariableParser.addElements(source, profile, line, enabled, true, listProviders);
         if (stack.empty())
             base.addAll(elements);
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
@@ -207,13 +205,6 @@ public class MultiLineStacker {
 
         }
         return base;
-    }
-
-    public ListProvider getProvider() {
-        for (int i = stack.size()-1; i >= 0; i--)
-            if (stack.get(i) instanceof ListElement.MultiLineBuilder mlb)
-                return mlb.provider;
-        return null;
     }
 
 }

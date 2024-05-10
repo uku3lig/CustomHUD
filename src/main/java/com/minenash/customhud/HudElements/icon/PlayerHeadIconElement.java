@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.icon;
 
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
@@ -7,19 +8,17 @@ import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerModelPart;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class PlayerHeadIconElement extends IconElement {
 
-
-    public PlayerHeadIconElement(Flags flags) {
+    public PlayerHeadIconElement(UUID providerID, Flags flags) {
         super(flags, 10);
+        this.providerID = providerID;
     }
 
     @Override

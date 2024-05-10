@@ -11,8 +11,6 @@ import net.minecraft.item.Items;
 
 public class ListRecordIconElement extends IconElement {
 
-    private static final ItemStack NO_RECORD = new ItemStack(Items.BARRIER);
-
     public ListRecordIconElement(Flags flags) {
         super(flags, 11);
     }

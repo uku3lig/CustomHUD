@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.minenash.customhud.HudElements.ConditionalElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
@@ -9,18 +8,22 @@ import com.minenash.customhud.conditionals.Operation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class ListElement implements HudElement, MultiElement {
 
-    private static final HudElement POP_LIST_ELEMENT = new FunctionalElement.PopList();
-    private static final HudElement ADVANCE_LIST_ELEMENT = new FunctionalElement.AdvanceList();
+    private final HudElement popList, advanceList;
 
+    private final UUID providerID;
     private final ListProvider provider;
     private final List<HudElement> main;
     private final List<HudElement> last;
 
-    public ListElement(ListProvider provider, List<HudElement> format, List<HudElement> separator) {
+    public ListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator) {
         this.provider = provider;
+        this.providerID = providerID;
+        this.popList = new FunctionalElement.PopList(providerID);
+        this.advanceList = new FunctionalElement.AdvanceList(providerID);
         last = format;
 
         if (format == null)
@@ -33,8 +36,9 @@ public class ListElement implements HudElement, MultiElement {
 
     }
 
-    public static HudElement of(ListProvider provider, List<HudElement> format, List<HudElement> separator, Operation operation) {
-        return operation == null ? new ListElement(provider, format, separator) : new FilteredListElement(provider, format, separator, operation);
+    public static HudElement of(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation) {
+        return operation == null ? new ListElement(provider, providerID, format, separator)
+                : new FilteredListElement(provider, providerID, format, separator, operation);
     }
 
     public List<HudElement> expand() {
@@ -45,14 +49,14 @@ public class ListElement implements HudElement, MultiElement {
             return Collections.emptyList();
 
         List<HudElement> expanded = new ArrayList<>();
-        expanded.add(new FunctionalElement.PushList(values));
+        expanded.add(new FunctionalElement.PushList(providerID, values));
 
         for (int i = 0; i < values.size(); i++) {
             expanded.addAll(i < values.size() - 1 ? main : last);
-            expanded.add(ADVANCE_LIST_ELEMENT);
+            expanded.add(advanceList);
         }
 
-        expanded.set(expanded.size()-1, POP_LIST_ELEMENT);
+        expanded.set(expanded.size()-1, popList);
         return expanded;
     }
 
@@ -68,20 +72,22 @@ public class ListElement implements HudElement, MultiElement {
 
     @Override
     public boolean getBoolean() {
-        return provider.get().isEmpty();
+        return !provider.get().isEmpty();
     }
 
     public static class MultiLineBuilder {
         private static final ListProvider EMPTY = () -> Collections.EMPTY_LIST;
 
+        public final UUID providerID;
         public final ListProvider provider;
         private final List<HudElement> elements = new ArrayList<>();
         private final List<HudElement> separator = new ArrayList<>();
         private final Operation filter;
         private boolean separatorMode = false;
 
-        public MultiLineBuilder(ListProvider provider, Operation filter) {
+        public MultiLineBuilder(ListProvider provider, UUID providerID, Operation filter) {
             this.provider = provider == null ? EMPTY : provider;
+            this.providerID = providerID;
             this.filter = filter;
         }
 
@@ -98,7 +104,8 @@ public class ListElement implements HudElement, MultiElement {
         }
 
         public HudElement build() {
-            return filter == null ? new ListElement(provider, elements, separator) : new FilteredListElement(provider, elements, separator, filter);
+            return filter == null ? new ListElement(provider, providerID, elements, separator)
+                    : new FilteredListElement(provider, providerID, elements, separator, filter);
         }
 
     }

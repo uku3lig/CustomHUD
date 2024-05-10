@@ -5,6 +5,9 @@ import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
 import com.minenash.customhud.HudElements.icon.*;
+import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
+import com.minenash.customhud.HudElements.supplier.StringSupplierElement;
+import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
@@ -15,6 +18,7 @@ import net.minecraft.village.TradeOffer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -27,11 +31,11 @@ public class Attributers {
 
     @FunctionalInterface
     public interface Attributer {
-        HudElement get(Supplier supplier, String attr, Flags flags);
+        HudElement get(UUID pid, Supplier supplier, String attr, Flags flags);
     }
 
     //TODO: IS ONLY LIST ONLY
-    public static final Attributer EFFECT = (sup, name, flags) -> switch (name) {
+    public static final Attributer EFFECT = (pid, sup, name, flags) -> switch (name) {
         case "e_name" -> new Str(sup,STATUS_NAME);
         case "", "e_id" -> new Id(sup,STATUS_ID,flags);
         case "e_duration", "e_dur" -> new Num(sup, STATUS_DURATION, flags);
@@ -43,17 +47,17 @@ public class Attributers {
         case "e_show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
         case "e_color" -> new Num(sup, STATUS_COLOR, flags);
         case "e_category", "e_cat" -> new Special(sup,STATUS_CATEGORY);
-        case "e_icon" -> new StatusEffectIconElement(flags, true); //LIST ONLY
-        case "e_icon_no_bg" -> new StatusEffectIconElement(flags, false); //LIST ONLY
+        case "e_icon" -> new StatusEffectIconElement(pid, flags, true); //LIST ONLY
+        case "e_icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //LIST ONLY
         default -> null;
     };
 
     private static Attributer TEAM2;
-    public static final Attributer PLAYER = (sup, name, flags) -> {
+    public static final Attributer PLAYER = (pid, sup, name, flags) -> {
         if (name.startsWith("p_team:")) {
             String attr = name.substring(7);
             Supplier sup2 = () -> ((PlayerListEntry) sup.get()).getScoreboardTeam();
-            return TEAM2.get(sup2, attr, flags);
+            return TEAM2.get(pid, sup2, attr, flags);
         }
 
         return switch (name) {
@@ -67,11 +71,11 @@ public class Attributers {
             case "p_creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
             case "p_adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
             case "p_spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
-            case "p_head" -> new PlayerHeadIconElement(flags); //TODO FIX
+            case "p_head" -> new PlayerHeadIconElement(pid, flags); //TODO FIX
         default -> null;
     };};
 
-    public static final Attributer SUBTITLE = (sup, name, flags) -> switch (name) {
+    public static final Attributer SUBTITLE = (pid, sup, name, flags) -> switch (name) {
         case "", "s_id" -> new Id(sup, SUBTITLE_ID,flags);
         case "s_name" -> new Str(sup, SUBTITLE_NAME);
 
@@ -91,7 +95,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer BLOCK_STATE = (sup, name, flags) -> switch (name) {
+    public static final Attributer BLOCK_STATE = (pid, sup, name, flags) -> switch (name) {
         case "", "b_name" -> new Str(sup, BLOCK_STATE_NAME);
         case "b_type" -> new Special(sup, BLOCK_STATE_TYPE);
         case "b_full_type" -> new Str(sup,BLOCK_STATE_FULL_TYPE);
@@ -99,13 +103,13 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer BLOCK_TAG = (sup, name, flags) -> switch (name) {
+    public static final Attributer BLOCK_TAG = (pid, sup, name, flags) -> switch (name) {
         case "b_name" -> new Str(sup,BLOCK_TAG_NAME);
         case "", "b_id" -> new Id(sup,BLOCK_TAG_ID,flags);
         default -> null;
     };
 
-    public static final Attributer ENCHANTMENT = (sup, name, flags) -> switch (name) {
+    public static final Attributer ENCHANTMENT = (pid, sup, name, flags) -> switch (name) {
         case "e_name" -> new Str(sup,ENCHANT_NAME);
         case "", "e_id" -> new Id(sup,ENCHANT_ID, flags);
         case "e_full" -> new Str(sup,ENCHANT_FULL);
@@ -115,11 +119,11 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ITEM_LORE_LINE = (sup, name, f) -> name.isEmpty() || name.equals("line") ? new Tex(sup, DIRECT) : null;
-    public static final Attributer ITEM_INFO_INFO = (sup, name, f) -> name.isEmpty() || name.equals("info") ? new Str(sup, DIRECT) : null;
-    public static final Attributer LOOP_ITEM = (sup, name, flags) -> name.isEmpty() || name.equals("value") ? new Num(sup, DIRECT, flags) : null;
+    public static final Attributer ITEM_LORE_LINE = (pid, sup, name, f) -> name.isEmpty() || name.equals("line") ? new Tex(sup, DIRECT) : null;
+    public static final Attributer ITEM_INFO_INFO = (pid, sup, name, f) -> name.isEmpty() || name.equals("info") ? new Str(sup, DIRECT) : null;
+    public static final Attributer LOOP_ITEM = (pid, sup, name, f) -> name.isEmpty() || name.equals("value") ? new Num(sup, DIRECT, f) : null;
 
-    public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
+    public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (pid, sup, name, flags) -> switch (name) {
         case "m_slot" -> new Str(sup,ITEM_ATTR_SLOT);
         case "m_attribute","m_attr" -> new Str(sup,ITEM_ATTR_NAME);
         case "m_attribute_id","m_attr_id" -> new Id(sup,ITEM_ATTR_ID,flags);
@@ -134,13 +138,13 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ITEM_CAN_X = (sup, name, flags) -> switch (name) {
+    public static final Attributer ITEM_CAN_X = (pid, sup, name, flags) -> switch (name) {
         case "x_name" -> new Str(sup,BLOCK_NAME);
         case "", "x_id" -> new Id(sup,BLOCK_ID,flags);
         default -> null;
     };
 
-    public static final Attributer ITEM = (sup, name, flags) -> switch (name) {
+    public static final Attributer ITEM = (pid, sup, name, flags) -> switch (name) {
         case "", "i_item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
         case "i_id" -> new SpecialId(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY, flags);
         case "i_name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
@@ -152,7 +156,7 @@ public class Attributers {
         case "i_dur_color","i_durability_color" -> new NumBool(sup, ITEM_DURABILITY_COLOR, ITEM_HAS_MAX_DURABILITY, flags);
         case "i_unbreakable" -> new Bool(sup, ITEM_UNBREAKABLE);
         case "i_repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
-        case "i_icon" -> new ItemSupplierIconElement(sup, flags);
+        case "i_icon" -> new ItemSupplierIconElement(pid, sup, flags);
         case "i_hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
         case "i_rarity" -> new Special(sup, ITEM_RARITY);
 
@@ -166,7 +170,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ATTRIBUTE_MODIFIER = (sup, name, flags) -> switch (name) {
+    public static final Attributer ATTRIBUTE_MODIFIER = (pid, sup, name, flags) -> switch (name) {
         case "", "m_name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
         case "m_id" -> new Str(sup,ATTRIBUTE_MODIFIER_ID);
         case "m_value" -> new Num(sup,ATTRIBUTE_MODIFIER_VALUE, flags);
@@ -175,7 +179,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer ATTRIBUTE = (sup, name, flags) -> switch (name) {
+    public static final Attributer ATTRIBUTE = (pid, sup, name, flags) -> switch (name) {
         case "a_name" -> new Str(sup,ATTRIBUTE_NAME);
         case "", "a_id" -> new Id(sup,ATTRIBUTE_ID,flags);
         case "a_tracked" -> new Bool(sup,ATTRIBUTE_TRACKED);
@@ -186,9 +190,9 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer TEAM_MEMBER = (sup, name, f) -> name.isEmpty() || name.equals("member") ? new Str(sup, DIRECT) : null;
+    public static final Attributer TEAM_MEMBER = (pid, sup, name, f) -> name.isEmpty() || name.equals("member") ? new Str(sup, DIRECT) : null;
 
-    public static final Attributer TEAM = (sup, name, flags) -> switch (name) {
+    public static final Attributer TEAM = (pid, sup, name, flags) -> switch (name) {
         case "t_name" -> new Tex(sup, TEAM_NAME);
         case "", "t_id" -> new Str(sup, TEAM_ID);
         case "t_friendly_fire" -> new Bool(sup, TEAM_FRIENDLY_FIRE);
@@ -203,7 +207,7 @@ public class Attributers {
     };
     static { TEAM2 = TEAM; }
 
-    public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sup, name, flags) -> switch (name) {
+    public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (pid, sup, name, flags) -> switch (name) {
         case "", "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
         case "s_display_name", "s_display" -> new Tex(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
         case "s_score", "s_value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
@@ -211,7 +215,7 @@ public class Attributers {
     };
 
 
-    public static final Attributer SCOREBOARD_OBJECTIVE = (sup, name, flags) -> switch (name) {
+    public static final Attributer SCOREBOARD_OBJECTIVE = (pid, sup, name, flags) -> switch (name) {
         case "", "o_name" -> new Tex(sup, OBJECTIVE_NAME);
         case "o_id" -> new Str(sup, OBJECTIVE_ID);
         case "o_criteria","o_criterion" -> new Str(sup, OBJECTIVE_CRITIERIA);
@@ -221,7 +225,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer SCOREBOARD_SCORE = (sup, name, flags) -> switch (name) {
+    public static final Attributer SCOREBOARD_SCORE = (pid, sup, name, flags) -> switch (name) {
         case "ss_name" -> new Tex(sup, SCORES_OBJECTIVE_NAME);
         case "", "ss_id" -> new Str(sup, SCORES_OBJECTIVE_ID);
         case "ss_criteria","ss_criterion" -> new Str(sup, SCORES_OBJECTIVE_CRITIERIA);
@@ -230,7 +234,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer BOSSBAR = (sup, name, flags) -> switch (name) {
+    public static final Attributer BOSSBAR = (pid, sup, name, flags) -> switch (name) {
         case "b_name" -> new Tex(sup, BOSSBAR_NAME);
         case "b_uuid" -> new Str(sup, BOSSBAR_UUID);
         case "b_id" -> new Id(sup, BOSSBAR_ID,flags); //SP Only
@@ -243,29 +247,29 @@ public class Attributers {
         case "b_text_color" -> new Special(sup, BOSSBAR_TEXT_COLOR);
         case "b_enabled", "b_visible" -> new Bool(sup, BOSSBAR_IS_VISIBLE); //SP Only
         case "b_players" -> new CreateListElement(sup, BOSSBAR_PLAYERS, PLAYER); //SP Only
-        case "b_icon", "b_bar" -> new BossbarIcon(sup, flags);
+        case "b_icon", "b_bar" -> new BossbarIcon(pid, flags);
         default -> null;
     };
 
-    public static final Attributer MOD_AUTHOR = (sup, name, f) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CONTRIBUTOR = (sup, name, f) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CREDIT = (sup, name, f) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_LICENSE = (sup, name, f) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_AUTHOR = (pid, sup, name, f) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CONTRIBUTOR = (pid, sup, name, f) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CREDIT = (pid, sup, name, f) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_LICENSE = (pid, sup, name, f) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
 
-    public static final Attributer MOD_BADGE = (sup, name, flags) -> switch (name) {
+    public static final Attributer MOD_BADGE = (pid, sup, name, flags) -> switch (name) {
         case "", "b_name" -> new Str(sup, BADGE_NAME);
         case "b_outline_color" -> new Num(sup, BADGE_OUTLINE_COLOR, flags);
         case "b_fill_color" -> new Num(sup, BADGE_FILL_COLOR, flags);
-        case "b_icon" -> new ModBadgeIconElement(flags);
+        case "b_icon" -> new ModBadgeIconElement(pid, flags);
         default -> null;
     };
 
     private static Attributer MOD2;
-    public static final Attributer MOD = (sup, name, flags) -> {
+    public static final Attributer MOD = (pid, sup, name, flags) -> {
         if (name.startsWith("m_parent:")) {
             String attr = name.substring(9);
             Supplier sup2 = () -> ModMenu.MODS.get( ((Mod) sup.get()).getParent() );
-            return MOD2.get(sup2, attr, flags);
+            return MOD2.get(pid, sup2, attr, flags);
         }
         return switch (name) {
             case "", "m_name" -> new Str(sup, MOD_NAME);
@@ -291,13 +295,13 @@ public class Attributers {
             case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
             case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
 
-            case "m_icon" -> new ModIconElement(sup, flags);
+            case "m_icon" -> new ModIconElement(pid, flags);
             default -> null;
         };
     };
     static { MOD2 = MOD; }
 
-    public static final Attributer PACK = (sup, name, flags) -> switch (name) {
+    public static final Attributer PACK = (pid, sup, name, flags) -> switch (name) {
         case "","p_name" -> new Tex(sup, PACK_NAME);
         case "p_id" -> new Str(sup, PACK_ID);
         case "p_description", "p_desc" -> new Tex(sup, PACK_DESCRIPTION);
@@ -305,11 +309,11 @@ public class Attributers {
         case "p_always_enabled" -> new Bool(sup, PACK_ALWAYS_ENABLED);
         case "p_pinned" -> new Bool(sup, PACK_IS_PINNED);
         case "p_compatible" -> new Bool(sup, PACK_IS_COMPATIBLE);
-        case "p_icon" -> new PackIconElement(sup, flags);
+        case "p_icon" -> new PackIconElement(pid, flags);
         default -> null;
     };
 
-    public static final Attributer RECORD = (sup, name, flags) -> switch (name) {
+    public static final Attributer RECORD = (pid, sup, name, flags) -> switch (name) {
         case "","r_name" -> new Tex(sup, RECORD_NAME);
         case "r_id" -> new Id(sup, RECORD_ID,flags);
         case "r_length" -> new Num(sup, RECORD_LENGTH, flags);
@@ -320,7 +324,7 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer OFFER = (sup, name, flags) -> {
+    public static final Attributer OFFER = (pid, sup, name, flags) -> {
         int collinIndex = name.indexOf(":");
         if (collinIndex > 0) {
             String attr = name.substring(collinIndex+1);
@@ -341,7 +345,7 @@ public class Attributers {
                 default -> null;
             };
             if (sup2 != null)
-                return ITEM.get(sup2, attr, flags);
+                return ITEM.get(pid, sup2, attr, flags);
         }
         return switch (name) {
             case "o_uses" -> new Num(sup, OFFER_USES, flags);
@@ -402,13 +406,30 @@ public class Attributers {
         // ENCHANTMENT
     }
 
-    public static HudElement get(ListProvider list, Supplier<?> value, String name, Flags flags) {
-        Attributer attributer = ATTRIBUTER_MAP.get(list);
-        if (attributer == null) {
-            CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
-            return null;
+    public static HudElement get(ListProviderSet set, String name, Flags flags) {
+        for (int i = set.providers.size()-1; i >= 0; i--) {
+            ListProvider provider = set.providers.get(i);
+            UUID providerID = set.providerIDs.get(i);
+            if (provider == null)
+                continue;
+
+            switch (name) {
+                case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(providerID), flags);
+                case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(providerID), flags);
+                case "raw": return new StringSupplierElement( () -> ListManager.getValue(providerID).toString() );
+            };
+
+            Attributer attributer = ATTRIBUTER_MAP.get(provider);
+            if (attributer == null) {
+                CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
+                continue;
+            }
+            HudElement element = attributer.get(providerID, () -> ListManager.getValue(providerID), name, flags);
+            if (element != null)
+                return element;
         }
-        return attributer.get(value, name, flags);
+
+        return null;
     }
 
 }

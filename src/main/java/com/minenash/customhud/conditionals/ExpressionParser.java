@@ -1,7 +1,7 @@
 package com.minenash.customhud.conditionals;
 
 import com.minenash.customhud.CustomHud;
-import com.minenash.customhud.HudElements.list.ListProvider;
+import com.minenash.customhud.HudElements.list.ListProviderSet;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.VariableParser;
@@ -31,11 +31,11 @@ public class ExpressionParser {
         }
     }
 
-    public static Operation parseExpression(String input, String source, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProvider listSupplier) {
+    public static Operation parseExpression(String input, String source, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers) {
         if (input.isBlank() || input.equals(",") || input.equals(", "))
             return new Operation.Literal(1);
         try {
-            List<Token> tokens = getTokens(input, profile, debugLine, enabled, listSupplier);
+            List<Token> tokens = getTokens(input, profile, debugLine, enabled, listSuppliers);
             Operation c = getConditional(tokens);
             CustomHud.logInDebugMode("Tree for Conditional on line " + debugLine + ":");
             c.printTree(0);
@@ -52,7 +52,7 @@ public class ExpressionParser {
 
     private static final List<TokenType> SUBTRACTABLE = List.of(TokenType.NUMBER, TokenType.BOOLEAN,
             TokenType.STRING, TokenType.VARIABLE, TokenType.END_PREN);
-    private static List<Token> getTokens(String original, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProvider listSupplier) throws ErrorException {
+    private static List<Token> getTokens(String original, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers) throws ErrorException {
 
         List<Token> tokens = new ArrayList<>();
         char[] chars = original.toCharArray();
@@ -103,7 +103,7 @@ public class ExpressionParser {
                     continue;
                 }
                 else if (isVar(chars[i + 1])) {
-                    i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSupplier) - 1;
+                    i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSuppliers) - 1;
                 }
                 else
                     throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "!");
@@ -159,7 +159,7 @@ public class ExpressionParser {
                 continue;
             }
             else if (isVar(c)) {
-                i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSupplier);
+                i += parseVariable(tokens, chars, i, profile, debugLine, enabled, listSuppliers);
                 continue;
             }
             i++;
@@ -199,7 +199,7 @@ public class ExpressionParser {
                 || c == '[' || c == ']' || c == ',' || c == 'π' || c == 'τ' || c == 'φ';
     }
 
-    private static int parseVariable(List<Token> tokens, char[] chars, int i, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProvider listSupplier) {
+    private static int parseVariable(List<Token> tokens, char[] chars, int i, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers) {
         Pair<Token,Integer> func = getFunctionStart(chars, i);
         if (func != null) {
             tokens.add(func.getLeft());
@@ -224,7 +224,7 @@ public class ExpressionParser {
         }
         builder.append('}');
 
-        HudElement element = VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSupplier);
+        HudElement element = VariableParser.parseElement(builder.toString(), profile, debugLine, enabled, listSuppliers);
         if (element == null)
             tokens.add(new Token(TokenType.BOOLEAN, false));
         else
