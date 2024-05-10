@@ -49,7 +49,7 @@ public enum ErrorType {
     CONDITIONAL_NOT_ENDED ("Conditionals", "conditionals", "Missing =endif="),
     CONDITIONAL_UNEXPECTED_VALUE ("Conditionals", "conditionals", "Unexpected Value: §e"),
     CONDITIONAL_WRONG_NUMBER_OF_TOKENS ("Conditionals", "conditionals", "Expected 4 tokens, found §e"),
-    MALFORMED_CONDITIONAL ("Conditionals", "conditionals", "Malformed conditional: "),
+    MALFORMED_CONDITIONAL ("Conditionals", "conditionals", "Malformed conditional: §e"),
     EMPTY_SECTION("Conditionals", "conditionals", "Empty section"),
     MALFORMED_LIST ("CHANGE ME", "CHANGE ME", "Malformed list variable: §e"),
     MALFORMED_BAR ("CHANGE ME", "CHANGE ME", "Malformed bar variable: §e"),

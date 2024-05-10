@@ -15,7 +15,6 @@ import com.minenash.customhud.HudElements.text.ActionbarMsgElement;
 import com.minenash.customhud.HudElements.text.TextSupplierElement;
 import com.minenash.customhud.HudElements.text.TitleMsgElement;
 import com.minenash.customhud.complex.ComplexData;
-import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.*;
@@ -248,6 +247,10 @@ public class VariableParser {
         }
 
         if (part.startsWith("{") && part.length() > 1) {
+            if (!part.endsWith("}")) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Conditional not closed / incomplete");
+                return null;
+            }
             part = part.substring(1, part.length() - 1);
 
             CustomHud.logInDebugMode("COND:");
@@ -256,7 +259,7 @@ public class VariableParser {
                 CustomHud.logInDebugMode("`" + p + "`");
 
             if (ps.size() < 2) {
-                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, null);
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "There's only a conditional section");
                 return null;
             }
             List<ConditionalElement.ConditionalPair> pairs = new ArrayList<>();
@@ -265,7 +268,7 @@ public class VariableParser {
                 String cond = ps.get(i);
                 String result = ps.get(i+1).trim();
                 if (!result.startsWith("\"") || !result.endsWith("\"")) {
-                    Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, null);
+                    Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Section not in quotations");
                     return null;
                 }
                 result = result.substring(1, result.length()-1);
@@ -276,8 +279,8 @@ public class VariableParser {
             }
             if (ps.size() % 2 == 1) {
                 String result = ps.get(ps.size()-1).trim();
-                if (!result.startsWith("\"") || !result.endsWith("\"")) {
-                    Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, null);
+                if (result.length() < 2 || !result.startsWith("\"") || !result.endsWith("\"")) {
+                    Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Section not in quotations");
                     return null;
                 }
                 result = result.substring(1, result.length()-1);
@@ -286,7 +289,7 @@ public class VariableParser {
             }
 
             if (pairs.isEmpty()) {
-                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, null);
+                Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "No pairs");
                 return null;
             }
             return new ConditionalElement(pairs);
@@ -503,7 +506,7 @@ public class VariableParser {
 
         if (part.startsWith("pteam:") || part.startsWith("player_team:")) {
             String method = part.substring(part.indexOf(':')+1);
-            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(java.util.UUID.randomUUID(), () -> CLIENT.player.getScoreboardTeam(), method, flags );
+            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(null, () -> CLIENT.player.getScoreboardTeam(), method, flags );
             if (element == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, method);
             return element;
@@ -1142,6 +1145,11 @@ public class VariableParser {
 //        Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
 
         String providerName = flagParts[0];
+
+        if (providerName.startsWith("[") && providerName.endsWith("]")) {
+            List<String> listParts = partitionConditional( providerName.substring(1, providerName.length() - 1) );
+        }
+
         int dotIndex = providerName.indexOf(".");
         if (dotIndex != -1)
             providerName = providerName.substring(0, dotIndex);
@@ -1465,7 +1473,6 @@ public class VariableParser {
             return new IgnoreErrorElement();
         }
 
-        //TODO: I removed `&& part.indexOf('\'') != -1`, not 100% how it worked
         boolean hasQuote = part.indexOf('"') != -1 ;
         Flags flags = hasQuote ? new Flags() : Flags.parse(profile.name, debugLine, part.split(" "));
         HudElement element = attributer.get(null, supplier.apply(value), method, flags);

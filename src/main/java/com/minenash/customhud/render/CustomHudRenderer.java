@@ -71,11 +71,21 @@ public class CustomHudRenderer {
             List<HudElement> elements = new ArrayList<>();
             for (HudElement e : section.elements)
                 lineCount += addElement(elements, e);
+            outer:
             for (int j = 1; j < elements.size()-1; j++) {
                 if (elements.get(j) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine
-                 && elements.get(j-1) instanceof FunctionalElement.NewLine
-                 && elements.get(j+1) instanceof FunctionalElement.NewLine)
-                    lineCount--;
+                && elements.get(j-1) instanceof FunctionalElement.NewLine) {
+                    for (int k = j+1; k < elements.size(); k++) {
+                        if (elements.get(k) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine)
+                            continue;
+                        if (elements.get(k) instanceof FunctionalElement.NewLine) {
+                            lineCount--;
+                            j = k+1;
+                            continue outer;
+                        }
+                        break outer;
+                    }
+                }
             }
 
 
@@ -114,9 +124,15 @@ public class CustomHudRenderer {
                         xOffset = 0;
                         formatting = theme.fgColor.copy();
                     } else if (e instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine) {
-                        if ( (ei-1 < 0 || elements.get(ei-1) instanceof FunctionalElement.NewLine)
-                        && (ei+1 >= elements.size() || elements.get(ei+1) instanceof FunctionalElement.NewLine) ) {
-                            ei++;
+                        if ( (ei+1 >= elements.size() || elements.get(ei+1) instanceof FunctionalElement.NewLine) ) {
+                            for (int j = ei-1; j >= 0; j--) {
+                                HudElement element = elements.get(j);
+                                if (element instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine)
+                                    continue;
+                                if (element instanceof FunctionalElement.NewLine)
+                                    ei++;
+                                break;
+                            }
                         }
 
                     } else if (e instanceof FunctionalElement.ChangeFormatting cfe && cfe.getFormatting() != null) {
