@@ -26,7 +26,7 @@ public class Profile {
     public KeyBinding keyBinding;
     public boolean cycle = true;
 
-    public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+))? ?(?:, ?([-+]?\\d+))? ?(?:, ?(true|false))? ?(?:, ?(-?\\d+|fit|max))? ?(?:, ?(left|right|center))? ?==");
+    public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+)?)? ?(?:, ?([-+]?\\d+)?)? ?(?:, ?(true|false)?)? ?(?:, ?(-?\\d+|fit|max)?)? ?(?:, ?(left|right|center)?)? ?==");
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
@@ -163,12 +163,12 @@ public class Profile {
                     default -> null;
                 };
 
-                section.xOffset = matcher.group(2) != null ? Integer.parseInt(matcher.group(2)) : 0;
-                section.yOffset = matcher.group(3) != null ? Integer.parseInt(matcher.group(3)) : 0;
-                section.hideOnChat = matcher.group(4) != null && Boolean.parseBoolean(matcher.group(4));
+                section.xOffset = matcher.group(2) != null && !matcher.group(2).isBlank() ? Integer.parseInt(matcher.group(2)) : 0;
+                section.yOffset = matcher.group(3) != null && !matcher.group(3).isBlank() ? Integer.parseInt(matcher.group(3)) : 0;
+                section.hideOnChat = matcher.group(3) != null && !matcher.group(3).isBlank() && Boolean.parseBoolean(matcher.group(4));
 
                 String width = matcher.group(5);
-                if (width == null) section.width = -1;
+                if (width == null || width.isBlank()) section.width = -1;
                 else section.width = switch (width) {
                         case "fit" -> -1;
                         case "max" -> -2;
@@ -176,7 +176,7 @@ public class Profile {
                     };
 
                 String textAlign = matcher.group(6);
-                if (textAlign != null)
+                if (textAlign != null && !textAlign.isBlank())
                     section.textAlign = switch (textAlign) {
                         case "left" -> Section.Align.LEFT;
                         case "right" -> Section.Align.RIGHT;

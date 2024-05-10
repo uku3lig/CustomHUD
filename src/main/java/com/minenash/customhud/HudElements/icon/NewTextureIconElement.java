@@ -14,7 +14,6 @@ import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class NewTextureIconElement extends IconElement implements ExecuteElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -27,17 +26,19 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
     private final int textureHeight;
     private final Operation regionWidth;
     private final Operation regionHeight;
-    private final int height;
-    private final int yOffset;
-    private final int iconWidth;
+    private final Operation width;
+    private final Operation height;
+    private final int textWidth;
 
     private final boolean iconAvailable;
 
 
-    public NewTextureIconElement(Identifier texture, Operation u, Operation v, Operation w, Operation h, Flags flags) {
+    public NewTextureIconElement(Identifier texture, Operation u, Operation v, Operation w, Operation h, Operation width, Operation height, Flags flags) {
         super(flags, 0);
         this.u = u != null ? u : new Operation.Literal(0);
         this.v = v != null ? v : new Operation.Literal(0);
+        this.width = width;
+        this.height = height;
 
         NativeImage img = null;
         try {
@@ -56,9 +57,7 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
         regionWidth = w != null ? w : new Operation.BiMathOperation(new Operation.Literal(textureWidth), this.u, ExpressionParser.MathOperator.SUBTRACT);
         regionHeight = h != null ? h : new Operation.BiMathOperation(new Operation.Literal(textureHeight), this.v, ExpressionParser.MathOperator.SUBTRACT);;
 
-        height = (int) (11 * flags.scale);
-        yOffset = referenceCorner ? 0 : (int) ((height*scale-height)/(scale*2));
-        iconWidth = flags.iconWidth;
+        textWidth = flags.iconWidth;
 
     }
 
@@ -74,7 +73,13 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
 
     @Override
     public int getTextWidth() {
-        return iconWidth != -1 ? iconWidth : (int) (height * (regionWidth.getValue()/regionHeight.getValue()));
+        return (int) (textWidth != -1 ? textWidth
+                : width != null ? width.getValue()
+                : height() * regionWidth.getValue()/regionHeight.getValue() );
+    }
+
+    public double height() {
+        return height != null ? height.getValue() : 11 * scale;
     }
 
     public boolean isIconAvailable() {
@@ -83,13 +88,12 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
-        int width = (int) (height * (calcRegionWidth/calcRegionHeight));
-        if (width == 0)
+        if (calcWidth == 0 || calcHeight == 0)
             return;
         context.getMatrices().push();
-        context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-yOffset-2, 0);
-        rotate(context.getMatrices(), width, height);
-        context.drawTexture(texture, 0, 0, width, height, calcU, calcV, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
+        context.getMatrices().translate(piece.x+shiftX, piece.y+shiftY-2 - (referenceCorner? 0 : (calcHeight*scale-calcHeight)/(scale*2)), 0);
+        rotate(context.getMatrices(), calcWidth, calcHeight);
+        context.drawTexture(texture, 0, 0, calcWidth, calcHeight, calcU, calcV, (int) calcRegionWidth, (int) calcRegionHeight, textureWidth, textureHeight);
         context.getMatrices().pop();
     }
 
@@ -97,6 +101,8 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
     int calcV = 0;
     double calcRegionWidth = 0;
     double calcRegionHeight = 0;
+    int calcWidth = 0;
+    int calcHeight = 0;
 
     @Override
     public void run() {
@@ -104,5 +110,7 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
         calcV = (int) v.getValue();
         calcRegionWidth = regionWidth.getValue();
         calcRegionHeight = regionHeight.getValue();
+        calcHeight = (int) (height != null ? height.getValue() : 11 * scale);
+        calcWidth = (int) (width != null ? width.getValue() : calcHeight * calcRegionWidth/calcRegionHeight);
     }
 }
