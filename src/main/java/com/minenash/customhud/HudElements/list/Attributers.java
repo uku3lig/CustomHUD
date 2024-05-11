@@ -9,6 +9,8 @@ import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.HudElements.supplier.StringSupplierElement;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.errors.ErrorType;
+import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
@@ -31,341 +33,342 @@ public class Attributers {
 
     @FunctionalInterface
     public interface Attributer {
-        HudElement get(UUID pid, Supplier supplier, String attr, Flags flags);
+        HudElement get(String prefixForSubList, UUID pid, Supplier supplier, String attr, Flags flags);
     }
 
     //TODO: IS ONLY LIST ONLY
-    public static final Attributer EFFECT = (pid, sup, name, flags) -> switch (name) {
-        case "e_name" -> new Str(sup,STATUS_NAME);
-        case "", "e_id" -> new Id(sup,STATUS_ID,flags);
-        case "e_duration", "e_dur" -> new Num(sup, STATUS_DURATION, flags);
-        case "e_infinite", "e_inf" -> new Bool(sup, STATUS_INFINITE);
-        case "e_amplification", "e_amp" -> new Num(sup, STATUS_AMPLIFICATION, flags);
-        case "e_level", "e_lvl" -> new Num(sup, STATUS_LEVEL, flags);
-        case "e_ambient" -> new Bool(sup,STATUS_AMBIENT);
-        case "e_show_particles", "e_particles" -> new Bool(sup,STATUS_SHOW_PARTICLES);
-        case "e_show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
-        case "e_color" -> new Num(sup, STATUS_COLOR, flags);
-        case "e_category", "e_cat" -> new Special(sup,STATUS_CATEGORY);
-        case "e_icon" -> new StatusEffectIconElement(pid, flags, true); //LIST ONLY
-        case "e_icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //LIST ONLY
+    public static final Attributer EFFECT = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup,STATUS_NAME);
+        case "", "id" -> new Id(sup,STATUS_ID,flags);
+        case "duration", "dur" -> new Num(sup, STATUS_DURATION, flags);
+        case "infinite", "inf" -> new Bool(sup, STATUS_INFINITE);
+        case "amplification", "amp" -> new Num(sup, STATUS_AMPLIFICATION, flags);
+        case "level", "lvl" -> new Num(sup, STATUS_LEVEL, flags);
+        case "ambient" -> new Bool(sup,STATUS_AMBIENT);
+        case "show_particles", "particles" -> new Bool(sup,STATUS_SHOW_PARTICLES);
+        case "show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
+        case "color" -> new Num(sup, STATUS_COLOR, flags);
+        case "category", "cat" -> new Special(sup,STATUS_CATEGORY);
+        case "icon" -> new StatusEffectIconElement(pid, flags, true); //LIST ONLY
+        case "icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //LIST ONLY
         default -> null;
     };
 
     private static Attributer TEAM2;
-    public static final Attributer PLAYER = (pid, sup, name, flags) -> {
+    public static final Attributer PLAYER = (sbp, pid, sup, name, flags) -> {
         if (name.startsWith("p_team:")) {
             String attr = name.substring(7);
             Supplier sup2 = () -> ((PlayerListEntry) sup.get()).getScoreboardTeam();
-            return TEAM2.get(pid, sup2, attr, flags);
+            return TEAM2.get(sbp, pid, sup2, attr, flags);
         }
 
         return switch (name) {
-            case "", "p_name" -> new Str(sup,PLAYER_ENTRY_NAME);
-            case "p_id" -> new Str(sup,PLAYER_ENTRY_UUID);
-            case "p_team" -> new Str(sup, PLAYER_ENTRY_TEAM);
-            case "p_latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
-            case "p_list_score" -> new Num(sup,PLAYER_ENTRY_LIST_SCORE, flags);
-            case "p_gamemode" -> new Special(sup,PLAYER_ENTRY_GAMEMODE);
-            case "p_survival" -> new Bool(sup,PLAYER_ENTRY_SURVIVAL);
-            case "p_creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
-            case "p_adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
-            case "p_spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
-            case "p_head" -> new PlayerHeadIconElement(pid, flags); //TODO FIX
+            case "", "name" -> new Str(sup,PLAYER_ENTRY_NAME);
+            case "id" -> new Str(sup,PLAYER_ENTRY_UUID);
+            case "team" -> new Str(sup, PLAYER_ENTRY_TEAM);
+            case "latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
+            case "list_score" -> new Num(sup,PLAYER_ENTRY_LIST_SCORE, flags);
+            case "gamemode" -> new Special(sup,PLAYER_ENTRY_GAMEMODE);
+            case "survival" -> new Bool(sup,PLAYER_ENTRY_SURVIVAL);
+            case "creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
+            case "adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
+            case "spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
+            case "head" -> new PlayerHeadIconElement(pid, flags); //TODO FIX
         default -> null;
     };};
 
-    public static final Attributer SUBTITLE = (pid, sup, name, flags) -> switch (name) {
-        case "", "s_id" -> new Id(sup, SUBTITLE_ID,flags);
-        case "s_name" -> new Str(sup, SUBTITLE_NAME);
+    public static final Attributer SUBTITLE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "id" -> new Id(sup, SUBTITLE_ID,flags);
+        case "name" -> new Str(sup, SUBTITLE_NAME);
 
-        case "s_age" -> new Num(sup, SUBTITLE_AGE, flags);
-        case "s_time" -> new Num(sup, SUBTITLE_TIME, flags);
-        case "s_alpha" -> new Num(sup, SUBTITLE_ALPHA, flags);
-        case "s_x" -> new Num(sup, SUBTITLE_X, flags);
-        case "s_y" -> new Num(sup, SUBTITLE_Y, flags);
-        case "s_z" -> new Num(sup, SUBTITLE_Z, flags);
-        case "s_dist", "distance" -> new Num(sup, SUBTITLE_DISTANCE, flags);
+        case "age" -> new Num(sup, SUBTITLE_AGE, flags);
+        case "time" -> new Num(sup, SUBTITLE_TIME, flags);
+        case "alpha" -> new Num(sup, SUBTITLE_ALPHA, flags);
+        case "x" -> new Num(sup, SUBTITLE_X, flags);
+        case "y" -> new Num(sup, SUBTITLE_Y, flags);
+        case "z" -> new Num(sup, SUBTITLE_Z, flags);
+        case "dist", "distance" -> new Num(sup, SUBTITLE_DISTANCE, flags);
 
-        case "s_dir", "s_direction" -> new Str(sup, SUBTITLE_DIRECTION);
-        case "s_left" -> new Bool(sup, SUBTITLE_LEFT);
-        case "s_right" -> new Bool(sup, SUBTITLE_RIGHT);
-        case "s_dir_yaw", "s_direction_yaw" -> new Num(sup, SUBTITLE_DIRECTION_YAW, flags);
-        case "s_dir_pitch", "s_direction_pitch" -> new Num(sup, SUBTITLE_DIRECTION_PITCH, flags);
+        case "dir", "direction" -> new Str(sup, SUBTITLE_DIRECTION);
+        case "left" -> new Bool(sup, SUBTITLE_LEFT);
+        case "right" -> new Bool(sup, SUBTITLE_RIGHT);
+        case "dir_yaw", "direction_yaw" -> new Num(sup, SUBTITLE_DIRECTION_YAW, flags);
+        case "dir_pitch", "direction_pitch" -> new Num(sup, SUBTITLE_DIRECTION_PITCH, flags);
         default -> null;
     };
 
-    public static final Attributer BLOCK_STATE = (pid, sup, name, flags) -> switch (name) {
-        case "", "b_name" -> new Str(sup, BLOCK_STATE_NAME);
-        case "b_type" -> new Special(sup, BLOCK_STATE_TYPE);
-        case "b_full_type" -> new Str(sup,BLOCK_STATE_FULL_TYPE);
-        case "b_value" -> new Str(sup, BLOCK_STATE_VALUE);
+    public static final Attributer BLOCK_STATE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "name" -> new Str(sup, BLOCK_STATE_NAME);
+        case "type" -> new Special(sup, BLOCK_STATE_TYPE);
+        case "full_type" -> new Str(sup,BLOCK_STATE_FULL_TYPE);
+        case "value" -> new Str(sup, BLOCK_STATE_VALUE);
         default -> null;
     };
 
-    public static final Attributer BLOCK_TAG = (pid, sup, name, flags) -> switch (name) {
-        case "b_name" -> new Str(sup,BLOCK_TAG_NAME);
-        case "", "b_id" -> new Id(sup,BLOCK_TAG_ID,flags);
+    public static final Attributer BLOCK_TAG = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup,BLOCK_TAG_NAME);
+        case "", "id" -> new Id(sup,BLOCK_TAG_ID,flags);
         default -> null;
     };
 
-    public static final Attributer ENCHANTMENT = (pid, sup, name, flags) -> switch (name) {
-        case "e_name" -> new Str(sup,ENCHANT_NAME);
-        case "", "e_id" -> new Id(sup,ENCHANT_ID, flags);
-        case "e_full" -> new Str(sup,ENCHANT_FULL);
-        case "e_level" -> new Special(sup,ENCHANT_LEVEL);
-        case "e_num", "e_number" -> new Num(sup,ENCHANT_NUM, flags);
-        case "e_rarity" -> new Str(sup,ENCHANT_RARITY);
+    public static final Attributer ENCHANTMENT = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup,ENCHANT_NAME);
+        case "", "id" -> new Id(sup,ENCHANT_ID, flags);
+        case "full" -> new Str(sup,ENCHANT_FULL);
+        case "level" -> new Special(sup,ENCHANT_LEVEL);
+        case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
+        case "rarity" -> new Str(sup,ENCHANT_RARITY);
         default -> null;
     };
 
-    public static final Attributer ITEM_LORE_LINE = (pid, sup, name, f) -> name.isEmpty() || name.equals("line") ? new Tex(sup, DIRECT) : null;
-    public static final Attributer ITEM_INFO_INFO = (pid, sup, name, f) -> name.isEmpty() || name.equals("info") ? new Str(sup, DIRECT) : null;
-    public static final Attributer LOOP_ITEM = (pid, sup, name, f) -> name.isEmpty() || name.equals("value") ? new Num(sup, DIRECT, f) : null;
+    public static final Attributer ITEM_LORE_LINE = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("line") ? new Tex(sup, DIRECT) : null;
+    public static final Attributer ITEM_INFO_INFO = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("info") ? new Str(sup, DIRECT) : null;
+    public static final Attributer LOOP_ITEM = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("value") ? new Num(sup, DIRECT, f) : null;
 
-    public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (pid, sup, name, flags) -> switch (name) {
-        case "m_slot" -> new Str(sup,ITEM_ATTR_SLOT);
-        case "m_attribute","m_attr" -> new Str(sup,ITEM_ATTR_NAME);
-        case "m_attribute_id","m_attr_id" -> new Id(sup,ITEM_ATTR_ID,flags);
-        case "m_tracked" -> new Bool(sup,ITEM_ATTR_TRACKED);
-        case "m_default_value" -> new Num(sup,ITEM_ATTR_VALUE_DEFAULT, flags);
-        case "m_attribute_value","m_attr_value" -> new Num(sup,ITEM_ATTR_VALUE, flags);
-        case "", "m_modifier_name","m_mod_name" -> new Str(sup,ITEM_ATTR_MODIFIER_NAME);
-        case "m_modifier_id","m_mod_id" -> new Str(sup,ITEM_ATTR_MODIFIER_ID);
-        case "m_mod_amount","m_amount" -> new Num(sup,ITEM_ATTR_MODIFIER_VALUE, flags);
-        case "m_op", "m_operation" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION);
-        case "m_op_name", "m_operation_name" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION_NAME);
+    public static final Attributer ITEM_ATTRIBUTE_MODIFIER = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "slot" -> new Str(sup,ITEM_ATTR_SLOT);
+        case "attribute","attr" -> new Str(sup,ITEM_ATTR_NAME);
+        case "attribute_id","attr_id" -> new Id(sup,ITEM_ATTR_ID,flags);
+        case "tracked" -> new Bool(sup,ITEM_ATTR_TRACKED);
+        case "default_value" -> new Num(sup,ITEM_ATTR_VALUE_DEFAULT, flags);
+        case "attribute_value","attr_value" -> new Num(sup,ITEM_ATTR_VALUE, flags);
+        case "", "modifier_name","mod_name" -> new Str(sup,ITEM_ATTR_MODIFIER_NAME);
+        case "modifier_id","mod_id" -> new Str(sup,ITEM_ATTR_MODIFIER_ID);
+        case "mod_amount","amount" -> new Num(sup,ITEM_ATTR_MODIFIER_VALUE, flags);
+        case "op", "operation" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION);
+        case "op_name", "operation_name" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION_NAME);
         default -> null;
     };
 
-    public static final Attributer ITEM_CAN_X = (pid, sup, name, flags) -> switch (name) {
-        case "x_name" -> new Str(sup,BLOCK_NAME);
-        case "", "x_id" -> new Id(sup,BLOCK_ID,flags);
+    public static final Attributer ITEM_CAN_X = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup,BLOCK_NAME);
+        case "", "id" -> new Id(sup,BLOCK_ID,flags);
         default -> null;
     };
 
-    public static final Attributer ITEM = (pid, sup, name, flags) -> switch (name) {
-        case "", "i_item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
-        case "i_id" -> new SpecialId(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY, flags);
-        case "i_name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
-        case "i_count" -> new NumBool(sup, ITEM_COUNT, ITEM_IS_NOT_EMPTY, flags);
-        case "i_max_count" -> new NumBool(sup, ITEM_MAX_COUNT, ITEM_IS_STACKABLE, flags);
-        case "i_dur","i_durability" -> new NumBool(sup, ITEM_DURABILITY, ITEM_HAS_DURABILITY, flags);
-        case "i_max_dur","i_max_durability" -> new NumBool(sup, ITEM_MAX_DURABILITY, ITEM_HAS_MAX_DURABILITY, flags);
-        case "i_dur_per","i_durability_percentage" -> new NumBool(sup, ITEM_DURABILITY_PERCENT, ITEM_HAS_MAX_DURABILITY, flags);
-        case "i_dur_color","i_durability_color" -> new NumBool(sup, ITEM_DURABILITY_COLOR, ITEM_HAS_MAX_DURABILITY, flags);
-        case "i_unbreakable" -> new Bool(sup, ITEM_UNBREAKABLE);
-        case "i_repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
-        case "i_icon" -> new ItemSupplierIconElement(pid, sup, flags);
-        case "i_hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
-        case "i_rarity" -> new Special(sup, ITEM_RARITY);
+    public static final Attributer ITEM = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
+        case "id" -> new SpecialId(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY, flags);
+        case "name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
+        case "count" -> new NumBool(sup, ITEM_COUNT, ITEM_IS_NOT_EMPTY, flags);
+        case "max_count" -> new NumBool(sup, ITEM_MAX_COUNT, ITEM_IS_STACKABLE, flags);
+        case "dur","durability" -> new NumBool(sup, ITEM_DURABILITY, ITEM_HAS_DURABILITY, flags);
+        case "max_dur","max_durability" -> new NumBool(sup, ITEM_MAX_DURABILITY, ITEM_HAS_MAX_DURABILITY, flags);
+        case "dur_per","durability_percentage" -> new NumBool(sup, ITEM_DURABILITY_PERCENT, ITEM_HAS_MAX_DURABILITY, flags);
+        case "dur_color","durability_color" -> new NumBool(sup, ITEM_DURABILITY_COLOR, ITEM_HAS_MAX_DURABILITY, flags);
+        case "unbreakable" -> new Bool(sup, ITEM_UNBREAKABLE);
+        case "repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
+        case "icon" -> new ItemSupplierIconElement(pid, sup, flags);
+        case "hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
+        case "rarity" -> new Special(sup, ITEM_RARITY);
 
-        case "i_enchants" -> new CreateListElement(sup, ITEM_ENCHANTS, ENCHANTMENT);
-        case "i_lore" -> new CreateListElement(sup, ITEM_LORE_LINES, ITEM_LORE_LINE);
-        case "i_attributes", "i_attrs" -> new CreateListElement(sup, ITEM_ATTRIBUTES, ITEM_ATTRIBUTE_MODIFIER);
-        case "i_can_destroy" -> new CreateListElement(sup, ITEM_CAN_DESTROY, ITEM_CAN_X);
-        case "i_can_place_on" -> new CreateListElement(sup, ITEM_CAN_PLAY_ON, ITEM_CAN_X);
-        case "i_info_shown" -> new CreateListElement(sup, ITEM_SHOWN, ITEM_INFO_INFO);
-        case "i_info_hidden" -> new CreateListElement(sup, ITEM_HIDDEN, ITEM_INFO_INFO);
+        case "enchants" -> new CreateListElement(sbp, sup, ITEM_ENCHANTS, ENCHANTMENT);
+        case "lore" -> new CreateListElement(sbp, sup, ITEM_LORE_LINES, ITEM_LORE_LINE);
+        case "attributes", "attrs" -> new CreateListElement(sbp, sup, ITEM_ATTRIBUTES, ITEM_ATTRIBUTE_MODIFIER);
+        case "can_destroy" -> new CreateListElement(sbp, sup, ITEM_CAN_DESTROY, ITEM_CAN_X);
+        case "can_place_on" -> new CreateListElement(sbp, sup, ITEM_CAN_PLAY_ON, ITEM_CAN_X);
+        case "info_shown" -> new CreateListElement(sbp, sup, ITEM_SHOWN, ITEM_INFO_INFO);
+        case "info_hidden" -> new CreateListElement(sbp, sup, ITEM_HIDDEN, ITEM_INFO_INFO);
         default -> null;
     };
 
-    public static final Attributer ATTRIBUTE_MODIFIER = (pid, sup, name, flags) -> switch (name) {
-        case "", "m_name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
-        case "m_id" -> new Str(sup,ATTRIBUTE_MODIFIER_ID);
-        case "m_value" -> new Num(sup,ATTRIBUTE_MODIFIER_VALUE, flags);
-        case "m_op", "m_operation" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION);
-        case "m_op_name", "m_operation_name" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION_NAME);
+    public static final Attributer ATTRIBUTE_MODIFIER = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
+        case "id" -> new Str(sup,ATTRIBUTE_MODIFIER_ID);
+        case "value" -> new Num(sup,ATTRIBUTE_MODIFIER_VALUE, flags);
+        case "op", "operation" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION);
+        case "op_name", "operation_name" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION_NAME);
         default -> null;
     };
 
-    public static final Attributer ATTRIBUTE = (pid, sup, name, flags) -> switch (name) {
-        case "a_name" -> new Str(sup,ATTRIBUTE_NAME);
-        case "", "a_id" -> new Id(sup,ATTRIBUTE_ID,flags);
-        case "a_tracked" -> new Bool(sup,ATTRIBUTE_TRACKED);
-        case "a_default_value" -> new Num(sup,ATTRIBUTE_VALUE_DEFAULT, flags);
-        case "a_base_value" -> new Num(sup,ATTRIBUTE_VALUE_BASE, flags);
-        case "a_value" -> new Num(sup,ATTRIBUTE_VALUE, flags);
-        case "a_modifiers" -> new CreateListElement(sup,ListSuppliers.ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
+    public static final Attributer ATTRIBUTE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup,ATTRIBUTE_NAME);
+        case "", "id" -> new Id(sup,ATTRIBUTE_ID,flags);
+        case "tracked" -> new Bool(sup,ATTRIBUTE_TRACKED);
+        case "default_value" -> new Num(sup,ATTRIBUTE_VALUE_DEFAULT, flags);
+        case "base_value" -> new Num(sup,ATTRIBUTE_VALUE_BASE, flags);
+        case "value" -> new Num(sup,ATTRIBUTE_VALUE, flags);
+        case "modifiers" -> new CreateListElement(sbp, sup,ListSuppliers.ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
         default -> null;
     };
 
-    public static final Attributer TEAM_MEMBER = (pid, sup, name, f) -> name.isEmpty() || name.equals("member") ? new Str(sup, DIRECT) : null;
+    public static final Attributer TEAM_MEMBER = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("member") ? new Str(sup, DIRECT) : null;
 
-    public static final Attributer TEAM = (pid, sup, name, flags) -> switch (name) {
-        case "t_name" -> new Tex(sup, TEAM_NAME);
-        case "", "t_id" -> new Str(sup, TEAM_ID);
-        case "t_friendly_fire" -> new Bool(sup, TEAM_FRIENDLY_FIRE);
-        case "t_see_friendly_invisibility", "t_friendly_invis" -> new Bool(sup, TEAM_FRIENDLY_INVIS);
-        case "t_name_tag_visibility", "t_name_tag" -> new Special(sup, TEAM_NAME_TAG_VISIBILITY);
-        case "t_death_msg_visibility", "t_death_msg" -> new Special(sup, TEAM_DEATH_MGS_VISIBILITY);
-        case "t_collision" -> new Special(sup, TEAM_COLLISION);
-        case "t_color" -> new Special(sup, TEAM_COLOR);
-        case "t_members" -> new CreateListElement(sup,ListSuppliers.TEAM_MEMBERS, TEAM_MEMBER);
-        case "t_online_players", "t_players" -> new CreateListElement(sup, TEAM_PLAYERS, PLAYER);
+    public static final Attributer TEAM = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Tex(sup, TEAM_NAME);
+        case "", "id" -> new Str(sup, TEAM_ID);
+        case "friendly_fire" -> new Bool(sup, TEAM_FRIENDLY_FIRE);
+        case "see_friendly_invisibility", "friendly_invis" -> new Bool(sup, TEAM_FRIENDLY_INVIS);
+        case "name_tag_visibility", "name_tag" -> new Special(sup, TEAM_NAME_TAG_VISIBILITY);
+        case "death_msg_visibility", "death_msg" -> new Special(sup, TEAM_DEATH_MGS_VISIBILITY);
+        case "collision" -> new Special(sup, TEAM_COLLISION);
+        case "color" -> new Special(sup, TEAM_COLOR);
+        case "members" -> new CreateListElement(sbp, sup,ListSuppliers.TEAM_MEMBERS, TEAM_MEMBER);
+        case "online_players", "players" -> new CreateListElement(sbp, sup, TEAM_PLAYERS, PLAYER);
         default -> null;
     };
     static { TEAM2 = TEAM; }
 
-    public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (pid, sup, name, flags) -> switch (name) {
-        case "", "s_name", "s_holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
-        case "s_display_name", "s_display" -> new Tex(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
-        case "s_score", "s_value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
+    public static final Attributer SCOREBOARD_OBJECTIVE_SCORE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "name", "holder" -> new Str(sup, OBJECTIVE_SCORE_HOLDER_OWNER);
+        case "display_name", "display" -> new Tex(sup, OBJECTIVE_SCORE_HOLDER_DISPLAY);
+        case "score", "value" -> new Num(sup, OBJECTIVE_SCORE_VALUE, flags);
         default -> null;
     };
 
 
-    public static final Attributer SCOREBOARD_OBJECTIVE = (pid, sup, name, flags) -> switch (name) {
-        case "", "o_name" -> new Tex(sup, OBJECTIVE_NAME);
-        case "o_id" -> new Str(sup, OBJECTIVE_ID);
-        case "o_criteria","o_criterion" -> new Str(sup, OBJECTIVE_CRITIERIA);
-        case "o_display_slot" -> new Str(sup, OBJECTIVE_DISPLAY_SLOT);
-        case "o_scores" -> new CreateListElement(sup, SCOREBOARD_OBJECTIVE_SCORES, SCOREBOARD_OBJECTIVE_SCORE);
-        case "o_online_scores" -> new CreateListElement(sup, SCOREBOARD_OBJECTIVE_SCORES_ONLINE, SCOREBOARD_OBJECTIVE_SCORE);
+    public static final Attributer SCOREBOARD_OBJECTIVE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "name" -> new Tex(sup, OBJECTIVE_NAME);
+        case "id" -> new Str(sup, OBJECTIVE_ID);
+        case "criteria","criterion" -> new Str(sup, OBJECTIVE_CRITIERIA);
+        case "display_slot" -> new Str(sup, OBJECTIVE_DISPLAY_SLOT);
+        case "scores" -> new CreateListElement(sbp, sup, SCOREBOARD_OBJECTIVE_SCORES, SCOREBOARD_OBJECTIVE_SCORE);
+        case "online_scores" -> new CreateListElement(sbp, sup, SCOREBOARD_OBJECTIVE_SCORES_ONLINE, SCOREBOARD_OBJECTIVE_SCORE);
         default -> null;
     };
 
-    public static final Attributer SCOREBOARD_SCORE = (pid, sup, name, flags) -> switch (name) {
-        case "ss_name" -> new Tex(sup, SCORES_OBJECTIVE_NAME);
-        case "", "ss_id" -> new Str(sup, SCORES_OBJECTIVE_ID);
-        case "ss_criteria","ss_criterion" -> new Str(sup, SCORES_OBJECTIVE_CRITIERIA);
-        case "ss_display_slot" -> new Str(sup, SCORES_OBJECTIVE_DISPLAY_SLOT);
-        case "ss_score","ss_value" -> new Num(sup, SCORES_VALUE, flags);
+    public static final Attributer SCOREBOARD_SCORE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Tex(sup, SCORES_OBJECTIVE_NAME);
+        case "", "id" -> new Str(sup, SCORES_OBJECTIVE_ID);
+        case "criteria","criterion" -> new Str(sup, SCORES_OBJECTIVE_CRITIERIA);
+        case "display_slot" -> new Str(sup, SCORES_OBJECTIVE_DISPLAY_SLOT);
+        case "score","value" -> new Num(sup, SCORES_VALUE, flags);
         default -> null;
     };
 
-    public static final Attributer BOSSBAR = (pid, sup, name, flags) -> switch (name) {
-        case "b_name" -> new Tex(sup, BOSSBAR_NAME);
-        case "b_uuid" -> new Str(sup, BOSSBAR_UUID);
-        case "b_id" -> new Id(sup, BOSSBAR_ID,flags); //SP Only
-        case "b_percent","b_per","b_value","" -> new Num(sup, BOSSBAR_PERCENT, flags);
-        case "b_darken_sky" -> new Bool(sup, BOSSBAR_DARKEN_SKY);
-        case "b_dragon_music" -> new Bool(sup, BOSSBAR_DRAGON_MUSIC);
-        case "b_thickens_fog" -> new Bool(sup, BOSSBAR_THICKENS_FOG);
-        case "b_style" -> new Special(sup, BOSSBAR_STYLE);
-        case "b_color" -> new Special(sup, BOSSBAR_COLOR);
-        case "b_text_color" -> new Special(sup, BOSSBAR_TEXT_COLOR);
-        case "b_enabled", "b_visible" -> new Bool(sup, BOSSBAR_IS_VISIBLE); //SP Only
-        case "b_players" -> new CreateListElement(sup, BOSSBAR_PLAYERS, PLAYER); //SP Only
-        case "b_icon", "b_bar" -> new BossbarIcon(pid, flags);
+    public static final Attributer BOSSBAR = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Tex(sup, BOSSBAR_NAME);
+        case "uuid" -> new Str(sup, BOSSBAR_UUID);
+        case "id" -> new Id(sup, BOSSBAR_ID,flags); //SP Only
+        case "percent","per","value","" -> new Num(sup, BOSSBAR_PERCENT, flags);
+        case "darken_sky" -> new Bool(sup, BOSSBAR_DARKEN_SKY);
+        case "dragon_music" -> new Bool(sup, BOSSBAR_DRAGON_MUSIC);
+        case "thickens_fog" -> new Bool(sup, BOSSBAR_THICKENS_FOG);
+        case "style" -> new Special(sup, BOSSBAR_STYLE);
+        case "color" -> new Special(sup, BOSSBAR_COLOR);
+        case "text_color" -> new Special(sup, BOSSBAR_TEXT_COLOR);
+        case "enabled", "visible" -> new Bool(sup, BOSSBAR_IS_VISIBLE); //SP Only
+        case "players" -> new CreateListElement(sbp, sup, BOSSBAR_PLAYERS, PLAYER); //SP Only
+        case "icon", "bar" -> new BossbarIcon(pid, flags);
         default -> null;
     };
 
-    public static final Attributer MOD_AUTHOR = (pid, sup, name, f) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CONTRIBUTOR = (pid, sup, name, f) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_CREDIT = (pid, sup, name, f) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
-    public static final Attributer MOD_LICENSE = (pid, sup, name, f) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_AUTHOR = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CONTRIBUTOR = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_CREDIT = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_LICENSE = (sbp, pid, sup, name, f) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
 
-    public static final Attributer MOD_BADGE = (pid, sup, name, flags) -> switch (name) {
-        case "", "b_name" -> new Str(sup, BADGE_NAME);
-        case "b_outline_color" -> new Num(sup, BADGE_OUTLINE_COLOR, flags);
-        case "b_fill_color" -> new Num(sup, BADGE_FILL_COLOR, flags);
-        case "b_icon" -> new ModBadgeIconElement(pid, flags);
+    public static final Attributer MOD_BADGE = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "", "name" -> new Str(sup, BADGE_NAME);
+        case "outline_color" -> new Num(sup, BADGE_OUTLINE_COLOR, flags);
+        case "fill_color" -> new Num(sup, BADGE_FILL_COLOR, flags);
+        case "icon" -> new ModBadgeIconElement(pid, flags);
         default -> null;
     };
 
     private static Attributer MOD2;
-    public static final Attributer MOD = (pid, sup, name, flags) -> {
-        if (name.startsWith("m_parent:")) {
+    public static final Attributer MOD = (sbp, pid, sup, name, flags) -> {
+        if (name.startsWith("parent:")) {
             String attr = name.substring(9);
             Supplier sup2 = () -> ModMenu.MODS.get( ((Mod) sup.get()).getParent() );
-            return MOD2.get(pid, sup2, attr, flags);
+            return MOD2.get(sbp, pid, sup2, attr, flags);
         }
         return switch (name) {
-            case "", "m_name" -> new Str(sup, MOD_NAME);
-            case "m_id" -> new Str(sup, MOD_ID);
-            case "m_summary" -> new Str(sup, MOD_SUMMARY);
-            case "m_description", "m_desc" -> new Str(sup, MOD_DESCRIPTION);
-            case "m_version" -> new Str(sup, MOD_VERSION);
-            case "m_hash" -> new Str(sup, MOD_HASH);
+            case "", "name" -> new Str(sup, MOD_NAME);
+            case "id" -> new Str(sup, MOD_ID);
+            case "summary" -> new Str(sup, MOD_SUMMARY);
+            case "description", "desc" -> new Str(sup, MOD_DESCRIPTION);
+            case "version" -> new Str(sup, MOD_VERSION);
+            case "hash" -> new Str(sup, MOD_HASH);
 
-            case "m_library" -> new Bool(sup, MOD_IS_LIBRARY);
-            case "m_client" -> new Bool(sup, MOD_IS_CLIENT);
-            case "m_deprecated" -> new Bool(sup, MOD_IS_DEPRECATED);
-            case "m_patchwork" -> new Bool(sup, MOD_IS_PATCHWORK);
-            case "m_from_modpack" -> new Bool(sup, MOD_IS_FROM_MODPACK);
-            case "m_minecraft" -> new Bool(sup, MOD_IS_MINECRAFT);
+            case "library" -> new Bool(sup, MOD_IS_LIBRARY);
+            case "client" -> new Bool(sup, MOD_IS_CLIENT);
+            case "deprecated" -> new Bool(sup, MOD_IS_DEPRECATED);
+            case "patchwork" -> new Bool(sup, MOD_IS_PATCHWORK);
+            case "from_modpack" -> new Bool(sup, MOD_IS_FROM_MODPACK);
+            case "minecraft" -> new Bool(sup, MOD_IS_MINECRAFT);
 
-            case "m_badges" -> new CreateListElement(sup, MOD_BADGES, MOD_BADGE);
-            case "m_authors" -> new CreateListElement(sup, MOD_AUTHORS, MOD_AUTHOR);
-            case "m_contributors" -> new CreateListElement(sup, MOD_CONTRIBUTORS, MOD_CONTRIBUTOR);
-            case "m_credits" -> new CreateListElement(sup, MOD_CREDITS, MOD_CREDIT);
-            case "m_licenses" -> new CreateListElement(sup, MOD_LICENSES, MOD_LICENSE);
+            case "badges" -> new CreateListElement(sbp, sup, MOD_BADGES, MOD_BADGE);
+            case "authors" -> new CreateListElement(sbp, sup, MOD_AUTHORS, MOD_AUTHOR);
+            case "contributors" -> new CreateListElement(sbp, sup, MOD_CONTRIBUTORS, MOD_CONTRIBUTOR);
+            case "credits" -> new CreateListElement(sbp, sup, MOD_CREDITS, MOD_CREDIT);
+            case "licenses" -> new CreateListElement(sbp, sup, MOD_LICENSES, MOD_LICENSE);
 
-            case "m_parent" -> new CreateListElement(sup, MOD_PARENTS, MOD2);
-            case "m_children" -> new CreateListElement(sup, MOD_CHILDREN, MOD2);
+            case "parent" -> new CreateListElement(sbp, sup, MOD_PARENTS, MOD2);
+            case "children" -> new CreateListElement(sbp, sup, MOD_CHILDREN, MOD2);
 
-            case "m_icon" -> new ModIconElement(pid, flags);
+            case "icon" -> new ModIconElement(pid, flags);
             default -> null;
         };
     };
     static { MOD2 = MOD; }
 
-    public static final Attributer PACK = (pid, sup, name, flags) -> switch (name) {
-        case "","p_name" -> new Tex(sup, PACK_NAME);
-        case "p_id" -> new Str(sup, PACK_ID);
-        case "p_description", "p_desc" -> new Tex(sup, PACK_DESCRIPTION);
-        case "p_version" -> new Num(sup, PACK_VERSION, flags);
-        case "p_always_enabled" -> new Bool(sup, PACK_ALWAYS_ENABLED);
-        case "p_pinned" -> new Bool(sup, PACK_IS_PINNED);
-        case "p_compatible" -> new Bool(sup, PACK_IS_COMPATIBLE);
-        case "p_icon" -> new PackIconElement(pid, flags);
+    public static final Attributer PACK = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "","name" -> new Tex(sup, PACK_NAME);
+        case "id" -> new Str(sup, PACK_ID);
+        case "description", "desc" -> new Tex(sup, PACK_DESCRIPTION);
+        case "version" -> new Num(sup, PACK_VERSION, flags);
+        case "always_enabled" -> new Bool(sup, PACK_ALWAYS_ENABLED);
+        case "pinned" -> new Bool(sup, PACK_IS_PINNED);
+        case "compatible" -> new Bool(sup, PACK_IS_COMPATIBLE);
+        case "icon" -> new PackIconElement(pid, flags);
         default -> null;
     };
 
-    public static final Attributer RECORD = (pid, sup, name, flags) -> switch (name) {
-        case "","r_name" -> new Tex(sup, RECORD_NAME);
-        case "r_id" -> new Id(sup, RECORD_ID,flags);
-        case "r_length" -> new Num(sup, RECORD_LENGTH, flags);
-        case "r_elapsed" -> new Num(sup, RECORD_ELAPSED, flags);
-        case "r_remaining" -> new Num(sup, RECORD_REMAINING, flags);
-        case "r_elapsed_percentage", "r_elapsed_per" -> new Num(sup, RECORD_ELAPSED_PER, flags);
-        case "r_icon" -> new ListRecordIconElement(flags);
+    public static final Attributer RECORD = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "","name" -> new Tex(sup, RECORD_NAME);
+        case "id" -> new Id(sup, RECORD_ID,flags);
+        case "length" -> new Num(sup, RECORD_LENGTH, flags);
+        case "elapsed" -> new Num(sup, RECORD_ELAPSED, flags);
+        case "remaining" -> new Num(sup, RECORD_REMAINING, flags);
+        case "elapsed_percentage", "elapsed_per" -> new Num(sup, RECORD_ELAPSED_PER, flags);
+        case "icon" -> new ListRecordIconElement(flags);
         default -> null;
     };
 
-    public static final Attributer OFFER = (pid, sup, name, flags) -> {
+    public static final Attributer OFFER = (sbp, pid, sup, name, flags) -> {
         int collinIndex = name.indexOf(":");
         if (collinIndex > 0) {
             String attr = name.substring(collinIndex+1);
-            boolean isIcon = attr.equals("i_icon");
+            boolean isIcon = attr.equals("icon");
             Supplier sup2 = switch (name.substring(0, collinIndex)) {
-                case "o_first" -> isIcon ?
+                case "first" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getAdjustedFirstBuyItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getAdjustedFirstBuyItem();
-                case "o_first_base" -> isIcon ?
+                case "first_base" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getOriginalFirstBuyItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem();
-                case "o_second" -> isIcon ?
+                case "second" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSecondBuyItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSecondBuyItem();
-                case "o_result" -> isIcon ?
+                case "result" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSellItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem();
                 default -> null;
             };
             if (sup2 != null)
-                return ITEM.get(pid, sup2, attr, flags);
+                return ITEM.get(sbp, pid, sup2, attr, flags);
         }
         return switch (name) {
-            case "o_uses" -> new Num(sup, OFFER_USES, flags);
-            case "o_max_uses" -> new Num(sup, OFFER_MAX_USES, flags);
-            case "o_special_price" -> new Num(sup, OFFER_SPECIAL_PRICE, flags);
-            case "o_demand_bonus" -> new Num(sup, OFFER_DEMAND_BONUS, flags);
-            case "o_price_multiplier" -> new Num(sup, OFFER_PRICE_MULTIPLIER, flags);
-            case "o_disabled" -> new Bool(sup, OFFER_DISABLED);
-            case "o_can_afford" -> new Bool(sup, OFFER_CAN_AFFORD);
+            case "uses" -> new Num(sup, OFFER_USES, flags);
+            case "max_uses" -> new Num(sup, OFFER_MAX_USES, flags);
+            case "special_price" -> new Num(sup, OFFER_SPECIAL_PRICE, flags);
+            case "demand_bonus" -> new Num(sup, OFFER_DEMAND_BONUS, flags);
+            case "price_multiplier" -> new Num(sup, OFFER_PRICE_MULTIPLIER, flags);
+            case "disabled" -> new Bool(sup, OFFER_DISABLED);
+            case "can_afford" -> new Bool(sup, OFFER_CAN_AFFORD);
 
-            case "o_first" -> new CreateListElement(sup, OFFER_FIRST_ADJUSTED, ITEM);
-            case "o_first_base" -> new CreateListElement(sup, OFFER_FIRST_BASE, ITEM);
-            case "o_second" -> new CreateListElement(sup, OFFER_SECOND, ITEM);
-            case "", "o_result" -> new CreateListElement(sup, OFFER_RESULT, ITEM);
+            case "first" -> new CreateListElement(sbp, sup, OFFER_FIRST_ADJUSTED, ITEM);
+            case "first_base" -> new CreateListElement(sbp, sup, OFFER_FIRST_BASE, ITEM);
+            case "second" -> new CreateListElement(sbp, sup, OFFER_SECOND, ITEM);
+            case "", "result" -> new CreateListElement(sbp, sup, OFFER_RESULT, ITEM);
             default -> null;
         };
     };
 
 
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
+    public static final Map<Attributer, String> DEFAULT_PREFIX = new HashMap<>();
     static {
         ATTRIBUTER_MAP.put(STATUS_EFFECTS, EFFECT);
         ATTRIBUTER_MAP.put(STATUS_EFFECTS_POSITIVE, EFFECT);
@@ -398,38 +401,116 @@ public class Attributers {
         ATTRIBUTER_MAP.put(RECORDS, RECORD);
         ATTRIBUTER_MAP.put(TARGET_VILLAGER_OFFERS, OFFER);
 
-        // ATTRIBUTER_MAP.put(ATTRIBUTE_MODIFIERS, ATTRIBUTE_MODIFIER);
-        // ATTRIBUTER_MAP.put(TEAM_MEMBERS, TEAM_MEMBER);
-        // ATTRIBUTER_MAP.put(TEAM_PLAYERS, PLAYER);
-
-        // ITEM_LORE
-        // ENCHANTMENT
+        DEFAULT_PREFIX.put(EFFECT, "ef");
+        DEFAULT_PREFIX.put(PLAYER, "pl");
+        DEFAULT_PREFIX.put(SUBTITLE, "su");
+        DEFAULT_PREFIX.put(BLOCK_STATE, "bs");
+        DEFAULT_PREFIX.put(BLOCK_TAG, "bt");
+        DEFAULT_PREFIX.put(ENCHANTMENT, "en");
+        DEFAULT_PREFIX.put(ITEM_LORE_LINE, "ll");
+        DEFAULT_PREFIX.put(ITEM_INFO_INFO, "ii");
+        DEFAULT_PREFIX.put(LOOP_ITEM, "loop");
+        DEFAULT_PREFIX.put(ITEM_ATTRIBUTE_MODIFIER, "im");
+        DEFAULT_PREFIX.put(ITEM_CAN_X, "cx");
+        DEFAULT_PREFIX.put(ITEM, "i");
+        DEFAULT_PREFIX.put(ATTRIBUTE_MODIFIER, "am");
+        DEFAULT_PREFIX.put(ATTRIBUTE, "at");
+        DEFAULT_PREFIX.put(TEAM_MEMBER, "tm");
+        DEFAULT_PREFIX.put(TEAM, "te");
+        DEFAULT_PREFIX.put(SCOREBOARD_OBJECTIVE_SCORE, "os");
+        DEFAULT_PREFIX.put(SCOREBOARD_OBJECTIVE, "o");
+        DEFAULT_PREFIX.put(SCOREBOARD_SCORE, "ss");
+        DEFAULT_PREFIX.put(BOSSBAR, "bb");
+        DEFAULT_PREFIX.put(MOD_AUTHOR, "ma");
+        DEFAULT_PREFIX.put(MOD_CONTRIBUTOR, "mc");
+        DEFAULT_PREFIX.put(MOD_CREDIT, "mc");
+        DEFAULT_PREFIX.put(MOD_LICENSE, "ml");
+        DEFAULT_PREFIX.put(MOD_BADGE, "mb");
+        DEFAULT_PREFIX.put(MOD, "m");
+        DEFAULT_PREFIX.put(PACK, "p");
+        DEFAULT_PREFIX.put(RECORD, "r");
+        DEFAULT_PREFIX.put(OFFER, "o");
     }
 
-    public static HudElement get(ListProviderSet set, String name, Flags flags) {
-        for (int i = set.providers.size()-1; i >= 0; i--) {
-            ListProvider provider = set.providers.get(i);
-            UUID providerID = set.providerIDs.get(i);
-            if (provider == null)
+    public static HudElement get(ListProviderSet set, String name, Flags flags, String profileName, int line) {
+        for (int i = set.entries.size()-1; i >= 0; i--) {
+            ListProviderSet.Entry entry = set.entries.get(i);
+            if (entry == null)
                 continue;
 
             switch (name) {
-                case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(providerID), flags);
-                case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(providerID), flags);
-                case "raw": return new StringSupplierElement( () -> ListManager.getValue(providerID).toString() );
+                case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(entry.id()), flags);
+                case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(entry.id()), flags);
+                case "raw": return new StringSupplierElement( () -> ListManager.getValue(entry.id()).toString() );
             };
 
-            Attributer attributer = ATTRIBUTER_MAP.get(provider);
+            String[] flagParts = name.split(" ");
+            String prefix = Attributers.defaultPrefix(entry.provider());
+            for (int j = 1; j < flagParts.length; j++) {
+                if (flagParts[j].startsWith("-pre:") || flagParts[j].startsWith("-prefix:")) {
+                    prefix = flagParts[j].substring(flagParts[j].indexOf(':')+1);
+                }
+                else {
+                    Errors.addError(profileName, line, flagParts[j], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, name);
+                }
+            }
+
+            Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
             if (attributer == null) {
                 CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
                 continue;
             }
-            HudElement element = attributer.get(providerID, () -> ListManager.getValue(providerID), name, flags);
+            HudElement element = attributer.get(prefix, entry.id(), () -> ListManager.getValue(entry.id()), name, flags);
             if (element != null)
                 return element;
         }
 
         return null;
+    }
+
+    public static HudElement getFromPrefix(ListProviderSet set, String part, Flags flags, String profileName, int line) {
+        ListProviderSet.Entry entry = null;
+        for (int i = set.entries.size() - 1; i >= 0; i--) {
+            ListProviderSet.Entry e = set.entries.get(i);
+            if (e != null && part.startsWith(e.prefix() + ":")) {
+                entry = e;
+                break;
+            }
+        }
+
+        if (entry == null)
+            return null;
+
+        UUID finalProviderID = entry.id();
+        part = part.substring(part.indexOf(':')+1);
+
+        switch (part) {
+            case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
+            case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(finalProviderID), flags);
+            case "raw": return new StringSupplierElement( () -> ListManager.getValue(finalProviderID).toString() );
+        };
+        
+        String[] flagParts = part.split(" ");
+        String prefix = Attributers.defaultPrefix(entry.provider());
+        for (int i = 1; i < flagParts.length; i++) {
+            if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:")) {
+                prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
+            }
+            else {
+                Errors.addError(profileName, line, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, part);
+            }
+        }
+
+        Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
+        if (attributer == null) {
+            CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
+            return null;
+        }
+        return attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), part, flags);
+    }
+
+    public static String defaultPrefix(ListProvider provider) {
+        return DEFAULT_PREFIX.get( ATTRIBUTER_MAP.get(provider) );
     }
 
 }

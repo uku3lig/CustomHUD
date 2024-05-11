@@ -3,6 +3,7 @@ package com.minenash.customhud.HudElements.functional;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.list.Attributers;
 import com.minenash.customhud.HudElements.list.ListProvider;
+import com.minenash.customhud.HudElements.list.ListProviderSet;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
 import com.minenash.customhud.data.HudTheme;
@@ -63,12 +64,13 @@ public class FunctionalElement implements HudElement {
         @Override public void run() { ListManager.push(providerID, values); }
     }
     public static class CreateListElement extends FunctionalElement {
-        public final ListProvider provider;
+        public final ListProviderSet.Entry entry;
         public final Attributers.Attributer attributer;
-        public CreateListElement(Supplier<?> supplier, Function<?,List<?>> function, Attributers.Attributer attributer) {
-            this.provider = new ListProvider.ListFunctioner(supplier,function);
+        public CreateListElement(String prefixFlag, Supplier<?> supplier, Function<?,List<?>> function, Attributers.Attributer attributer) {
+            String prefix = prefixFlag.isEmpty() ? Attributers.DEFAULT_PREFIX.get(attributer) : prefixFlag;
+            this.entry = new ListProviderSet.Entry(new ListProvider.ListFunctioner(supplier,function), UUID.randomUUID(), prefix);
             this.attributer = attributer;
-            Attributers.ATTRIBUTER_MAP.put(provider, attributer);
+            Attributers.ATTRIBUTER_MAP.put(entry.provider(), attributer);
         }
     }
 

@@ -12,6 +12,7 @@ public enum ErrorType {
     UNKNOWN_VARIABLE ("Variables", "variables", "Unknown Variable: §e"),
     UNKNOWN_LIST ("CHANGE ME", "CHANGE ME", "Unknown List Variable: §e"),
     UNKNOWN_VARIABLE_FLAG ("Variable Flags", "references/variable_flags", "Unknown Variable Flag: §e"),
+    UNKNOWN_LIST_VARIABLE_FLAG ("Variable Flags", "references/variable_flags", "Unknown List Variable Flag: §e"),
     UNKNOWN_THEME_FLAG ("Theming", "references/theming", "Unknown Theme Option or Value"),
     UNKNOWN_COLOR ("Theming", "references/theming", "Unknown Color: §e"),
     UNKNOWN_CROSSHAIR ("Theming", "references/theming", "Unknown Crosshair: §e"),

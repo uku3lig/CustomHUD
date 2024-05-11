@@ -21,6 +21,7 @@ public class Flags {
     public int numSize = 0;
     public boolean noDelimiters = false;
     public IdPart idPart = IdPart.FULL;
+    public String listPrefix = "";
 
     public int precision = -1;
     public double scale = 1;
@@ -49,6 +50,7 @@ public class Flags {
     private static final Pattern WIDTH_PATTERN = Pattern.compile("-(?:w|width)(\\d+)");
     private static final Pattern SHIFT_PATTERN = Pattern.compile("-(?:sh|shift)(-?\\d+)(?:,(-?\\d+))?");
     private static final Pattern ROTATE_PATTERN = Pattern.compile("-(?:r|rotation)(-?\\d+)");
+    private static final Pattern PREFIX_PATTERN = Pattern.compile("-(?:pre|prefix):(-?\\w+)");
 
     public static Flags parse(String profileName, int line, String[] parts) {
         Flags flags = new Flags();
@@ -121,6 +123,11 @@ public class Flags {
                     matcher = ROTATE_PATTERN.matcher(parts[i]);
                     if (matcher.matches()) {
                         flags.rotation = Integer.parseInt(matcher.group(1)) * 0.017453292F;
+                        continue;
+                    }
+                    matcher = PREFIX_PATTERN.matcher(parts[i]);
+                    if (matcher.matches()) {
+                        flags.listPrefix = matcher.group(1);
                         continue;
                     }
 

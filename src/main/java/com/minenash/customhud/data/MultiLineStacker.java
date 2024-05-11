@@ -90,8 +90,8 @@ public class MultiLineStacker {
         List<String> parts = VariableParser.partitionConditional(list);
         list = parts.get(0);
 
-        ListProvider provider = VariableParser.getListProvider(list, profile, line, enabled, source, listProviders);
-        if (provider == ListProvider.REGUIRES_MODMENU) {
+        ListProviderSet.Entry provider = VariableParser.getListProvider(list, profile, line, enabled, source, listProviders);
+        if (provider != null && provider.provider() == ListProvider.REGUIRES_MODMENU) {
             Errors.addError(profile.name, line, source, ErrorType.REQUIRES_MODMENU, "");
             listProviders.push(null);
             stack.push( new ListElement.MultiLineBuilder(null, null, null) );
@@ -106,20 +106,20 @@ public class MultiLineStacker {
                 return;
             }
             if (e instanceof FunctionalElement.CreateListElement cle)
-                provider = cle.provider;
+                provider = cle.entry;
         }
 
         if (provider == null && !listProviders.isEmpty()) {
-            HudElement e = Attributers.get(listProviders, list, new Flags());
+            HudElement e = Attributers.get(listProviders, list, new Flags(), profile.name, line);
             if (e instanceof FunctionalElement.CreateListElement cle) {
-                provider = cle.provider;
+                provider = cle.entry;
             }
         }
 
         if (provider == null)
             Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
 
-        UUID providerId = listProviders.push(provider);
+        listProviders.push(provider);
 
         Operation filter = null;
         if (parts.size() > 1) {
@@ -128,7 +128,7 @@ public class MultiLineStacker {
             filter.printTree(2);
         }
 
-        stack.push( new ListElement.MultiLineBuilder(provider, providerId, filter) );
+        stack.push( new ListElement.MultiLineBuilder(provider.provider(), provider.id(), filter) );
     }
 
     public void forSeparator(Profile profile, int line, String source) {
