@@ -67,7 +67,9 @@ import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
 
 public class VariableParser {
 
-    private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._ -]+)(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?");
+//    private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._ -]+)(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?");
+    private static final Pattern TEXTURE_ICON_PATTERN = Pattern.compile("((?:[a-z0-9/._-]+:)?[a-z0-9/._-]+(?:(?:[a-z0-9/._ -]*(?:-(?:sh|shift)(?:-?\\d+)(,(?:-?\\d+))?)[a-z0-9/._ -]*)|(?:[a-z0-9/._ -]*)))(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?(?:,([^,]*))?");
+
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
     private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.: -]*))?.*");
@@ -432,16 +434,24 @@ public class VariableParser {
 
             String[] mainParts = matcher.group(1).split(" ");
             Identifier id = new Identifier(mainParts[0].endsWith(".png") ? mainParts[0] : mainParts[0] + ".png");
-            Operation u = matcher.group(2) == null || matcher.group(2).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProviders);
-            Operation v = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders);
-            Operation w = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders);
-            Operation h = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders);
-            Operation width = matcher.group(7) == null || matcher.group(6).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(6), original, profile, debugLine, enabled, listProviders);
-            int hg = matcher.group(7) == null ? 6 : 7;
+            Operation u = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders);
+            Operation v = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders);
+            Operation w = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders);
+            Operation h = matcher.group(6) == null || matcher.group(6).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(6), original, profile, debugLine, enabled, listProviders);
+            Operation width = matcher.group(8) == null || matcher.group(7).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(7), original, profile, debugLine, enabled, listProviders);
+            int hg = matcher.group(8) == null ? 7 : 8;
             Operation height = matcher.group(hg) == null || matcher.group(hg).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(hg), original, profile, debugLine, enabled, listProviders);
 
-
             Flags flags = Flags.parse(profile.name, debugLine, mainParts);
+            if (!matcher.group(2).isEmpty() && u == null && v == null && w == null && h == null && width == null && height == null) {
+                SimpleTextureIconElement element = new SimpleTextureIconElement(id, flags);
+                if (element.isIconAvailable())
+                    return Flags.wrap(element, flags);
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, id.toString());
+                return null;
+            }
+
+
             NewTextureIconElement element = new NewTextureIconElement(id, u, v, w, h, width, height, flags);
             if (element.isIconAvailable())
                 return element;

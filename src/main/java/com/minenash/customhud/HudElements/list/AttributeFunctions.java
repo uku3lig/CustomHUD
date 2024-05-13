@@ -148,10 +148,15 @@ public class AttributeFunctions {
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant.getKey().getRarity().toString().toLowerCase();
     public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant.getValue();
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL =
-            (enchant) -> I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
+            (enchant) -> enchant.getKey().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().getTranslationKey())
+            : I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
             (enchant) -> I18n.translate("enchantment.level." + enchant.getValue()),
             (enchant) -> enchant.getValue(),
+            (enchant) -> true);
+    public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_MAX_LEVEL = new Entry<> (
+            (enchant) -> I18n.translate("enchantment.level." + enchant.getKey().getMaxLevel()),
+            (enchant) -> enchant.getKey().getMaxLevel(),
             (enchant) -> true);
 
 
