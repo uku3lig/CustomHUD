@@ -16,10 +16,13 @@ import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
@@ -119,6 +122,7 @@ public class ListSuppliers {
     public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, "CanPlaceOn");
     public static final Function<ItemStack,List<?>> ITEM_HIDDEN = (stack) -> getHideFlagStrings(stack, false);
     public static final Function<ItemStack,List<?>> ITEM_SHOWN = (stack) -> getHideFlagStrings(stack, true);
+    public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;
@@ -140,7 +144,26 @@ public class ListSuppliers {
             .filter(score -> scoreboardPlayer(score.owner())) //TODO: Make Work with entities
             .sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
 
-    public static final Function<String,List<?>> SCORES = (name) -> Arrays.asList(scoreboard().getScores(name).scores.entrySet().toArray());
+
+    public static ListProvider SCORES(String name) { return () -> Arrays.asList(scoreboard().getScores(name).scores.entrySet().toArray()); }
+
+    public static <T> ListProvider TAG_ENTRIES(Registry<T> registry, String name) {
+        if (name.startsWith("#"))
+            name = name.substring(1);
+        Identifier id = Identifier.tryParse(name);
+        if (id == null)
+            return null;
+        return () -> {
+            var opt = registry.getEntryList( TagKey.of(registry.getKey(), id) );
+            if (opt.isEmpty())
+                return Collections.EMPTY_LIST;
+
+            var entryList = opt.get();
+            List<T> values = new ArrayList<>(entryList.size());
+            for (var e : entryList)
+                values.add( e.value() );
+            return values;
+    }; }
 
 
     // Don't change to method references

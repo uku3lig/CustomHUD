@@ -149,7 +149,6 @@ public class CustomHud implements ModInitializer {
 					CLIENT.setScreen(new NewConfigScreen(null));
 		}
 
-		updateCrosshairObjectShare();
 		saveDelay = 100;
 	}
 
@@ -207,6 +206,31 @@ public class CustomHud implements ModInitializer {
 			ignoreFirstToast = false;
 		}
 		key.reset();
+	}
+
+	public static void resourceTriggeredReload() {
+		boolean anyHasErrors = false;
+		try(Stream<Path> pathsStream = Files.list(PROFILE_FOLDER).sorted(Comparator.comparing(p -> p.getFileName().toString()))) {
+			for (Path path : pathsStream.toList()) {
+				if (!Files.isDirectory(path)) {
+					String name = path.getFileName().toString();
+					if (name.endsWith(".txt")) {
+						name = name.substring(0, name.length() - 4);
+						ProfileManager.replace(Profile.parseProfile(path, name));
+						if (Errors.hasErrors(name)) {
+							anyHasErrors = true;
+							CustomHud.showToast(name);
+						}
+					}
+				}
+			}
+			if (!anyHasErrors) {
+				CustomHud.showAllUpdatedToast();
+			}
+		} catch (IOException e) {
+			CustomHud.LOGGER.catching(e);
+		}
+		CustomHud.updateCrosshairObjectShare();
 	}
 
 	public static void updateCrosshairObjectShare() {

@@ -7,14 +7,14 @@ import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateLis
 import com.minenash.customhud.HudElements.icon.*;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.HudElements.supplier.StringSupplierElement;
+import com.minenash.customhud.VariableParser;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.Flags;
-import com.minenash.customhud.errors.ErrorType;
-import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.TradeOffer;
 
@@ -105,9 +105,9 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer BLOCK_TAG = (sbp, pid, sup, name, flags) -> switch (name) {
-        case "name" -> new Str(sup,BLOCK_TAG_NAME);
-        case "", "id" -> new Id(sup,BLOCK_TAG_ID,flags);
+    public static final Attributer TAG = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Str(sup, TAG_NAME);
+        case "", "id" -> new Id(sup, TAG_ID,flags);
         default -> null;
     };
 
@@ -158,7 +158,7 @@ public class Attributers {
         case "dur_color","durability_color" -> new NumBool(sup, ITEM_DURABILITY_COLOR, ITEM_HAS_MAX_DURABILITY, flags);
         case "unbreakable" -> new Bool(sup, ITEM_UNBREAKABLE);
         case "repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
-        case "icon" -> new ItemSupplierIconElement(pid, sup, flags);
+        case "icon" -> new RichItemSupplierIconElement(pid, sup, flags);
         case "hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
         case "rarity" -> new Special(sup, ITEM_RARITY);
 
@@ -169,6 +169,7 @@ public class Attributers {
         case "can_place_on" -> new CreateListElement(sbp, sup, ITEM_CAN_PLAY_ON, ITEM_CAN_X);
         case "info_shown" -> new CreateListElement(sbp, sup, ITEM_SHOWN, ITEM_INFO_INFO);
         case "info_hidden" -> new CreateListElement(sbp, sup, ITEM_HIDDEN, ITEM_INFO_INFO);
+        case "tags" -> new CreateListElement(sbp, sup, ITEM_TAGS, TAG);
         default -> null;
     };
 
@@ -366,6 +367,13 @@ public class Attributers {
         };
     };
 
+    public static final Attributer ITEM_CONVERTABLE_TAG_ENTRY = (sbp, pid, sup, name, flags) -> switch (name) {
+        case "name" -> new Tex(sup, TAG_ENTRY_NAME);
+        case "", "id" -> new Id(sup, TAG_ENTRY_ID,flags);
+        case "icon" -> new RichItemSupplierIconElement(pid, () -> new ItemStack(((ItemConvertible) sup.get()).asItem()), flags);
+        default -> null;
+    };
+
 
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
     public static final Map<Attributer, String> DEFAULT_PREFIX = new HashMap<>();
@@ -377,7 +385,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(ONLINE_PLAYERS, PLAYER);
         ATTRIBUTER_MAP.put(SUBTITLES, SUBTITLE);
         ATTRIBUTER_MAP.put(TARGET_BLOCK_STATES, BLOCK_STATE);
-        ATTRIBUTER_MAP.put(TARGET_BLOCK_TAGS, BLOCK_TAG);
+        ATTRIBUTER_MAP.put(TARGET_BLOCK_TAGS, TAG);
         ATTRIBUTER_MAP.put(PLAYER_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(TARGET_ENTITY_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(HOOKED_ENTITY_ATTRIBUTES, ATTRIBUTE);
@@ -404,10 +412,10 @@ public class Attributers {
         DEFAULT_PREFIX.put(EFFECT, "ef");
         DEFAULT_PREFIX.put(PLAYER, "pl");
         DEFAULT_PREFIX.put(SUBTITLE, "su");
-        DEFAULT_PREFIX.put(BLOCK_STATE, "bs");
-        DEFAULT_PREFIX.put(BLOCK_TAG, "bt");
+        DEFAULT_PREFIX.put(BLOCK_STATE, "bp");
+        DEFAULT_PREFIX.put(TAG, "t");
         DEFAULT_PREFIX.put(ENCHANTMENT, "en");
-        DEFAULT_PREFIX.put(ITEM_LORE_LINE, "ll");
+        DEFAULT_PREFIX.put(ITEM_LORE_LINE, "lore");
         DEFAULT_PREFIX.put(ITEM_INFO_INFO, "ii");
         DEFAULT_PREFIX.put(LOOP_ITEM, "loop");
         DEFAULT_PREFIX.put(ITEM_ATTRIBUTE_MODIFIER, "im");
@@ -427,9 +435,11 @@ public class Attributers {
         DEFAULT_PREFIX.put(MOD_LICENSE, "ml");
         DEFAULT_PREFIX.put(MOD_BADGE, "mb");
         DEFAULT_PREFIX.put(MOD, "m");
+        DEFAULT_PREFIX.put(MOD2, "mm");
         DEFAULT_PREFIX.put(PACK, "p");
         DEFAULT_PREFIX.put(RECORD, "r");
         DEFAULT_PREFIX.put(OFFER, "o");
+        DEFAULT_PREFIX.put(ITEM_CONVERTABLE_TAG_ENTRY, "t");
     }
 
     public static HudElement get(ListProviderSet set, String name, Flags flags, String profileName, int line) {
@@ -444,23 +454,14 @@ public class Attributers {
                 case "raw": return new StringSupplierElement( () -> ListManager.getValue(entry.id()).toString() );
             };
 
-            String[] flagParts = name.split(" ");
-            String prefix = Attributers.defaultPrefix(entry.provider());
-            for (int j = 1; j < flagParts.length; j++) {
-                if (flagParts[j].startsWith("-pre:") || flagParts[j].startsWith("-prefix:")) {
-                    prefix = flagParts[j].substring(flagParts[j].indexOf(':')+1);
-                }
-                else {
-                    Errors.addError(profileName, line, flagParts[j], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, name);
-                }
-            }
-
             Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
             if (attributer == null) {
                 CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
                 continue;
             }
-            HudElement element = attributer.get(prefix, entry.id(), () -> ListManager.getValue(entry.id()), name, flags);
+            String[] flagParts = name.split(" ");
+            String prefix = VariableParser.getPrefix(entry.provider(), flagParts, profileName, line, name);
+            HudElement element = attributer.get(prefix, entry.id(), () -> ListManager.getValue(entry.id()), flagParts[0], flags);
             if (element != null)
                 return element;
         }
@@ -489,24 +490,15 @@ public class Attributers {
             case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(finalProviderID), flags);
             case "raw": return new StringSupplierElement( () -> ListManager.getValue(finalProviderID).toString() );
         };
-        
-        String[] flagParts = part.split(" ");
-        String prefix = Attributers.defaultPrefix(entry.provider());
-        for (int i = 1; i < flagParts.length; i++) {
-            if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:")) {
-                prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
-            }
-            else {
-                Errors.addError(profileName, line, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, part);
-            }
-        }
 
         Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
         if (attributer == null) {
             CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
             return null;
         }
-        return attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), part, flags);
+        String[] flagParts = part.split(" ");
+        String prefix = VariableParser.getPrefix(entry.provider(), flagParts, profileName, line, part);
+        return attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), flagParts[0], flags);
     }
 
     public static String defaultPrefix(ListProvider provider) {

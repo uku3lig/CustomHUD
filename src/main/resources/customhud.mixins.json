@@ -22,12 +22,7 @@
     "fonts.TextRendererMixin",
     "music.MinecraftClientAccess",
     "music.MusicTrackerAccess",
-    "music.WorldRendererMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "mixins": [
+    "music.WorldRendererMixin",
     "BossBarS2CPacketMixin",
     "PlayerEntityMixin",
     "ResourcePackProfileMetadataMixin",
@@ -35,5 +30,8 @@
     "WorldTimeUpdateS2CPacketMixin",
     "accessors.AttributeContainerAccessor",
     "accessors.DefaultAttributeContainerAccessor"
-  ]
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

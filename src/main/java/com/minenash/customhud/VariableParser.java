@@ -32,6 +32,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.stat.StatType;
@@ -448,6 +449,31 @@ public class VariableParser {
             return null;
         }
 
+        el = listOnlyElement(part, profile, debugLine, enabled, original, listProviders, (p) -> {
+            int collinIndex = p.indexOf(':');
+            if (collinIndex == -1) return null;
+            String value = p.substring(collinIndex+1);
+            ListProvider provider = null;
+
+            if (p.startsWith("itag:") || p.startsWith("item_tag:")) {
+                provider = ListSuppliers.TAG_ENTRIES(Registries.ITEM, value);
+                ATTRIBUTER_MAP.put(provider, ITEM_CONVERTABLE_TAG_ENTRY);
+            }
+            else if (p.startsWith("btag:") || p.startsWith("block_tag:")) {
+                provider = ListSuppliers.TAG_ENTRIES(Registries.BLOCK, value);
+                ATTRIBUTER_MAP.put(provider, ITEM_CONVERTABLE_TAG_ENTRY);
+            }
+            else if (p.startsWith("score:") && p.indexOf(':', 6) == -1) {
+                provider = ListSuppliers.SCORES(value);
+                ATTRIBUTER_MAP.put(provider, SCOREBOARD_SCORE);
+            }
+
+            return provider;
+        });
+        if (el != null)
+            return el;
+
+
         String[] flagParts = part.split(" ");
         part = flagParts[0];
         Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
@@ -472,25 +498,25 @@ public class VariableParser {
         }
 
         if (part.startsWith("score:")) {
-            String p = part.substring(6);
-
-            int collinIndex = p.indexOf(':');
-            if (collinIndex == -1) {
-                int commaIndex = p.indexOf(',');
-                String pp = p.substring(0, commaIndex == -1 ? p.length() : commaIndex);
-                ListProvider provider = new ListProvider.ListFunctioner<>(() -> pp ,SCORES);
-                ATTRIBUTER_MAP.put(provider, SCOREBOARD_SCORE);
-                String prefix = flags.listPrefix.isEmpty() ? DEFAULT_PREFIX.get(SCOREBOARD_SCORE) : flags.listPrefix;
-                ListProviderSet.Entry entry = new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), prefix);
-                return listElement(entry, original.substring(1, original.length() - 1), commaIndex, profile, debugLine, enabled, original, listProviders);
-            }
-            String player = p.substring(0, collinIndex);
-            String objective = p.substring(collinIndex+1);
+            part = part.substring(6);
+            int collinIndex = part.indexOf(':');
+            String player = part.substring(0, collinIndex);
+            String objective = part.substring(collinIndex+1);
 
             return Flags.wrap(new NumberSupplierElement(() -> {
                 ScoreboardObjective obj = scoreboard().getNullableObjective(objective);
                 if (obj == null) return null;
                 var score = scoreboard().getScore(ScoreHolder.fromName(player), obj);
+                return score == null ? 0 : score.getScore();
+            }, flags), flags);
+        }
+
+        if (part.startsWith("pscore:") || part.startsWith("player_score:")) {
+            String p = part.substring(part.indexOf(':')+1);
+            return Flags.wrap(new NumberSupplierElement(() -> {
+                ScoreboardObjective obj = scoreboard().getNullableObjective(p);
+                if (obj == null) return null;
+                var score = scoreboard().getScore(ScoreHolder.fromProfile(CLIENT.player.getGameProfile()), obj);
                 return score == null ? 0 : score.getScore();
             }, flags), flags);
         }
@@ -651,9 +677,9 @@ public class VariableParser {
             case "gizmo": return Flags.wrap(new DebugGizmoElement(flags), flags);
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
             case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = true;
-                return Flags.wrap(new ItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = true;
-                return Flags.wrap(new ItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags), flags);
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
@@ -665,7 +691,11 @@ public class VariableParser {
             }
         }
 
-        HudElement element = Attributers.get(listProviders, part, flags, profile.name, debugLine);
+        HudElement element = getSupplierElement(part, enabled, flags);
+        if (element != null)
+            return Flags.wrap(element, flags);
+
+        element = Attributers.get(listProviders, part, flags, profile.name, debugLine);
         if (element instanceof FunctionalElement.CreateListElement cle) {
             String p = original.substring(1, original.length() - 1);
             return listElement(cle.entry, p, p.indexOf(','), profile, debugLine, enabled, original, listProviders);
@@ -673,11 +703,7 @@ public class VariableParser {
         if (element != null)
             return Flags.wrap(element, flags);
 
-        element = getSupplierElement(part, enabled, flags);
-        if (element != null)
-            return Flags.wrap(element, flags);
-        else
-            Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_VARIABLE, part);
+        Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_VARIABLE, part);
         return null;
     }
 
@@ -1269,17 +1295,20 @@ public class VariableParser {
         if (provider == null)
             return null;
 
+        return new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), getPrefix(provider, flagParts, profile.name, debugLine, variable));
+    }
+
+    public static String getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
         String prefix = Attributers.defaultPrefix(provider);
         for (int i = 1; i < flagParts.length; i++) {
             if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:")) {
                 prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
             }
             else {
-                Errors.addError(profile.name, debugLine, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, variable);
+                Errors.addError(profile, line, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, part);
             }
         }
-
-        return new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), prefix);
+        return prefix;
     }
 
     public static ListProviderSet.Entry getLoopProvider(String variable, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
@@ -1370,6 +1399,19 @@ public class VariableParser {
 
         return new ProgressBarIcon(op1, op2, style, flags);
 
+    }
+
+    public static HudElement listOnlyElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders,  Function<String,ListProvider> getProvider) {
+        int commaIndex = part.indexOf(",");
+        String p = part;
+        if (commaIndex != -1)
+            p = p.substring(0, commaIndex);
+        String[] flagParts = p.split(" ");
+        ListProvider provider = getProvider.apply(flagParts[0]);
+        if (provider == null)
+            return null;
+        String prefix = getPrefix(provider, flagParts, profile.name, debugLine, original);
+        return listElement( new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), prefix), part, commaIndex, profile, debugLine, enabled, original, listProviders);
     }
 
 
@@ -1511,7 +1553,7 @@ public class VariableParser {
             return new IgnoreErrorElement();
         }
 
-        String[] flagParts = matcher.group(2).split(" ");
+        String[] flagParts = method.split(" ");
         Flags flags = Flags.parse(profile.name, debugLine, flagParts);
         HudElement element = attributer.get(flags.listPrefix, null, supplier.apply(value), flagParts[0], flags);
 

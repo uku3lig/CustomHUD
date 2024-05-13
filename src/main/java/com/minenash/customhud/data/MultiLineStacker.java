@@ -27,7 +27,7 @@ public class MultiLineStacker {
     private final ListProviderSet listProviders = new ListProviderSet();
 
     public void startIf(String cond, Profile profile, int line, String source, ComplexData.Enabled enabled) {
-        Operation op = ExpressionParser.parseExpression(cond, source, profile, line+1, enabled, listProviders);
+        Operation op = ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders);
         stack.push(new ConditionalElement.MultiLineBuilder(op));
     }
 

@@ -3,8 +3,6 @@ package com.minenash.customhud.mixin;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.CustomHud;
-import com.minenash.customhud.data.Profile;
-import com.minenash.customhud.errors.Errors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.hud.DebugHud;
@@ -19,14 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.stream.Stream;
-
-import static com.minenash.customhud.CustomHud.PROFILE_FOLDER;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -81,27 +71,7 @@ public abstract class MinecraftClientMixin {
             return;
         }
 
-        boolean anyHasErrors = false;
-        try(Stream<Path> pathsStream = Files.list(PROFILE_FOLDER).sorted(Comparator.comparing(p -> p.getFileName().toString()))) {
-            for (Path path : pathsStream.toList()) {
-                if (!Files.isDirectory(path)) {
-                    String name = path.getFileName().toString();
-                    if (name.endsWith(".txt")) {
-                        name = name.substring(0, name.length() - 4);
-                        ProfileManager.replace(Profile.parseProfile(path, name));
-                        if (Errors.hasErrors(name)) {
-                            anyHasErrors = true;
-                            CustomHud.showToast(name);
-                        }
-                    }
-                }
-            }
-            if (!anyHasErrors) {
-                CustomHud.showAllUpdatedToast();
-            }
-        } catch (IOException e) {
-            CustomHud.LOGGER.catching(e);
-        }
+        CustomHud.resourceTriggeredReload();
     }
 
 }

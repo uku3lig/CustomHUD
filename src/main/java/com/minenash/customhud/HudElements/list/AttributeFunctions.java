@@ -21,6 +21,7 @@ import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
@@ -135,9 +136,9 @@ public class AttributeFunctions {
             (property) -> blockstate$getPropertyType(property.getKey().getType()) != 0);
 
 
-    // BLOCK TAGS
-    public static final Function<TagKey<Block>,Identifier> BLOCK_TAG_ID = (tag) -> tag.id();
-    public static final Function<TagKey<Block>,String> BLOCK_TAG_NAME = (tag) -> tag.id().getNamespace().equals("minecraft") ?
+    // BLOCK/ITEM TAGS
+    public static final Function<TagKey<?>,Identifier> TAG_ID = (tag) -> tag.id();
+    public static final Function<TagKey<?>,String> TAG_NAME = (tag) -> tag.id().getNamespace().equals("minecraft") ?
             tag.id().getPath() : tag.id().toString();
 
 
@@ -408,8 +409,8 @@ public class AttributeFunctions {
 
     };
 
-
-
+    public static final Function<ItemConvertible,Text> TAG_ENTRY_NAME = (convertible) -> convertible.asItem().getName();
+    public static final Function<ItemConvertible,Identifier> TAG_ENTRY_ID = (convertible) -> Registries.ITEM.getId(convertible.asItem());
 
 
 

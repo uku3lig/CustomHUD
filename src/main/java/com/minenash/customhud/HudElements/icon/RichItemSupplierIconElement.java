@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.icon;
 
-import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.MinecraftClient;
@@ -8,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 
@@ -15,14 +15,14 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ItemSupplierIconElement extends IconElement {
+public class RichItemSupplierIconElement extends IconElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private final Supplier<?> supplier;
     private final boolean showCount, showDur, showCooldown;
     private final int numSize;
 
-    public ItemSupplierIconElement(UUID providerID, Supplier<?> supplier, Flags flags) {
+    public RichItemSupplierIconElement(UUID providerID, Supplier<?> supplier, Flags flags) {
         super(flags, 11);
         this.supplier = supplier;
         this.showCount = flags.iconShowCount;
@@ -57,7 +57,7 @@ public class ItemSupplierIconElement extends IconElement {
     }
     private ItemStack getStack(RenderPiece piece) {
         if (piece.value != null)
-            return (ItemStack) piece.value;
+            return piece.value instanceof ItemConvertible ic ? ic.asItem().getDefaultStack() : (ItemStack) piece.value;
         Object result = supplier.get();
         if (result instanceof ItemStack stack)
             return stack;
@@ -96,11 +96,13 @@ public class ItemSupplierIconElement extends IconElement {
             context.fill(RenderLayer.getGuiOverlay(), 2, 13, 2 + i, 13 + 1, j | -16777216);
         }
 
-        float f = client.player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getTickDelta());
-        if (showCooldown && f > 0.0F) {
-            int k = MathHelper.floor(16.0F * (1.0F - f));
-            int l = k + MathHelper.ceil(16.0F * f);
-            context.fill(RenderLayer.getGuiOverlay(), 0, k, 16, l, Integer.MAX_VALUE);
+        if (showCooldown) {
+            float f = client.player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getTickDelta());
+            if (f > 0.0F) {
+                int k = MathHelper.floor(16.0F * (1.0F - f));
+                int l = k + MathHelper.ceil(16.0F * f);
+                context.fill(RenderLayer.getGuiOverlay(), 0, k, 16, l, Integer.MAX_VALUE);
+            }
         }
 
         matrices.pop();
