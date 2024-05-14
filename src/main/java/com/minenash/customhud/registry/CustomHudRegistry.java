@@ -1,6 +1,8 @@
 package com.minenash.customhud.registry;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.list.Attributers;
+import com.minenash.customhud.HudElements.list.ListProvider;
 import com.minenash.customhud.data.Flags;
 
 import java.util.*;
@@ -10,6 +12,7 @@ public class CustomHudRegistry {
 
     private static final Map<String, BiFunction<Flags,ParseContext,HudElement>> elementRegistry = new HashMap<>();
     private static final Map<String, BiFunction<String,ParseContext,HudElement>> parseRegistry = new LinkedHashMap<>();
+    private static final Map<String, ListProvider> listRegistry = new HashMap<>();
     private static final List<Runnable> complexData = new ArrayList<>();
 
     public static void registerElement(String name, BiFunction<Flags,ParseContext,HudElement> element) {
@@ -20,11 +23,21 @@ public class CustomHudRegistry {
         parseRegistry.put(id, element);
     }
 
+    public static void registerList(String name, String prefix, ListProvider listProvider, Attributers.Attributer attributer) {
+        Attributers.ATTRIBUTER_MAP.put(listProvider, attributer);
+        Attributers.DEFAULT_PREFIX.put(attributer, prefix);
+        listRegistry.put(name, listProvider);
+    }
+
     public static void unregisterElement(String name) {
         elementRegistry.remove(name);
     }
     public static void unregisterParser(String id) {
         parseRegistry.remove(id);
+    }
+    public static void unregisterList(String name) {
+        Attributers.ATTRIBUTER_MAP.remove(listRegistry.get(name));
+        listRegistry.remove(name);
     }
 
     public static HudElement get(String variable, ParseContext context) {
@@ -39,12 +52,18 @@ public class CustomHudRegistry {
         var function = elementRegistry.get(parts[0]);
         return function == null ? null : function.apply(Flags.parse(context.profile().name, context.line(), parts), context);
     }
+    public static ListProvider getList(String name) {
+        return listRegistry.get(name);
+    }
 
     public static boolean hasElement(String name) {
         return elementRegistry.containsKey(name);
     }
     public static boolean hasParser(String id) {
         return parseRegistry.containsKey(id);
+    }
+    public static boolean hasList(String name) {
+        return parseRegistry.containsKey(name);
     }
 
 

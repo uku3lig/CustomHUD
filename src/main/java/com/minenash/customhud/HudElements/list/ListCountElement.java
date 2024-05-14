@@ -9,9 +9,9 @@ public class ListCountElement implements HudElement {
     public final UUID providerID;
     public final HudElement attribute;
 
-    public ListCountElement(ListProvider provider, HudElement attribute) {
-        this.provider = provider;
-        this.providerID = UUID.randomUUID();
+    public ListCountElement(ListProviderSet.Entry provider, HudElement attribute) {
+        this.provider = provider.provider();
+        this.providerID = provider.id();
         this.attribute = attribute;
     }
 

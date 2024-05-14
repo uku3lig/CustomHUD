@@ -1214,7 +1214,7 @@ public class VariableParser {
             HudElement attribute = Attributers.get(listProviders, attr, new Flags(), profile.name, debugLine);
             if (attribute == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
-            return new ListCountElement(provider.provider(), attribute);
+            return new ListCountElement(provider, attribute);
         }
 
 
@@ -1302,6 +1302,10 @@ public class VariableParser {
 
             default -> null;
         };
+
+        if (provider == null)
+            provider = CustomHudRegistry.getList(variable);
+
         if (provider == null)
             return null;
 
@@ -1432,7 +1436,7 @@ public class VariableParser {
             HudElement attribute = Attributers.get(new ListProviderSet().with(provider), attr, new Flags(), profile.name, debugLine);
             if (attribute == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
-            return new ListCountElement(provider.provider(), attribute);
+            return new ListCountElement(provider, attribute);
         }
 
         List<String> parts = partitionConditional(part);
