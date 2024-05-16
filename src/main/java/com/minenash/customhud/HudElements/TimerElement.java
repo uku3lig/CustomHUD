@@ -10,6 +10,7 @@ import net.minecraft.stat.StatFormatter;
 public class TimerElement implements HudElement {
 
     private final int precision;
+    private final int zerofill;
     private final double scale;
     private final StatFormatter formatter;
 
@@ -21,6 +22,7 @@ public class TimerElement implements HudElement {
 
     public TimerElement(Operation end, Operation interval, Flags flags) {
         precision = flags.precision == -1 ? 0 : flags.precision;
+        zerofill = flags.zerofill;
         scale = flags.scale;
         formatter = flags.hex ? NumberSupplierElement.HEX : null;
 
@@ -41,7 +43,7 @@ public class TimerElement implements HudElement {
 
     @Override
     public String getString() {
-        return NumElement.formatString(get()*scale, formatter, precision);
+        return NumElement.formatString(get()*scale, formatter, precision, zerofill);
     }
 
     @Override

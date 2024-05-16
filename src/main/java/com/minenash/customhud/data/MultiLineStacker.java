@@ -116,10 +116,13 @@ public class MultiLineStacker {
             }
         }
 
-        if (provider == null)
-            Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
-
         listProviders.push(provider);
+
+        if (provider == null) {
+            Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
+            stack.push( new ListElement.MultiLineBuilder(null, null, null) );
+            return;
+        }
 
         Operation filter = null;
         if (parts.size() > 1) {

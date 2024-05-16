@@ -68,6 +68,9 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> FISHING_IN_OPEN_WATER = () -> client.player.fishHook != null && client.player.fishHook.isOpenOrWaterAround(client.player.fishHook.getBlockPos());
 
     public static final Supplier<Boolean> HAS_NOISE = () -> ComplexData.serverWorld.getChunkManager().getChunkGenerator() instanceof NoiseChunkGenerator;
+    public static final Supplier<Boolean> IS_TICK_SPRINTING = () -> client.getServer() != null ? client.getServer().getTickManager().isSprinting() : null;
+    public static final Supplier<Boolean> IS_TICK_FROZEN = () -> client.getServer() != null ? client.getServer().getTickManager().isFrozen() : null;
+    public static final Supplier<Boolean> IS_TICK_STEPPING = () -> client.getServer() != null ? client.getServer().getTickManager().isStepping() : null;
 
 
     public static final Supplier<Boolean> REAL_AM = () -> LocalTime.now().getHour() < 12;

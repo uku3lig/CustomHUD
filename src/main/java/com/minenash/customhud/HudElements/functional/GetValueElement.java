@@ -11,12 +11,14 @@ public class GetValueElement implements HudElement {
 
     private final String valueName;
     private final int precision;
+    private final int zerofill;
     private final double scale;
     private final StatFormatter formatter;
 
     public GetValueElement(String valueName, Flags flags) {
         this.valueName = valueName;
         this.precision = flags.precision == -1 ? 0 : flags.precision;
+        this.zerofill = flags.zerofill;
         this.scale = flags.scale;
         this.formatter = flags.hex ? NumberSupplierElement.HEX : null;
     }
@@ -24,7 +26,7 @@ public class GetValueElement implements HudElement {
 
     @Override
     public String getString() {
-        return NumElement.formatString( getNumber().doubleValue() * scale, formatter, precision );
+        return NumElement.formatString( getNumber().doubleValue() * scale, formatter, precision, zerofill );
     }
 
     @Override

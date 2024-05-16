@@ -25,6 +25,7 @@ public class Flags {
 
     public int precision = -1;
     public double scale = 1;
+    public int zerofill = 0;
     public boolean hex = false;
     public int frequency = -1;
 
@@ -45,6 +46,7 @@ public class Flags {
     }
 
     private static final Pattern PRECISION_PATTERN = Pattern.compile("-(?:p|precision)(\\d+)");
+    private static final Pattern ZEROFILL_PATTERN = Pattern.compile("-(?:zf|zero-?fill)(\\d+)");
     private static final Pattern SCALE_PATTERN = Pattern.compile("-(?:s|scale)((\\d+)/(\\d+)|\\d+(\\.\\d+)?)");
     private static final Pattern FREQUENCY_PATTERN = Pattern.compile("-(?:v|freq|frequency)((\\d+)/(\\d+)|\\d+(\\.\\d+)?)");
     private static final Pattern WIDTH_PATTERN = Pattern.compile("-(?:w|width)(\\d+)");
@@ -88,6 +90,11 @@ public class Flags {
                     Matcher matcher = PRECISION_PATTERN.matcher(parts[i]);
                     if (matcher.matches()) {
                         flags.precision = Integer.parseInt(matcher.group(1));
+                        continue;
+                    }
+                    matcher = ZEROFILL_PATTERN.matcher(parts[i]);
+                    if (matcher.matches()) {
+                        flags.zerofill = Integer.parseInt(matcher.group(1));
                         continue;
                     }
                     matcher = SCALE_PATTERN.matcher(parts[i]);

@@ -110,7 +110,7 @@ public class CustomHudRenderer {
                     String str = builder.toString();
                     if (!str.isEmpty()) {
                         str = formatting.getFormatting() + str;
-                        pieces.add(new RenderPiece(str, null, theme.font, xOffset, y, formatting.getColor(), theme.bgColor, theme.textShadow));
+                        pieces.add(new RenderPiece(str, null, theme.font, xOffset, y, formatting.getColor(), theme.bgColor, theme.textShadow, theme.lineSpacing == 0));
                         xOffset += client.textRenderer.getWidth(str);
                         builder.setLength(0);
                     }
@@ -150,10 +150,10 @@ public class CustomHudRenderer {
                         theme = cte.theme;
                         font = cte.theme.font;
                     } else if (e instanceof IconElement ie) {
-                        pieces.add( new RenderPiece(ie, ListManager.getValue(ie.getProviderID()), null, xOffset, y, formatting.getColor(), theme.bgColor, false) );
+                        pieces.add( new RenderPiece(ie, ListManager.getValue(ie.getProviderID()), null, xOffset, y, formatting.getColor(), theme.bgColor, false, false) );
                         xOffset += ie.getTextWidth();
                     } else if (e instanceof TextElement te) {
-                        pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.bgColor, theme.textShadow) );
+                        pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.bgColor, theme.textShadow, theme.lineSpacing == 0) );
                         xOffset += te.getTextWidth();
                     }
                     if (e instanceof ExecuteElement ee) ee.run();
@@ -195,15 +195,16 @@ public class CustomHudRenderer {
 
         for (RenderPiece piece : pieces) {
             font = piece.font;
+            int y = piece.shiftTextUp ? piece.y-1 : piece.y;
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
                 catch (Exception e){
                     CustomHud.LOGGER.catching(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
-                context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, value, piece.x, y, piece.color, piece.shadow);
             else if (piece.element instanceof Text text)
-                context.drawText(client.textRenderer, text, piece.x, piece.y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, text, piece.x, y, piece.color, piece.shadow);
 
         }
 

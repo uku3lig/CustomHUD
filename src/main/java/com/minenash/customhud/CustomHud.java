@@ -67,8 +67,6 @@ public class CustomHud implements ModInitializer {
 			EstimatedTick.reset();
 		});
 
-
-
 	}
 
 	public static void delayedInitialize() {

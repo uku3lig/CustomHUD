@@ -22,6 +22,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
     private final Supplier<Number> supplier;
     private final int precision;
     private final double scale;
+    private final int zerofill;
     private StatFormatter formatter;
 
     public NumberSupplierElement(Entry entry, Flags flags) {
@@ -32,6 +33,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
     public NumberSupplierElement(Supplier<Number> supplier, Flags flags) {
         this.supplier = supplier;
         this.precision = flags.precision == -1 ? 0 : flags.precision;
+        this.zerofill = flags.zerofill;
         this.scale = flags.scale;
         this.formatter = flags.hex ? HEX : null;
     }
@@ -45,7 +47,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
     public String getString() {
         try {
             double num = supplier.get().doubleValue() * scale;
-            return NumElement.formatString(num, formatter, precision);
+            return NumElement.formatString(num, formatter, precision, zerofill);
 
         }
         catch (Exception _e) {

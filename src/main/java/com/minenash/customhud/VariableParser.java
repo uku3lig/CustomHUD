@@ -837,6 +837,9 @@ public class VariableParser {
             case "java_version" -> JAVA_VERSION;
             case "cpu_name" -> CPU_NAME;
             case "gpu_name" -> GPU_NAME;
+            case "gpu_vendor" -> GPU_VENDOR;
+            case "gl_version" -> GL_VERSION;
+            case "gpu_driver" -> GPU_DRIVER;
             case "server_brand" -> SERVER_BRAND;
 
             case "music_name" -> {enabled.music = true; yield MUSIC_NAME;}
@@ -887,6 +890,9 @@ public class VariableParser {
             case "record_playing" -> {enabled.music = true; yield RECORD_PLAYING;}
 
             case "has_noise" -> {enabled.serverWorld = true; yield HAS_NOISE;}
+            case "is_tick_sprinting", "tick_sprinting" -> IS_TICK_SPRINTING;
+            case "is_tick_frozen", "tick_frozen" -> IS_TICK_FROZEN;
+            case "is_tick_stepping", "tick_stepping" -> IS_TICK_STEPPING;
 
             case "reaL_am" -> REAL_AM;
             case "reaL_pm" -> REAL_PM;
@@ -1086,8 +1092,10 @@ public class VariableParser {
             case "memory_total" -> TOTAL_MEMORY;
             case "memory_allocated_percentage" -> ALLOCATED_PERCENTAGE;
             case "memory_allocated" -> ALLOCATED;
+            case "memory_allocation_rate" -> ALLOCATION_RATE;
             case "cpu_usage", "cpu" -> {enabled.cpu = true; yield CPU_USAGE;}
             case "gpu_usage", "gpu" -> {enabled.gpuMetrics = true; yield GPU_USAGE;}
+            case "ms_per_tick" -> { enabled.world = true; yield MS_PER_TICK;}
             case "ms_ticks", "tick_ms" -> TICK_MS;
             case "frame_ms_min" -> { enabled.frameMetrics = true; yield FRAME_MS_MIN;}
             case "frame_ms_max" -> { enabled.frameMetrics = true; yield FRAME_MS_MAX;}
@@ -1166,6 +1174,7 @@ public class VariableParser {
             case "facing_towards_pn_word" -> FACING_TOWARDS_PN_WORD;
             case "facing_towards_pn_sign" -> FACING_TOWARDS_PN_SIGN;
             case "gamemode" -> GAMEMODE;
+            case "active_renderer" -> ACTIVE_RENDERER;
             default -> null;
         };
     }
@@ -1277,6 +1286,8 @@ public class VariableParser {
             case "subtitles" -> {enabled.subtitles = true; yield SUBTITLES;}
             case "target_block_props", "target_block_properties", "tbp" -> {enabled.targetBlock = true; yield TARGET_BLOCK_STATES;}
             case "target_block_tags", "tbt" -> {enabled.targetBlock = true; yield TARGET_BLOCK_TAGS;}
+            case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
+            case "target_fluid_tags", "tft" -> {enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
             case "attributes" -> PLAYER_ATTRIBUTES;
             case "target_entity_attributes", "target_entity_attrs", "teas" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ATTRIBUTES;}
             case "hooked_entity_attributes", "hooked_entity_attrs", "heas" -> HOOKED_ENTITY_ATTRIBUTES;

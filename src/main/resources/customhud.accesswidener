@@ -46,3 +46,6 @@ accessible field net/minecraft/client/gui/hud/InGameHud titleFadeOutTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleStayTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleFadeInTicks I
 accessible field net/minecraft/resource/ResourcePackProfile metadata Lnet/minecraft/resource/ResourcePackProfile$Metadata;
+accessible class net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator
+accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator <init> ()V
+accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator get (J)J

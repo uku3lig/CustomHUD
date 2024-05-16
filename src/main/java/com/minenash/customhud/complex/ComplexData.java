@@ -74,7 +74,6 @@ public class ComplexData {
     public static final CentralProcessor cpu = new SystemInfo().getHardware().getProcessor();
     private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
     public static double cpuLoad = 0;
-
     public static double gpuUsage = 0;
 
     public static int[] clicksSoFar = new int[]{0,0};

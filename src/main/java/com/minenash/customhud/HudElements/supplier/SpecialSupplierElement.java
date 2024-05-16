@@ -16,6 +16,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.util.function.Supplier;
 
 import static com.minenash.customhud.ProfileManager.getActive;
+import static net.fabricmc.fabric.api.renderer.v1.RendererAccess.INSTANCE;
 
 public class SpecialSupplierElement implements HudElement {
 
@@ -85,6 +86,11 @@ public class SpecialSupplierElement implements HudElement {
     public static final Entry FACING_TOWARDS_PN_SIGN = of( () -> isFacingEastOrSouth() ? "+" : "-",
             () -> isFacingEastOrSouth() ? 1 : 0,
             SpecialSupplierElement::isFacingEastOrSouth);
+
+    public static final Entry ACTIVE_RENDERER = of( () -> INSTANCE.hasRenderer() ? INSTANCE.getRenderer().getClass().getSimpleName() : "none (vanilla)",
+                                                    () -> INSTANCE.hasRenderer() ? INSTANCE.getRenderer().getClass().getSimpleName().length() : 7,
+                                                    () -> INSTANCE.hasRenderer());
+
 
     public record Entry(Supplier<String> stringSupplier, Supplier<Number> numberSupplier, Supplier<Boolean> booleanSupplier) {}
     public static Entry of(Supplier<String> stringSupplier, Supplier<Number> numberSupplier, Supplier<Boolean> booleanSupplier) {

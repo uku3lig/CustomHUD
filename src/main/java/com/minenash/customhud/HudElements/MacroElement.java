@@ -18,12 +18,14 @@ public class MacroElement implements HudElement, MultiElement {
 
     private final String macroName;
     private final int precision;
+    private final int zerofill;
     private final double scale;
     private final StatFormatter formatter;
 
     public MacroElement(String macroName, Flags flags) {
         this.macroName = macroName;
         this.precision = flags.precision == -1 ? 0 : flags.precision;
+        this.zerofill = flags.zerofill;
         this.scale = flags.scale;
         this.formatter = flags.hex ? NumberSupplierElement.HEX : null;
     }
@@ -74,6 +76,6 @@ public class MacroElement implements HudElement, MultiElement {
         if (macro.elements() != null)
             return macro.elements();
 
-        return Collections.singletonList( new StringElement( NumElement.formatString(macro.op().getValue() * scale, formatter, precision) ) );
+        return Collections.singletonList( new StringElement( NumElement.formatString(macro.op().getValue() * scale, formatter, precision, zerofill) ) );
     }
 }

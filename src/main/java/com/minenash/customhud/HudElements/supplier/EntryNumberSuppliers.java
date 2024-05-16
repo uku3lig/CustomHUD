@@ -4,6 +4,7 @@ import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.EstimatedTick;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.math.BlockPos;
@@ -22,6 +23,7 @@ public class EntryNumberSuppliers {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Runtime runtime = Runtime.getRuntime();
     public static final VanillaBiomeParameters par = new VanillaBiomeParameters();
+    public static DebugHud.AllocationRateCalculator allocationRateCalculator = new DebugHud.AllocationRateCalculator();
 
     private static Entity cameraEntity() { return client.getCameraEntity(); }
     private static boolean inNether() { return client.world.getRegistryKey().getValue().equals(World.NETHER.getValue()); }
@@ -69,7 +71,9 @@ public class EntryNumberSuppliers {
     public static final Entry FPS_MAX = of( () -> 1000 / ComplexData.frameTimeMetrics[1], 0);
     public static final Entry FPS_AVG = of( () -> 1000 / ComplexData.frameTimeMetrics[0], 1);
 
-    public static final Entry TICK_MS = of( () -> Math.max(client.getServer() == null ? EstimatedTick.get() : client.getServer().getAverageTickTime(), 50), 0);
+    public static final Entry MS_PER_TICK = of( () -> client.getServer() == null ? null : ComplexData.world.getTickManager().getMillisPerTick(), 0);
+
+    public static final Entry TICK_MS = of( () -> client.getServer() != null ? client.getServer().getAverageTickTime() : EstimatedTick.get(), 0);
     public static final Entry TICK_MS_MIN = of( () -> ComplexData.tickTimeMetrics[1], 0);
     public static final Entry TICK_MS_MAX = of( () -> ComplexData.tickTimeMetrics[2], 0);
     public static final Entry TICK_MS_AVG = of( () -> ComplexData.tickTimeMetrics[0], 1);
@@ -128,6 +132,7 @@ public class EntryNumberSuppliers {
     public static final Entry TOTAL_MEMORY = of( () -> toMiB(runtime.maxMemory()), 0);
     public static final Entry ALLOCATED_PERCENTAGE = of( () -> runtime.totalMemory() * 100 / runtime.maxMemory(), 0);
     public static final Entry ALLOCATED = of( () -> toMiB(runtime.totalMemory()), 0);
+    public static final Entry ALLOCATION_RATE = of( () -> toMiB( allocationRateCalculator.get( runtime.totalMemory() - runtime.freeMemory() ) ), 0);
 //    public static final Entry OFF_HEAP = of( () -> toMiB(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed() + NativeBuffer.getTotalAllocated()), 0);
 
     private static final double PHI_CONST = (1 + Math.sqrt(5))/2;
