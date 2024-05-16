@@ -81,6 +81,7 @@ public class AttributeFunctions {
 
     // PLAYERS (From PlayerList)
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_NAME = (player) -> player.getProfile().getName();
+    public static final Function<PlayerListEntry,Text> PLAYER_ENTRY_DISPLAY_NAME = (player) -> player.getDisplayName();
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_UUID = (player) -> player.getProfile().getId().toString();
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_TEAM = (player) -> player.getScoreboardTeam().getName(); //TODO: CHANGE TEAM VAR
     public static final Function<PlayerListEntry,Number> PLAYER_ENTRY_LATENCY = (player) -> player.getLatency();
@@ -147,6 +148,7 @@ public class AttributeFunctions {
     public static final Function<Map.Entry<Enchantment,Integer>,Identifier> ENCHANT_ID = (enchant) -> Registries.ENCHANTMENT.getId(enchant.getKey());
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant.getKey().getRarity().toString().toLowerCase();
     public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant.getValue();
+    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant.getKey().getMaxLevel();
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL =
             (enchant) -> enchant.getKey().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().getTranslationKey())
             : I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());

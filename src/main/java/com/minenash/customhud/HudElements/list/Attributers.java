@@ -63,8 +63,9 @@ public class Attributers {
         }
 
         return switch (name) {
-            case "", "name" -> new Str(sup,PLAYER_ENTRY_NAME);
-            case "id" -> new Str(sup,PLAYER_ENTRY_UUID);
+            case "name", "display_name" -> new Tex(sup,PLAYER_ENTRY_DISPLAY_NAME);
+            case "", "username" -> new Str(sup,PLAYER_ENTRY_NAME);
+            case "id", "uuid" -> new Str(sup,PLAYER_ENTRY_UUID);
             case "team" -> new Str(sup, PLAYER_ENTRY_TEAM);
             case "latency" -> new Num(sup,PLAYER_ENTRY_LATENCY, flags);
             case "list_score" -> new Num(sup,PLAYER_ENTRY_LIST_SCORE, flags);
@@ -116,7 +117,9 @@ public class Attributers {
         case "", "id" -> new Id(sup,ENCHANT_ID, flags);
         case "full" -> new Str(sup,ENCHANT_FULL);
         case "level" -> new Special(sup,ENCHANT_LEVEL);
+        case "max_level" -> new Special(sup,ENCHANT_MAX_LEVEL);
         case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
+        case "max_num", "max_number" -> new Num(sup,ENCHANT_MAX_NUM, flags);
         case "rarity" -> new Str(sup,ENCHANT_RARITY);
         default -> null;
     };
