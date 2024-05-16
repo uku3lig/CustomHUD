@@ -54,7 +54,7 @@ public class EntitySuppliers {
     public static final NumberSupplierElement.Entry VEHICLE_ENTITY_MAX_HEALTH = of ( () -> !(veh() instanceof LivingEntity le)? null : le.getMaxHealth(), 0);
     public static final Supplier<Number> VEHICLE_ENTITY_ARMOR = () -> !(veh() instanceof LivingEntity le)? null : le.getArmor();
     public static final NumberSupplierElement.Entry VEHICLE_HORSE_JUMP = of ( () -> !(veh() instanceof HorseEntity)? null : CLIENT.player.getMountJumpStrength()*100, 0);
-    public static final Supplier<String> VEHICLE_HORSE_ARMOR = () -> !(veh() instanceof HorseEntity he)? null : he.getArmorType().getItem().getName().getString(); //TODO: Attribute
+    public static final Supplier<Text> VEHICLE_HORSE_ARMOR = () -> !(veh() instanceof HorseEntity he)? null : he.getArmorType().getName(); //TODO: Attribute
 
 
     private static String type(Entity e) { return e == null ? null : I18n.translate(e.getType().getTranslationKey()); }

@@ -783,6 +783,7 @@ public class VariableParser {
             case "last_hit_name", "lhn" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_NAME;}
             case "hooked_entity_name", "hen" -> HOOKED_ENTITY_NAME;
             case "vehicle_entity_name", "vehicle_name", "ven" -> VEHICLE_ENTITY_NAME;
+            case "vehicle_horse_armor", "horse_armor", "vha" -> VEHICLE_HORSE_ARMOR;
             case "team_name" -> PLAYER_TEAM_NAME;
             case "record_name" -> {enabled.music = true; yield RECORD_NAME;}
             case "team", "pteam", "player_team" -> PLAYER_TEAM;
@@ -830,7 +831,6 @@ public class VariableParser {
             case "hooked_entity_uuid", "heu" -> HOOKED_ENTITY_UUID;
             case "vehicle_entity", "vehicle", "ve" -> VEHICLE_ENTITY;
             case "vehicle_entity_uuid", "vehicle_uuid", "veu" -> VEHICLE_ENTITY_UUID;
-            case "vehicle_horse_armor", "horse_armor", "vha" -> VEHICLE_HORSE_ARMOR;
             case "world_name", "world" -> WORLD_NAME;
             case "server_name" -> SERVER_NAME;
             case "server_address", "address", "ip" -> SERVER_ADDRESS;
