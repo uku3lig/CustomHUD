@@ -17,12 +17,14 @@ import com.minenash.customhud.HudElements.text.TitleMsgElement;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
+import com.minenash.customhud.conditionals.SudoElements;
 import com.minenash.customhud.data.*;
 import com.minenash.customhud.errors.ErrorType;
 import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.registry.CustomHudRegistry;
 import com.minenash.customhud.registry.ParseContext;
 import com.terraformersmc.modmenu.ModMenu;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -698,6 +700,11 @@ public class VariableParser {
             return new SeededSlimeChunkElement(seedStr);
         }
 
+        if (part.startsWith("mod_loaded:")) {
+            String modid = part.substring(11);
+            return new SudoElements.Bool(  FabricLoader.getInstance().isModLoaded(modid) );
+        }
+
         switch (part) {
             case "gizmo": return Flags.wrap(new DebugGizmoElement(flags), flags);
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
@@ -1012,7 +1019,6 @@ public class VariableParser {
             case "display_width" -> DISPLAY_WIDTH;
             case "display_height" -> DISPLAY_HEIGHT;
             case "display_refresh_rate" -> DISPLAY_REFRESH_RATE;
-//            case "mods" -> MODS;
             case "ping" -> {enabled.pingMetrics = true; yield PING;}
             case "latency" -> LATENCY;
             case "time", "solar_time" -> SOLAR_TIME;

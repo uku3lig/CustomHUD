@@ -124,19 +124,20 @@ public class CustomHud implements ModInitializer {
 		//TODO: Redo KeyBinds!
 		while (kb_enable.wasPressed()) {
 			ProfileManager.enabled = !ProfileManager.enabled;
+			saveDelay = 100;
 		}
 		while (kb_cycleProfiles.wasPressed()) {
 			ProfileManager.cycle();
+			saveDelay = 100;
 		}
 		for (Profile p : ProfileManager.getProfiles()) {
 			while (p.keyBinding.wasPressed()) {
 				ProfileManager.setActive(p);
 				ProfileManager.enabled = true;
+				saveDelay = 100;
 			}
 			for (Toggle t : p.toggles.values()) {
 				boolean wasPressed = t.key.wasPressed();
-				if (t.name.equals("test2"))
-					System.out.println(t.name + " " + isKeybindPressed(t.modifier) +wasPressed);
 				if (isKeybindPressed(t.modifier) && wasPressed)
 					t.toggle();
 			}
@@ -149,8 +150,6 @@ public class CustomHud implements ModInitializer {
 				else
 					CLIENT.setScreen(new NewConfigScreen(null));
 		}
-
-		saveDelay = 100;
 	}
 
 	public static final Map<Integer,Boolean> IS_MOUSE_DOWN = new HashMap<>(6);

@@ -148,7 +148,6 @@ public class ProfileManager {
             Profile p = profiles.get(i);
             if (p.cycle) {
                 setActive(p);
-                ConfigManager.save();
                 return;
             }
         }
@@ -156,7 +155,6 @@ public class ProfileManager {
             Profile p = profiles.get(i);
             if (p.cycle) {
                 setActive(p);
-                ConfigManager.save();
                 return;
             }
         }
