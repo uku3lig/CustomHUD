@@ -71,9 +71,9 @@ public class CustomHud implements ModInitializer {
 
 	public static void delayedInitialize() {
 		MODMENU_INSTALLED = FabricLoader.getInstance().isModLoaded("modmenu");
-		ConfigManager.load();
 
 		readProfiles();
+		ConfigManager.load();
 		updateCrosshairObjectShare();
 
 		ConfigManager.save();
@@ -134,7 +134,10 @@ public class CustomHud implements ModInitializer {
 				ProfileManager.enabled = true;
 			}
 			for (Toggle t : p.toggles.values()) {
-				while (t.keyBinding.wasPressed())
+				boolean wasPressed = t.key.wasPressed();
+				if (t.name.equals("test2"))
+					System.out.println(t.name + " " + isKeybindPressed(t.modifier) +wasPressed);
+				if (isKeybindPressed(t.modifier) && wasPressed)
 					t.toggle();
 			}
 		}
@@ -148,6 +151,15 @@ public class CustomHud implements ModInitializer {
 		}
 
 		saveDelay = 100;
+	}
+
+	public static final Map<Integer,Boolean> IS_MOUSE_DOWN = new HashMap<>(6);
+	public static boolean isKeybindPressed(KeyBinding key) {
+		if (key.isUnbound())
+			return true;
+		if (key.boundKey.type == InputUtil.Type.MOUSE)
+			return IS_MOUSE_DOWN.getOrDefault(KeyBindingHelper.getBoundKeyOf(key).getCode(), false);
+		return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), KeyBindingHelper.getBoundKeyOf(key).getCode());
 	}
 
 	public static boolean isNotDisabled(DisableElement element) {

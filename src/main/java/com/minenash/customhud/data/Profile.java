@@ -64,9 +64,9 @@ public class Profile {
 
         if (!Errors.getErrors(profileName).isEmpty()) {
             CustomHud.LOGGER.warn("");
-            CustomHud.LOGGER.warn("Errors Found in profile '{}'", profileName);
+            CustomHud.LOGGER.warn("[CustomHud] Errors Found in profile '{}'", profileName);
             for (var e : Errors.getErrors(profileName))
-                CustomHud.LOGGER.warn("{} | {} | {} | {}", e.line(), e.type(), e.source(), e.context());
+                CustomHud.LOGGER.warn("[CustomHud] {} | {} | {} | {}", e.line(), e.type(), e.source(), e.context());
             CustomHud.LOGGER.warn("");
         }
 

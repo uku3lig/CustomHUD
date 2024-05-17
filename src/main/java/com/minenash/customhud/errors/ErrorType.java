@@ -12,6 +12,8 @@ public enum ErrorType {
     UNKNOWN_VARIABLE ("Variables", "variables", "Unknown Variable: §e"),
     UNKNOWN_LIST ("CHANGE ME", "CHANGE ME", "Unknown List Variable: §e"),
     UNKNOWN_VARIABLE_FLAG ("Variable Flags", "references/variable_flags", "Unknown Variable Flag: §e"),
+    RADIX_TOO_BIG ("Variable Flags", "references/variable_flags", "Radix can't be above 36"),
+    RADIX_TOO_SMALL ("Variable Flags", "references/variable_flags", "Radix can't be below 2"),
     UNKNOWN_LIST_VARIABLE_FLAG ("Variable Flags", "references/variable_flags", "Unknown List Variable Flag: §e"),
     UNKNOWN_THEME_FLAG ("Theming", "references/theming", "Unknown Theme Option or Value"),
     UNKNOWN_COLOR ("Theming", "references/theming", "Unknown Color: §e"),

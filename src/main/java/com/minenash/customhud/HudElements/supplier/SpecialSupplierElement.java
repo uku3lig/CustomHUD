@@ -26,7 +26,7 @@ public class SpecialSupplierElement implements HudElement {
         return dir == Direction.EAST || dir == Direction.SOUTH;
     }
 
-    public static final Entry PROFILE_KEYBIND = of( () -> getActive() == null ? "" : I18n.translate(getActive().keyBinding.getBoundKeyTranslationKey()),
+    public static final Entry PROFILE_KEYBIND = of( () -> getActive() == null ? "" : getActive().keyBinding.getBoundKeyLocalizedText().getString(),
             () -> getActive() == null ? 0 : getActive().keyBinding.boundKey.getCode(),
             () -> getActive() != null && !getActive().keyBinding.isUnbound());
 
@@ -39,8 +39,8 @@ public class SpecialSupplierElement implements HudElement {
                                                 () -> (int)((ComplexData.timeOfDay % 1000) / (1000/60F)) != 0);
 
     public static final Entry TIME_SECONDS = of( () -> String.format("%02d",(int)((ComplexData.timeOfDay % 1000) % (1000/60F) * 3.6F)),
-            () -> (int)((ComplexData.timeOfDay % 1000) % (1000/60F) * 3.6F),
-            () -> (int)((ComplexData.timeOfDay % 1000) % (1000/60F) * 3.6F) != 0);
+                                                 () -> (int)((ComplexData.timeOfDay % 1000) % (1000/60F) * 3.6F),
+                                                 () -> (int)((ComplexData.timeOfDay % 1000) % (1000/60F) * 3.6F) != 0);
 
     public static final Entry TARGET_BLOCK = of( () -> I18n.translate(ComplexData.targetBlock.getBlock().getTranslationKey()),
                                                  () -> Block.getRawIdFromState(ComplexData.targetBlock),

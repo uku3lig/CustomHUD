@@ -12,7 +12,7 @@ public class TimerElement implements HudElement {
     private final int precision;
     private final int zerofill;
     private final double scale;
-    private final StatFormatter formatter;
+    private final int base;
 
     private final Operation interval;
     private final Operation end;
@@ -24,7 +24,7 @@ public class TimerElement implements HudElement {
         precision = flags.precision == -1 ? 0 : flags.precision;
         zerofill = flags.zerofill;
         scale = flags.scale;
-        formatter = flags.hex ? NumberSupplierElement.HEX : null;
+        base = flags.base;
 
         this.interval = interval;
         this.end = end;
@@ -43,7 +43,7 @@ public class TimerElement implements HudElement {
 
     @Override
     public String getString() {
-        return NumElement.formatString(get()*scale, formatter, precision, zerofill);
+        return NumElement.formatString(get()*scale, null, precision, zerofill, base);
     }
 
     @Override

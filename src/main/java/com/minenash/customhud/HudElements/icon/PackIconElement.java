@@ -68,7 +68,7 @@ public class PackIconElement extends IconElement {
                 return identifier;
             }
         } catch (Exception var14) {
-            CustomHud.LOGGER.warn("Failed to load icon from pack {}", resourcePackProfile.getName(), var14);
+            CustomHud.LOGGER.warn("[CustomHud] Failed to load icon from pack {}", resourcePackProfile.getName(), var14);
             return UNKNOWN_PACK;
         }
     }

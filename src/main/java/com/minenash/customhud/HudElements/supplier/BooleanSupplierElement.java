@@ -69,8 +69,8 @@ public class BooleanSupplierElement implements HudElement {
 
     public static final Supplier<Boolean> HAS_NOISE = () -> ComplexData.serverWorld.getChunkManager().getChunkGenerator() instanceof NoiseChunkGenerator;
     public static final Supplier<Boolean> IS_TICK_SPRINTING = () -> client.getServer() != null ? client.getServer().getTickManager().isSprinting() : null;
-    public static final Supplier<Boolean> IS_TICK_FROZEN = () -> client.getServer() != null ? client.getServer().getTickManager().isFrozen() : null;
-    public static final Supplier<Boolean> IS_TICK_STEPPING = () -> client.getServer() != null ? client.getServer().getTickManager().isStepping() : null;
+    public static final Supplier<Boolean> IS_TICK_FROZEN = () -> client.getServer() != null ? client.getServer().getTickManager().isFrozen() : client.world.getTickManager().isFrozen();
+    public static final Supplier<Boolean> IS_TICK_STEPPING = () -> client.getServer() != null ? client.getServer().getTickManager().isStepping() : client.world.getTickManager().isStepping();
 
 
     public static final Supplier<Boolean> REAL_AM = () -> LocalTime.now().getHour() < 12;

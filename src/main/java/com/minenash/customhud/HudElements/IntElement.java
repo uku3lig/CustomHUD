@@ -1,24 +1,25 @@
 package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
+import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.data.Flags;
 
-public class IntElement implements HudElement {
+public class IntElement implements HudElement, NumElement {
     private final float color;
     private final int precision;
-    private final boolean hex;
+    private final int zerofill;
+    private final int base;
 
     public IntElement(int color, Flags flags) {
         this.color = (float) (color * flags.scale);
         this.precision = flags.precision == -1 ? 0 : flags.precision;
-        this.hex = flags.hex;
+        this.zerofill = flags.zerofill;
+        this.base = flags.base;
     }
 
     @Override
     public String getString() {
-        return hex ? Integer.toHexString((int) color).toUpperCase()
-                : precision == 0 ? Integer.toString((int) color)
-                : String.format("%."+precision+"f", color);
+        return NumElement.formatString(color, null, precision, zerofill, base);
     }
 
     @Override
@@ -31,4 +32,8 @@ public class IntElement implements HudElement {
         return color > 0;
     }
 
+    @Override
+    public int getPrecision() {
+        return precision;
+    }
 }

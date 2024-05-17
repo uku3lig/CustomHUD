@@ -20,8 +20,8 @@ public class KeyBindingMixin {
             if (p.keyBinding.matchesKey(key.getCode(), key.getCode()))
                 ++p.keyBinding.timesPressed;
             for (Toggle t : p.toggles.values()) {
-                if (t.keyBinding.matchesKey(key.getCode(), key.getCode()))
-                    ++t.keyBinding.timesPressed;
+                if (t.key.matchesKey(key.getCode(), key.getCode()))
+                    ++t.key.timesPressed;
             }
         }
 

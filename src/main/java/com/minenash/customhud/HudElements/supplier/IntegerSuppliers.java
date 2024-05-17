@@ -93,6 +93,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> TARGET_BLOCK_Z = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getZ();
     public static final Supplier<Number> TARGET_BLOCK_DISTANCE = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getManhattanDistance(client.player.getBlockPos());
     public static final Supplier<Number> TARGET_BLOCK_COLOR = () -> ComplexData.targetBlock == null || ComplexData.targetBlock.isAir() ? null : ComplexData.targetBlock.getMapColor(client.world, ComplexData.targetBlockPos).color;
+    public static final Supplier<Number> TARGET_BLOCK_LUMINANCE = () -> ComplexData.targetBlock == null || ComplexData.targetBlock.isAir() ? null : ComplexData.world.getLuminance(ComplexData.targetBlockPos);
     public static final Supplier<Number> TARGET_FLUID_X = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getX();
     public static final Supplier<Number> TARGET_FLUID_Y = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getY();
     public static final Supplier<Number> TARGET_FLUID_Z = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getZ();
@@ -146,6 +147,11 @@ public class IntegerSuppliers {
     public static final Supplier<Number> SERVER_HEIGHT_MAP_OCEAN_FLOOR = () -> chunk(ComplexData.serverChunk, Heightmap.Type.OCEAN_FLOOR);
     public static final Supplier<Number> SERVER_HEIGHT_MAP_MOTION_BLOCKING = () -> chunk(ComplexData.serverChunk, Heightmap.Type.MOTION_BLOCKING);
     public static final Supplier<Number> SERVER_HEIGHT_MAP_MOTION_BLOCKING_NO_LEAVES = () -> chunk(ComplexData.serverChunk, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES);
+
+    public static final Supplier<Number> WORLD_MIN_Y = () -> ComplexData.world.getBottomY();
+    public static final Supplier<Number> WORLD_MAX_Y = () -> ComplexData.world.getTopY();
+    public static final Supplier<Number> WORLD_HEIGHT = () -> ComplexData.world.getHeight();
+    public static final Supplier<Number> WORLD_COORD_SCALE = () -> ComplexData.world.getDimension().coordinateScale();;
 
     public static final Supplier<Number> MOON_PHASE = () -> ComplexData.clientChunk.isEmpty() ? null : client.world.getMoonPhase()+1;
 

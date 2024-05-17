@@ -550,7 +550,7 @@ Attribute Modifier Info
   - Tick related stuff
     - Minecraft added the ability to change and freeze the tick rate in a recent version
       - `{ms_per_tick}`
-      - `{is_tick_sprinting}`/`{tick_sprinting}`
+      - `{is_tick_sprinting}`/`{tick_sprinting}` (Singleplayer only for some reason)
       - `{is_tick_frozen}`/`{tick_frozen}`
       - `{is_tick_stepping}`/`{tick_stepping}`
   - `{memory_allocation_rate}`

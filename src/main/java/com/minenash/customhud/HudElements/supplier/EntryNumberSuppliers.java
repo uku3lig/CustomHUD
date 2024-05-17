@@ -71,7 +71,7 @@ public class EntryNumberSuppliers {
     public static final Entry FPS_MAX = of( () -> 1000 / ComplexData.frameTimeMetrics[1], 0);
     public static final Entry FPS_AVG = of( () -> 1000 / ComplexData.frameTimeMetrics[0], 1);
 
-    public static final Entry MS_PER_TICK = of( () -> client.getServer() == null ? null : ComplexData.world.getTickManager().getMillisPerTick(), 0);
+    public static final Entry MS_PER_TICK = of( () -> ComplexData.world.getTickManager().getMillisPerTick(), 0);
 
     public static final Entry TICK_MS = of( () -> client.getServer() != null ? client.getServer().getAverageTickTime() : EstimatedTick.get(), 0);
     public static final Entry TICK_MS_MIN = of( () -> ComplexData.tickTimeMetrics[1], 0);
@@ -124,6 +124,7 @@ public class EntryNumberSuppliers {
         float ms_ticks = server == null ? EstimatedTick.get() : server.getAverageTickTime();
         return ms_ticks < 50 ? 20 : 1000/ms_ticks;
     }, 0);
+    public static final Entry MAX_TPS = of( () -> client.world.getTickManager().getTickRate(), 0);
 
     public static final Entry CPU_USAGE = of( () -> ComplexData.cpuLoad, 0);
     public static final Entry GPU_USAGE = of(() -> ComplexData.gpuUsage, 0);
@@ -133,7 +134,6 @@ public class EntryNumberSuppliers {
     public static final Entry ALLOCATED_PERCENTAGE = of( () -> runtime.totalMemory() * 100 / runtime.maxMemory(), 0);
     public static final Entry ALLOCATED = of( () -> toMiB(runtime.totalMemory()), 0);
     public static final Entry ALLOCATION_RATE = of( () -> toMiB( allocationRateCalculator.get( runtime.totalMemory() - runtime.freeMemory() ) ), 0);
-//    public static final Entry OFF_HEAP = of( () -> toMiB(ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage().getUsed() + NativeBuffer.getTotalAllocated()), 0);
 
     private static final double PHI_CONST = (1 + Math.sqrt(5))/2;
 

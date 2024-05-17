@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,11 +26,11 @@ public class ConfigManager {
             Files.createDirectories(CustomHud.PROFILE_FOLDER);
         }
         catch (Exception e) {
-            CustomHud.LOGGER.info("Can't write to config dir");
+            CustomHud.LOGGER.info("[CustomHud] Can't write to config dir");
             return;
         }
         if(!Files.exists(CONFIG)) {
-            CustomHud.LOGGER.info("Couldn't find the config File, creating one");
+            CustomHud.LOGGER.info("[CustomHud] Couldn't find the config File, creating one");
             save();
             return;
         }
@@ -37,11 +38,11 @@ public class ConfigManager {
             read( GSON.fromJson(Files.newBufferedReader(CONFIG), JsonObject.class) );
         }
         catch (JsonSyntaxException | NullPointerException e) {
-            CustomHud.LOGGER.warn("Malformed Json, Fixing");
+            CustomHud.LOGGER.warn("[CustomHud] Malformed Json, Fixing");
             save();
         }
         catch (IOException e) {
-            CustomHud.LOGGER.error("Couldn't read the config");
+            CustomHud.LOGGER.error("[CustomHud] Couldn't read the config");
         }
     }
 
@@ -58,13 +59,13 @@ public class ConfigManager {
         int version = json.get("configVersion").getAsInt();
         if (version != 2) {
             //TODO: Do Toast
-            CustomHud.LOGGER.warn("Unknown Config Version. Not loading it");
+            CustomHud.LOGGER.warn("[CustomHud] Unknown Config Version. Not loading it");
         }
         readV2(json);
     }
 
     public static void readV1AndConvert(JsonObject json) {
-        CustomHud.LOGGER.info("Config Version Not Found, Assuming Version 1, Converting");
+        CustomHud.LOGGER.info("[CustomHud] Config Version Not Found, Assuming Version 1, Converting");
         ProfileManager.enabled = json.get("enabled").getAsBoolean();
 
         try(Stream<Path> pathsStream = Files.list(CustomHud.CONFIG_FOLDER)) {
@@ -101,6 +102,23 @@ public class ConfigManager {
             CustomHud.DEBUG_MODE = json.get("debugMode").getAsBoolean();
 
         ProfileManager.enabled = json.get("enabled").getAsBoolean();
+
+        JsonArray jsonProfiles = json.get("profiles").getAsJsonArray();
+        List<Profile> order = new ArrayList<>();
+        for (JsonElement element : jsonProfiles) {
+            JsonObject obj = element.getAsJsonObject();
+            String name = obj.get("name").getAsString();
+
+            Profile p = profiles.get(name);
+            if (p != null) {
+                String keyTranslation = obj.get("key").getAsString();
+                p.keyBinding.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
+                p.cycle = obj.get("cycle").getAsBoolean();
+                order.add(p);
+            }
+        }
+        ProfileManager.reorder(order, false);
+
         String activeProfileName = json.get("activeProfile").getAsString();
         if (activeProfileName == null)
             ProfileManager.setActive(null);
@@ -118,32 +136,20 @@ public class ConfigManager {
             if (p != null) {
                 String name = obj.get("name").getAsString();
                 String keyTranslation = obj.get("key").getAsString();
+                String modifierTranslation = obj.has("modifier") ? obj.get("modifier").getAsString() : null;
 
                 if (p.toggles.containsKey(name))
-                    p.toggles.get(name).keyBinding.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
+                    p.toggles.get(name).key.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
                 else {
-                    KeyBinding key = new KeyBinding("customhud_toggle_" + name, GLFW.GLFW_KEY_UNKNOWN, "customhud");
+                    KeyBinding key = new KeyBinding("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, "customhud");
                     key.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
-                    p.toggles.put(name, new Toggle(name, false, -1, key, false));
+                    KeyBinding modifier = new KeyBinding("customhud_toggle_" + UUID.randomUUID(), GLFW.GLFW_KEY_UNKNOWN, "customhud");
+                    if (modifierTranslation != null)
+                        modifier.setBoundKey(InputUtil.fromTranslationKey(modifierTranslation));
+                    p.toggles.put(name, new Toggle(name, false, -1, false, modifier, key));
                 }
             }
         }
-
-        JsonArray jsonProfiles = json.get("profiles").getAsJsonArray();
-        List<Profile> order = new ArrayList<>();
-        for (JsonElement element : jsonProfiles) {
-            JsonObject obj = element.getAsJsonObject();
-            String name = obj.get("name").getAsString();
-
-            Profile p = profiles.get(name);
-            if (p != null) {
-                String keyTranslation = obj.get("key").getAsString();
-                p.keyBinding.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
-                p.cycle = obj.get("cycle").getAsBoolean();
-                order.add(p);
-            }
-        }
-        ProfileManager.reorder(order, false);
     }
 
     public static void save() {
@@ -151,7 +157,7 @@ public class ConfigManager {
             try {
                 Files.createFile(CONFIG);
             } catch (IOException e) {
-                CustomHud.LOGGER.error("Couldn't create the config file");
+                CustomHud.LOGGER.error("[CustomHud] Couldn't create the config file");
                 return;
             }
         }
@@ -175,12 +181,13 @@ public class ConfigManager {
         JsonArray toggleBinds = new JsonArray();
         for (Profile profile : ProfileManager.getProfiles()) {
             for (Toggle toggle : profile.toggles.values()) {
-                if (toggle.direct || toggle.keyBinding.isUnbound())
+                if (toggle.direct || toggle.key.isUnbound())
                     continue;
                 JsonObject obj = new JsonObject();
                 obj.addProperty("profile", profile.name);
                 obj.addProperty("name", toggle.name);
-                obj.addProperty("key", toggle.keyBinding.getBoundKeyTranslationKey());
+                obj.addProperty("key", toggle.key.getBoundKeyTranslationKey());
+                obj.addProperty("modifier", toggle.modifier.getBoundKeyTranslationKey());
                 obj.addProperty("value", toggle.value);
                 toggleBinds.add(obj);
             }
@@ -190,8 +197,9 @@ public class ConfigManager {
 
         try {
             Files.write(CONFIG, GSON.toJson(config).getBytes());
+//            CustomHud.LOGGER.info("[CustomHud] Saved config");
         } catch (IOException e) {
-            CustomHud.LOGGER.error("Couldn't save the config file");
+            CustomHud.LOGGER.error("[CustomHud] Couldn't save the config file");
         }
     }
 

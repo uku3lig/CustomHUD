@@ -11,17 +11,19 @@ public class Toggle {
     public final String name;
     public final boolean direct;
     public final List<Integer> lines;
-    public final KeyBinding keyBinding;
+    public final KeyBinding modifier;
+    public final KeyBinding key;
 
     public boolean inProfile;
     public boolean value;
 
-    public Toggle(String name, boolean direct, int line, KeyBinding keyBinding, boolean inProfile) {
+    public Toggle(String name, boolean direct, int line, boolean inProfile, KeyBinding modifier, KeyBinding key) {
         this.name = name;
         this.direct = direct;
         this.lines = new ArrayList<>();
         this.lines.add(line);
-        this.keyBinding = keyBinding;
+        this.modifier = modifier;
+        this.key = key;
         this.inProfile = inProfile;
     }
 

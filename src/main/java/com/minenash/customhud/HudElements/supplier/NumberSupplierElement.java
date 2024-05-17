@@ -17,17 +17,16 @@ public class NumberSupplierElement implements HudElement, NumElement {
         return new Entry(supplier, precision, formatter);
     }
 
-    public static final StatFormatter HEX = (value) -> Integer.toHexString(value).toUpperCase();
-
     private final Supplier<Number> supplier;
     private final int precision;
     private final double scale;
     private final int zerofill;
-    private StatFormatter formatter;
+    private StatFormatter formatter = null;
+    private final int base;
 
     public NumberSupplierElement(Entry entry, Flags flags) {
         this(entry.supplier, flags);
-        if (flags.formatted && !flags.hex) formatter = entry.formatter;
+        this.formatter = flags.formatted ? entry.formatter : null;
     }
 
     public NumberSupplierElement(Supplier<Number> supplier, Flags flags) {
@@ -35,7 +34,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
         this.precision = flags.precision == -1 ? 0 : flags.precision;
         this.zerofill = flags.zerofill;
         this.scale = flags.scale;
-        this.formatter = flags.hex ? HEX : null;
+        this.base = flags.base;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class NumberSupplierElement implements HudElement, NumElement {
     public String getString() {
         try {
             double num = supplier.get().doubleValue() * scale;
-            return NumElement.formatString(num, formatter, precision, zerofill);
+            return NumElement.formatString(num, formatter, precision, zerofill, base);
 
         }
         catch (Exception _e) {

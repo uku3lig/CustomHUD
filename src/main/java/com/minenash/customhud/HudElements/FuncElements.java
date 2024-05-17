@@ -78,6 +78,7 @@ public abstract class FuncElements<T> implements HudElement {
         private final int zerofill;
         private final double scale;
         private final StatFormatter formatter;
+        private final int base;
 
         public Num(Supplier<T> supplier, Function<T,Number> func, Flags flags) {
             super(supplier);
@@ -85,7 +86,8 @@ public abstract class FuncElements<T> implements HudElement {
             precision = flags.precision == -1 ? 0 : flags.precision;
             zerofill = flags.zerofill;
             scale = flags.scale;
-            formatter = flags.hex ? NumberSupplierElement.HEX : null;
+            formatter = null;
+            base = flags.base;
         }
         public Num(Supplier<T> supplier, NumEntry<T> entry, Flags flags) {
             super(supplier);
@@ -93,7 +95,8 @@ public abstract class FuncElements<T> implements HudElement {
             precision = flags.precision == -1 ? entry.precision : flags.precision;
             zerofill = flags.zerofill;
             scale = flags.scale;
-            formatter = flags.hex ? NumberSupplierElement.HEX : entry.formatter;
+            formatter = flags.formatted ? entry.formatter : null;
+            base = flags.base;
         }
 
 
@@ -101,7 +104,7 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public boolean getBoolean() { return sanitize(supplier, function, Double.NaN).doubleValue() > 0; }
         @Override public String getString() {
             double num = getNumber().doubleValue() * scale;
-            return NumElement.formatString(num, formatter, precision, zerofill);
+            return NumElement.formatString(num, formatter, precision, zerofill, base);
         }
     }
 

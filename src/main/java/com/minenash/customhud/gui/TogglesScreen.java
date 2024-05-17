@@ -10,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -67,13 +66,11 @@ public class TogglesScreen extends Screen {
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackgroundTexture(context);
         super.render(context, mouseX, mouseY, delta);
 
         this.listWidget.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
-
-//        int x = this.width / 2;
-//        context.fill(x - 30, 47, x + 30, 48, 0xFFFFFFFF);
     }
 
     @Override
@@ -114,17 +111,23 @@ public class TogglesScreen extends Screen {
             if (noEntries)
                 return;
 
-            for (var e :profile.toggles.entrySet())
+            for (var e : profile.toggles.entrySet())
                 if (e.getValue().inProfile)
                     this.addEntry(new ToggleEntry(e.getValue(), e.getKey()));
+
+            this.addEntry(new BlankSeparator());
             this.addEntry(new ToggleEntrySeparator());
-            for (var e :profile.toggles.entrySet())
+            this.addEntry(new BlankSeparator());
+            for (var e : profile.toggles.entrySet())
                 if (!e.getValue().inProfile)
                     this.addEntry(new ToggleEntry(e.getValue(), e.getKey()));
 
-            if (children().get(children().size()-1) instanceof ToggleEntrySeparator)
-                children().remove(children().size()-1);
-
+            int index = children().size()-2;
+            if (children().get(index) instanceof ToggleEntrySeparator) {
+                children().remove(index+1);
+                children().remove(index);
+                children().remove(index-1);
+            }
         }
 
         @Override
@@ -146,6 +149,7 @@ public class TogglesScreen extends Screen {
         public class ToggleEntryHeader extends TEntry {
             private static final Text LINE = Text.literal("Line").formatted(Formatting.UNDERLINE);
             private static final Text NAME = Text.literal("Name").formatted(Formatting.UNDERLINE);
+            private static final Text MODIFIER = Text.literal("Modifier").formatted(Formatting.UNDERLINE);
             private static final Text KEYBIND = Text.literal("Key").formatted(Formatting.UNDERLINE);
             private static final Text NO_TOGGLES = Text.literal("This profiles has no toggles").formatted(Formatting.UNDERLINE);
             private final boolean noEntries;
@@ -154,9 +158,10 @@ public class TogglesScreen extends Screen {
 
             @Override
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                context.drawCenteredTextWithShadow(textRenderer, LINE, x + 15, y+2, 0xFFFFFFFF);
-                context.drawTextWithShadow(textRenderer, NAME, x+15+24, y+2, 0xFFFFFFFF);
-                context.drawCenteredTextWithShadow(textRenderer, KEYBIND, x+entryWidth-40, y+2, 0xFFFFFFFF);
+                context.drawCenteredTextWithShadow(textRenderer, LINE, x+0, y+2, 0xFFFFFFFF);
+                context.drawTextWithShadow(textRenderer, NAME, x+0+24, y+2, 0xFFFFFFFF);
+                context.drawCenteredTextWithShadow(textRenderer, MODIFIER, x+entryWidth-40-80-4+15, y+2, 0xFFFFFFFF);
+                context.drawCenteredTextWithShadow(textRenderer, KEYBIND, x+entryWidth-40+15, y+2, 0xFFFFFFFF);
                 if (noEntries)
                     context.drawCenteredTextWithShadow(textRenderer, NO_TOGGLES, x + (entryWidth/2), y+2+12, 0xFFFFFFFF);
             }
@@ -168,19 +173,29 @@ public class TogglesScreen extends Screen {
                 context.drawCenteredTextWithShadow(textRenderer, "§nPrior Bound Toggles from this Profile", x + entryWidth/2, y+4, 0xFFFFFFFF);
             }
         }
+        public class BlankSeparator extends TEntry {
+            @Override
+            public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {}
+        }
 
         @Environment(EnvType.CLIENT)
         public class ToggleEntry extends TEntry {
             final Toggle toggle;
-            final ButtonWidget keybind;
+            final ButtonWidget modifier;
+            final ButtonWidget key;
             final ButtonWidget remove;
             final String keyName;
 
             public ToggleEntry(Toggle toggle, String keyName) {
                 this.toggle = toggle;
                 this.keyName = keyName;
-                this.keybind = ButtonWidget.builder(toggle.keyBinding.getBoundKeyLocalizedText(), b -> {
-                    selectedKeybind = toggle.keyBinding;
+                this.modifier = ButtonWidget.builder(toggle.modifier.getBoundKeyTranslationKey().equals("key.keyboard.unknown") ?
+                        Text.literal("None") : toggle.modifier.getBoundKeyLocalizedText(), b -> {
+                    selectedKeybind = toggle.modifier;
+                    update();
+                }).size(80, 16).build();
+                this.key = ButtonWidget.builder(toggle.key.getBoundKeyLocalizedText(), b -> {
+                    selectedKeybind = toggle.key;
                     update();
                 }).size(80, 16).build();
                 this.remove = ButtonWidget.builder(Text.literal("§c-"), b -> {
@@ -189,26 +204,31 @@ public class TogglesScreen extends Screen {
                     ConfigManager.save();
                 }).size(16, 16).build();
                 this.remove.setTooltip(Tooltip.of(Text.literal("§cRemove")));
-                this.keybind.active = !toggle.direct;
+                this.key.active = !toggle.direct;
+                this.modifier.active = !toggle.direct;
             }
 
             public void render(DrawContext context, int index, int y, int x, int eWidth, int eHeight, int mX, int mY, boolean hovered, float delta) {
-                context.drawTextWithShadow(textRenderer, toggle.getDisplayName(), x+15+24, y+4, 0xFFFFFFFF);
+                context.drawTextWithShadow(textRenderer, toggle.getDisplayName(), x+0+24, y+4, 0xFFFFFFFF);
 
                 if (!toggle.inProfile) {
                     remove.setY(y);
-                    remove.setX(x + 7);
+                    remove.setX(x + 2 - 10);
                     remove.render(context, mX, mY, delta);
                 }
                 else
-                    context.drawCenteredTextWithShadow(textRenderer, getLines(), x+15, y+4, 0xFFFFFFFF);
+                    context.drawCenteredTextWithShadow(textRenderer, getLines(), x+0, y+4, 0xFFFFFFFF);
 
                 if (toggle.lines.size() > 2 && hovered && mX > x && mX < x+30)
                     setTooltip(Tooltip.of(Text.literal(StringUtils.join(toggle.lines, ", "))));
 
-                keybind.setY(y);
-                keybind.setX(x+eWidth-80);
-                keybind.render(context, mX, mY, delta);
+                modifier.setY(y);
+                modifier.setX(x+eWidth-80-80-4+15);
+                modifier.render(context, mX, mY, delta);
+
+                key.setY(y);
+                key.setX(x+eWidth-80+15);
+                key.render(context, mX, mY, delta);
             }
 
             private Text getLines() {
@@ -221,15 +241,20 @@ public class TogglesScreen extends Screen {
 
             @Override
             public void update() {
-                keybind.setMessage(toggle.keyBinding.getBoundKeyLocalizedText());
-                if (selectedKeybind == toggle.keyBinding)
-                    keybind.setMessage(Text.literal("> ")
-                            .append(keybind.getMessage().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE))
+                modifier.setMessage(toggle.modifier.getBoundKeyTranslationKey().equals("key.keyboard.unknown") ? Text.literal("None") : toggle.modifier.getBoundKeyLocalizedText());
+                if (selectedKeybind == toggle.modifier)
+                    modifier.setMessage(Text.literal("> ")
+                            .append(modifier.getMessage().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE))
+                            .append(" <").formatted(Formatting.YELLOW));
+                key.setMessage(toggle.key.getBoundKeyLocalizedText());
+                if (selectedKeybind == toggle.key)
+                    key.setMessage(Text.literal("> ")
+                            .append(key.getMessage().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE))
                             .append(" <").formatted(Formatting.YELLOW));
             }
 
-            @Override public List<? extends Selectable> selectableChildren() { return toggle.inProfile ? List.of(keybind) : List.of(remove, keybind); }
-            @Override public List<? extends Element> children() { return toggle.inProfile ? List.of(keybind) : List.of(remove, keybind); }
+            @Override public List<? extends Selectable> selectableChildren() { return toggle.inProfile ? List.of(modifier, key) : List.of(remove, modifier, key); }
+            @Override public List<? extends Element> children() { return toggle.inProfile ? List.of(modifier, key) : List.of(remove, modifier, key); }
         }
     }
 }

@@ -60,7 +60,7 @@ public class ProfileManager {
 
                 for (var entry : p.toggles.entrySet()) {
                     Toggle t = entry.getValue();
-                    if (!t.direct && !t.keyBinding.isUnbound() && !profile.toggles.containsKey(entry.getKey())) {
+                    if (!t.direct && !t.key.isUnbound() && !profile.toggles.containsKey(entry.getKey())) {
                         entry.getValue().inProfile = false;
                         profile.toggles.put(entry.getKey(), t);
                     }
@@ -148,6 +148,7 @@ public class ProfileManager {
             Profile p = profiles.get(i);
             if (p.cycle) {
                 setActive(p);
+                ConfigManager.save();
                 return;
             }
         }
@@ -155,6 +156,7 @@ public class ProfileManager {
             Profile p = profiles.get(i);
             if (p.cycle) {
                 setActive(p);
+                ConfigManager.save();
                 return;
             }
         }

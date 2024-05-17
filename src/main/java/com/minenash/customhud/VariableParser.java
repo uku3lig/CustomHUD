@@ -32,7 +32,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.stat.StatType;
@@ -64,6 +63,7 @@ import static com.minenash.customhud.HudElements.supplier.SpecialIdSupplier.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
 import static com.minenash.customhud.HudElements.text.TextSupplierElement.*;
+import static java.util.UUID.randomUUID;
 
 public class VariableParser {
 
@@ -197,11 +197,11 @@ public class VariableParser {
                 }
                 case '"' -> {
                     if (qStack.size() == nest) qStack.push('"');
-                    else if (qStack.peek() == '"') qStack.pop();
+                    else if (!qStack.isEmpty() && qStack.peek() == '"') qStack.pop();
                 }
                 case '\'' -> {
                     if (qStack.size() == nest) qStack.push('\'');
-                    else if (qStack.peek() == '\'') qStack.pop();
+                    else if (!qStack.isEmpty() && qStack.peek() == '\'') qStack.pop();
                 }
             }
         }
@@ -618,12 +618,25 @@ public class VariableParser {
             }
             Toggle toggle = profile.toggles.get(name);
             if (toggle == null) //Replace with saved key
-                toggle = new Toggle(name.replace('_', ' '), false, debugLine, new KeyBinding("customhud_toggle_" + name, GLFW.GLFW_KEY_UNKNOWN, "customhud"), true);
+                toggle = new Toggle(name.replace('_', ' '), false, debugLine, true,
+                        new KeyBinding("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, "customhud"),
+                        new KeyBinding("customhud_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, "customhud"));
             else
                 toggle.lines.add(debugLine);
 
             profile.toggles.put(name, toggle);
             return new BooleanSupplierElement(toggle::getValue);
+        }
+        if (part.startsWith("toggle_keybind:")) {
+            String name = part.substring(15);
+            if (name.isEmpty()) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.EMPTY_TOGGLE, null);
+                return null;
+            }
+            return new TextSupplierElement( () -> {
+                Toggle toggle = ProfileManager.getActive().toggles.get(name);
+                return toggle == null ? null : toggle.key.getBoundKeyLocalizedText();
+            }, flags );
         }
 
         if (part.startsWith("toggle_key:")) {
@@ -649,7 +662,9 @@ public class VariableParser {
 
             Toggle toggle = profile.toggles.get(" " + name); //Space indicates key variant
             if (toggle == null)
-                toggle = new Toggle(name, true, debugLine, new KeyBinding("customhud_key_toggle_" + name, key.getCode(), "customhud"), true);
+                toggle = new Toggle(name, true, debugLine, true,
+                        new KeyBinding("customhud_key_toggle_" + randomUUID(), GLFW.GLFW_KEY_UNKNOWN, "customhud"),
+                        new KeyBinding("customhud_key_toggle_" + randomUUID(), key.getCode(), "customhud"));
             else
                 toggle.lines.add(debugLine);
 
@@ -927,6 +942,7 @@ public class VariableParser {
             case "target_block_z", "target_z", "tbz" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_Z; }
             case "target_block_distance", "target_distance", "tbd" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_DISTANCE; }
             case "target_block_color", "target_color", "tbc" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_COLOR; }
+            case "target_block_luminance", "target_luminance", "tbl" -> { enabled.targetBlock = true; enabled.world = true; yield TARGET_BLOCK_LUMINANCE; }
             case "target_fluid_x", "tfx" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_X; }
             case "target_fluid_y", "tfy" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_Y; }
             case "target_fluid_z", "tfz" -> { enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_Z; }
@@ -974,6 +990,12 @@ public class VariableParser {
             case "server_height_map_ocean_floor", "sho" -> { enabled.serverChunk = true; yield SERVER_HEIGHT_MAP_OCEAN_FLOOR; }
             case "server_height_map_motion_blocking", "shm" -> { enabled.serverChunk = true; yield SERVER_HEIGHT_MAP_MOTION_BLOCKING; }
             case "server_height_map_motion_blocking_no_leaves", "shml" -> { enabled.serverChunk = true; yield SERVER_HEIGHT_MAP_MOTION_BLOCKING_NO_LEAVES; }
+
+            case "world_min_y", "min_y" -> { enabled.world = true; yield WORLD_MIN_Y; }
+            case "world_max_y", "max_y" -> { enabled.world = true; yield WORLD_MAX_Y; }
+            case "world_height" -> { enabled.world = true; yield WORLD_HEIGHT; }
+            case "world_coord_scale", "coord_scale" -> { enabled.world = true; yield WORLD_COORD_SCALE; }
+
             case "moon_phase" -> { enabled.clientChunk = true; yield MOON_PHASE; }
             case "spawn_chunks", "sc" -> { enabled.serverWorld = true; yield SPAWN_CHUNKS; }
             case "monsters" -> { enabled.serverWorld = true; yield MONSTERS; }
@@ -1087,6 +1109,7 @@ public class VariableParser {
             case "day" -> DAY;
             case "mood" -> MOOD;
             case "tps" -> TPS;
+            case "max_tps" -> {enabled.world = true; yield MAX_TPS;}
             case "memory_used_percentage" -> MEMORY_USED_PERCENTAGE;
             case "memory_used" -> MEMORY_USED;
             case "memory_total" -> TOTAL_MEMORY;
@@ -1320,7 +1343,7 @@ public class VariableParser {
         if (provider == null)
             return null;
 
-        return new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), getPrefix(provider, flagParts, profile.name, debugLine, variable));
+        return new ListProviderSet.Entry(provider, randomUUID(), getPrefix(provider, flagParts, profile.name, debugLine, variable));
     }
 
     public static String getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
@@ -1386,7 +1409,7 @@ public class VariableParser {
                 Errors.addError(profile.name, debugLine, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, variable);
         }
 
-        return new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), prefix);
+        return new ListProviderSet.Entry(provider, randomUUID(), prefix);
     }
 
     public static HudElement barElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
@@ -1436,7 +1459,7 @@ public class VariableParser {
         if (provider == null)
             return null;
         String prefix = getPrefix(provider, flagParts, profile.name, debugLine, original);
-        return listElement( new ListProviderSet.Entry(provider, java.util.UUID.randomUUID(), prefix), part, commaIndex, profile, debugLine, enabled, original, listProviders);
+        return listElement( new ListProviderSet.Entry(provider, randomUUID(), prefix), part, commaIndex, profile, debugLine, enabled, original, listProviders);
     }
 
 

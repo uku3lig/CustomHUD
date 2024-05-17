@@ -461,7 +461,7 @@ public class Attributers {
 
             Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
             if (attributer == null) {
-                CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
+                CustomHud.LOGGER.error("[CustomHud] [FIX ME]: Attributer not in Map!");
                 continue;
             }
             String[] flagParts = name.split(" ");
@@ -498,7 +498,7 @@ public class Attributers {
 
         Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
         if (attributer == null) {
-            CustomHud.LOGGER.error("[FIX ME]: Attributer not in Map!");
+            CustomHud.LOGGER.error("[CustomHud] [FIX ME]: Attributer not in Map!");
             return null;
         }
         String[] flagParts = part.split(" ");

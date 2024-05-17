@@ -49,3 +49,4 @@ accessible field net/minecraft/resource/ResourcePackProfile metadata Lnet/minecr
 accessible class net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator <init> ()V
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator get (J)J
+accessible field net/minecraft/client/util/InputUtil$Key type Lnet/minecraft/client/util/InputUtil$Type;

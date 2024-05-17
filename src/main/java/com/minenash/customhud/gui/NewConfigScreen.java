@@ -203,7 +203,7 @@ public class NewConfigScreen extends Screen {
                 ignoreFirstToast = true;
                 Files.copy(path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
             } catch (IOException e) {
-                CustomHud.LOGGER.warn("Failed to copy profile from {} to {}", path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
+                CustomHud.LOGGER.warn("[CustomHud] Failed to copy profile from {} to {}", path, CustomHud.PROFILE_FOLDER.resolve(path.getFileName()));
                 SystemToast.addPackCopyFailure(client, path.toString());
             }
         }

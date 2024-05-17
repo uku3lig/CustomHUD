@@ -26,7 +26,7 @@ public class Flags {
     public int precision = -1;
     public double scale = 1;
     public int zerofill = 0;
-    public boolean hex = false;
+    public int base = 10;
     public int frequency = -1;
 
     public boolean formatted = false;
@@ -53,6 +53,7 @@ public class Flags {
     private static final Pattern SHIFT_PATTERN = Pattern.compile("-(?:sh|shift)(-?\\d+)(?:,(-?\\d+))?");
     private static final Pattern ROTATE_PATTERN = Pattern.compile("-(?:r|rotation)(-?\\d+)");
     private static final Pattern PREFIX_PATTERN = Pattern.compile("-(?:pre|prefix):(-?\\w+)");
+    private static final Pattern BASE_PATTERN = Pattern.compile("-base(\\d+)");
 
     public static Flags parse(String profileName, int line, String[] parts) {
         Flags flags = new Flags();
@@ -69,7 +70,9 @@ public class Flags {
                 case "-sc", "-smallcaps" -> flags.smallCaps = true;
                 case "-sub", "-subnums" -> flags.numSize = 1;
                 case "-sup", "-supnums" -> flags.numSize = 2;
-                case "-hex" -> flags.hex = true;
+                case "-hex" -> flags.base = 16;
+                case "-oct" -> flags.base = 8;
+                case "-bin" -> flags.base = 2;
                 case "-nd", "-nodashes" -> flags.noDelimiters = true;
                 // ID
                 case "-ns", "-namespace" -> flags.idPart = IdPart.NAMESPACE;
@@ -103,6 +106,17 @@ public class Flags {
                             flags.scale = Integer.parseInt(matcher.group(2)) / (double) Integer.parseInt(matcher.group(3));
                         else
                             flags.scale = Double.parseDouble(matcher.group(1));
+                        continue;
+                    }
+                    matcher = BASE_PATTERN.matcher(parts[i]);
+                    if (matcher.matches()) {
+                        int base = Integer.parseInt(matcher.group(1));
+                        if (base > 36)
+                            Errors.addError(profileName, line, parts[i], ErrorType.RADIX_TOO_BIG, null);
+                        else if (base < 2)
+                            Errors.addError(profileName, line, parts[i], ErrorType.RADIX_TOO_SMALL, null);
+                        else
+                            flags.base = base;
                         continue;
                     }
                     //Frequency / Update
