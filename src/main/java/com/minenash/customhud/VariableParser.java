@@ -90,7 +90,7 @@ public class VariableParser {
                 elements.add(element);
         }
 
-        if (line)
+        if (line && profile.convertLineBreak)
             elements.add(new FunctionalElement.NewLine());
         return elements;
     }
@@ -566,7 +566,14 @@ public class VariableParser {
 
         if (part.startsWith("pteam:") || part.startsWith("player_team:")) {
             String method = part.substring(part.indexOf(':')+1);
+            int dotIndex = method.lastIndexOf('.');
+            if (dotIndex != -1)
+                method = method.substring(0, dotIndex);
             HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(flags.listPrefix, null, () -> CLIENT.player.getScoreboardTeam(), method, flags, null );
+            if (element instanceof CreateListElement cle) {
+                String attr = dotIndex == -1 ? "" : flagParts[0].substring(dotIndex + 1);
+                cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, debugLine);
+            }
             if (element == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, method);
             return element;
@@ -1239,7 +1246,7 @@ public class VariableParser {
 
         String providerName = flagParts[0];
 
-        int dotIndex = providerName.indexOf(".");
+        int dotIndex = providerName.indexOf('.');
         if (dotIndex != -1)
             providerName = providerName.substring(0, dotIndex);
 
@@ -1604,7 +1611,7 @@ public class VariableParser {
 
         String src = matcher.group(1) == null ? "" : matcher.group(1);
         String method = matcher.group(2) == null ? "" : matcher.group(2);
-        int dotIndex = method.lastIndexOf(".");
+        int dotIndex = method.lastIndexOf('.');
         if (dotIndex != -1 && dotIndex > method.lastIndexOf(":"))
             method = method.substring(0, dotIndex);
 

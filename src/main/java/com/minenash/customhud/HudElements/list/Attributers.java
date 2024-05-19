@@ -431,26 +431,26 @@ public class Attributers {
         ATTRIBUTER_MAP.put(RECORDS, RECORD);
         ATTRIBUTER_MAP.put(TARGET_VILLAGER_OFFERS, OFFER);
 
-        DEFAULT_PREFIX.put(EFFECT, "ef");
-        DEFAULT_PREFIX.put(PLAYER, "pl");
-        DEFAULT_PREFIX.put(SUBTITLE, "su");
-        DEFAULT_PREFIX.put(BLOCK_STATE, "bp");
+        DEFAULT_PREFIX.put(EFFECT, "e");
+        DEFAULT_PREFIX.put(PLAYER, "p");
+        DEFAULT_PREFIX.put(SUBTITLE, "s");
+        DEFAULT_PREFIX.put(BLOCK_STATE, "p");
         DEFAULT_PREFIX.put(TAG, "t");
-        DEFAULT_PREFIX.put(ENCHANTMENT, "en");
+        DEFAULT_PREFIX.put(ENCHANTMENT, "e");
         DEFAULT_PREFIX.put(ITEM_LORE_LINE, "lore");
         DEFAULT_PREFIX.put(ITEM_INFO_INFO, "ii");
         DEFAULT_PREFIX.put(LOOP_ITEM, "loop");
-        DEFAULT_PREFIX.put(ITEM_ATTRIBUTE_MODIFIER, "im");
-        DEFAULT_PREFIX.put(ITEM_CAN_X, "cx");
+        DEFAULT_PREFIX.put(ITEM_ATTRIBUTE_MODIFIER, "am");
+        DEFAULT_PREFIX.put(ITEM_CAN_X, "c");
         DEFAULT_PREFIX.put(ITEM, "i");
         DEFAULT_PREFIX.put(ATTRIBUTE_MODIFIER, "am");
-        DEFAULT_PREFIX.put(ATTRIBUTE, "at");
-        DEFAULT_PREFIX.put(TEAM_MEMBER, "tm");
-        DEFAULT_PREFIX.put(TEAM, "te");
+        DEFAULT_PREFIX.put(ATTRIBUTE, "a");
+        DEFAULT_PREFIX.put(TEAM_MEMBER, "m");
+        DEFAULT_PREFIX.put(TEAM, "t");
         DEFAULT_PREFIX.put(SCOREBOARD_OBJECTIVE_SCORE, "os");
         DEFAULT_PREFIX.put(SCOREBOARD_OBJECTIVE, "o");
         DEFAULT_PREFIX.put(SCOREBOARD_SCORE, "ss");
-        DEFAULT_PREFIX.put(BOSSBAR, "bb");
+        DEFAULT_PREFIX.put(BOSSBAR, "b");
         DEFAULT_PREFIX.put(MOD_AUTHOR, "ma");
         DEFAULT_PREFIX.put(MOD_CONTRIBUTOR, "mc");
         DEFAULT_PREFIX.put(MOD_CREDIT, "mc");
@@ -466,42 +466,23 @@ public class Attributers {
 
     public static HudElement get(ListProviderSet set, String name, Flags flags, Profile profile, int line) {
         for (int i = set.entries.size()-1; i >= 0; i--) {
-            ListProviderSet.Entry entry = set.entries.get(i);
-            if (entry == null)
-                continue;
-
-            switch (name) {
-                case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(entry.id()), flags);
-                case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(entry.id()), flags);
-                case "raw": return new StringSupplierElement( () -> ListManager.getValue(entry.id()).toString() );
-            };
-
-            Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
-            if (attributer == null) {
-                CustomHud.LOGGER.error("[CustomHud] [FIX ME]: Attributer not in Map!");
-                continue;
-            }
-            String[] flagParts = name.split(" ");
-            String prefix = VariableParser.getPrefix(entry.provider(), flagParts, profile.name, line, name);
-            ParseContext context = new ParseContext(profile, line, null, null);
-            HudElement element = attributer.get(prefix, entry.id(), () -> ListManager.getValue(entry.id()), flagParts[0], flags, context);
-            if (element != null)
-                return element;
+            HudElement e = get0(set.entries.get(i), name, flags, profile, line);
+            if (e != null)
+                return e;
         }
-
         return null;
     }
 
     public static HudElement getFromPrefix(ListProviderSet set, String part, Flags flags, Profile profile, int line) {
-        ListProviderSet.Entry entry = null;
         for (int i = set.entries.size() - 1; i >= 0; i--) {
-            ListProviderSet.Entry e = set.entries.get(i);
-            if (e != null && part.startsWith(e.prefix() + ":")) {
-                entry = e;
-                break;
-            }
+            ListProviderSet.Entry entry = set.entries.get(i);
+            if (entry != null && part.startsWith(entry.prefix() + ":"))
+                return get0(entry, part, flags, profile, line);
         }
+        return null;
+    }
 
+    public static HudElement get0( ListProviderSet.Entry entry, String part, Flags flags, Profile profile, int line) {
         if (entry == null)
             return null;
 
@@ -521,8 +502,19 @@ public class Attributers {
         }
         String[] flagParts = part.split(" ");
         String prefix = VariableParser.getPrefix(entry.provider(), flagParts, profile.name, line, part);
+        part = flagParts[0];
+
+        int dotIndex = part.lastIndexOf('.');
+        if (dotIndex != -1)
+            part = part.substring(0, dotIndex);
+
         ParseContext context = new ParseContext(profile, line, null, null);
-        return attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), flagParts[0], flags, context);
+        HudElement element = attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), part, flags, context);
+        if (element instanceof CreateListElement cle) {
+            String attr = dotIndex == -1 ? "" : flagParts[0].substring(dotIndex + 1);
+            cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, line);
+        }
+        return element;
     }
 
     public static String defaultPrefix(ListProvider provider) {

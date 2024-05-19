@@ -67,6 +67,7 @@ public class FunctionalElement implements HudElement {
     public static class CreateListElement extends FunctionalElement {
         public final ListProviderSet.Entry entry;
         public final Attributers.Attributer attributer;
+        public HudElement attribute;
         public CreateListElement(String prefixFlag, Supplier<?> supplier, Function<?,List<?>> function, Attributers.Attributer attributer) {
             String prefix = prefixFlag.isEmpty() ? Attributers.DEFAULT_PREFIX.get(attributer) : prefixFlag;
             this.entry = new ListProviderSet.Entry(new ListProvider.ListFunctioner(supplier,function), UUID.randomUUID(), prefix);

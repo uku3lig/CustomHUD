@@ -70,7 +70,7 @@ public class CustomHudRenderer {
             int lineCount = 0;
             List<HudElement> elements = new ArrayList<>();
             for (HudElement e : section.elements)
-                lineCount += addElement(elements, e);
+                lineCount += addElement(elements, e, profile.convertLineBreak);
             outer:
             for (int j = 0; j < elements.size()-1; j++) {
                 if (elements.get(j) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine
@@ -215,16 +215,17 @@ public class CustomHudRenderer {
     }
 
 
-    public static int addElement(List<HudElement> allElements, HudElement element) {
+    public static int addElement(List<HudElement> allElements, HudElement element, boolean convertLineBreak) {
         if (element instanceof MultiElement me) {
             int nl = 0;
             List<HudElement> elements = me.expand();
-            if (elements.isEmpty() && me.ignoreNewlineIfEmpty()) {
-                allElements.add(new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine());
+            if (elements.isEmpty()) {
+                if (me.ignoreNewlineIfEmpty() && convertLineBreak)
+                    allElements.add(new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine());
                 return nl;
             }
             for (HudElement e : me.expand())
-                nl += addElement(allElements, e);
+                nl += addElement(allElements, e, convertLineBreak);
             return nl;
         }
         else {
