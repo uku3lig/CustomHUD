@@ -5,6 +5,7 @@ import com.minenash.customhud.HudElements.interfaces.HudElement;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.CloudRenderMode;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.GraphicsMode;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.fluid.Fluid;
@@ -25,6 +26,10 @@ public class SpecialSupplierElement implements HudElement {
         Direction dir = client.getCameraEntity().getHorizontalFacing();
         return dir == Direction.EAST || dir == Direction.SOUTH;
     }
+
+    public static final Entry MAX_FPS = of( () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE ? null : client.options.getMaxFps().getValue().toString(),
+            () ->  client.options.getMaxFps().getValue(),
+            () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE);
 
     public static final Entry PROFILE_KEYBIND = of( () -> getActive() == null ? "" : getActive().keyBinding.getBoundKeyLocalizedText().getString(),
             () -> getActive() == null ? 0 : getActive().keyBinding.boundKey.getCode(),

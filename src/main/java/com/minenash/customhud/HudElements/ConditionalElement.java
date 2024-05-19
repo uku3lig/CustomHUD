@@ -13,9 +13,11 @@ public class ConditionalElement implements HudElement, MultiElement {
     public record ConditionalPair(Operation conditional, List<HudElement> ifTrue) {}
 
     private final List<ConditionalPair> pairs;
+    private final boolean multiline;
 
-    public ConditionalElement(List<ConditionalPair> pairs) {
+    public ConditionalElement(List<ConditionalPair> pairs, boolean multiline) {
         this.pairs = pairs;
+        this.multiline = multiline;
     }
 
     public List<HudElement> expand() {
@@ -25,6 +27,11 @@ public class ConditionalElement implements HudElement, MultiElement {
             }
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean ignoreNewlineIfEmpty() {
+        return !multiline;
     }
 
     @Override
@@ -82,7 +89,7 @@ public class ConditionalElement implements HudElement, MultiElement {
 
         public ConditionalElement build() {
             pairs.add(new ConditionalPair(conditional, elements));
-            return new ConditionalElement(pairs);
+            return new ConditionalElement(pairs, true);
         }
 
     }

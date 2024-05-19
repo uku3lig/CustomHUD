@@ -60,7 +60,15 @@ public class Profile {
     }
 
     public static Profile parseProfile(Path path, String profileName) {
-        Profile profile = parseProfileInner(path, profileName);
+        Profile profile;
+        try {
+            profile = parseProfileInner(path, profileName);
+        }
+        catch (Exception e) {
+            Errors.addError(profileName, 0, "", ErrorType.PROFILE_ERROR, "");
+            CustomHud.LOGGER.catching(e);
+            return null;
+        }
 
         if (!Errors.getErrors(profileName).isEmpty()) {
             CustomHud.LOGGER.warn("");

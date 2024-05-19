@@ -31,12 +31,12 @@ public class ExpressionParser {
         }
     }
 
-    public static Operation parseExpression(String input, String source, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers) {
+    public static Operation parseExpression(String input, String source, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers, boolean forCondition) {
         if (input.isBlank() || input.equals(",") || input.equals(", "))
             return new Operation.Literal(1);
         try {
             List<Token> tokens = getTokens(input, profile, debugLine, enabled, listSuppliers);
-            Operation c = getConditional(tokens);
+            Operation c = getConditional(tokens, forCondition);
             CustomHud.logInDebugMode("Tree for Conditional on line " + debugLine + ":");
             c.printTree(0);
             CustomHud.logInDebugMode("");
@@ -150,11 +150,12 @@ public class ExpressionParser {
                     builder.append(chars[i++]);
                 tokens.add(new Token(TokenType.STRING, builder.toString()));
             }
-            else if (isNum(c) || c == '-') {
+            else if ((isNum(c) && c != '.') || c == '-') {
                 StringBuilder builder = new StringBuilder();
                 builder.append(chars[i++]);
                 while (i < chars.length && isNum(chars[i]))
                     builder.append(chars[i++]);
+
                 tokens.add(new Token(TokenType.NUMBER, Double.parseDouble(builder.toString())));
                 continue;
             }
@@ -368,7 +369,7 @@ public class ExpressionParser {
 
     }
 
-    private static Operation getConditional(List<Token> tokens) throws ErrorException {
+    private static Operation getConditional(List<Token> tokens, boolean forCondition) throws ErrorException {
         if (tokens.isEmpty())
             throw new ErrorException(ErrorType.EMPTY_SECTION, "");
         List<List<Token>> ors = split(tokens, TokenType.OR);
@@ -376,7 +377,11 @@ public class ExpressionParser {
         for (var or : ors)
             conditionals.add(getAndConditional(or));
 
-        return conditionals.size() == 1 ? conditionals.get(0) : new Operation.Or(conditionals);
+        if (conditionals.size() == 1) {
+            Operation o = conditionals.get(0);
+            return forCondition && o instanceof Operation.Element oe ? new Operation.ElementUseBool(oe.element()) : o;
+        }
+        return new Operation.Or(conditionals);
 
     }
 
@@ -456,17 +461,17 @@ public class ExpressionParser {
             case STRING -> new SudoElements.Str((String) token.value());
             case NUMBER -> new SudoElements.Num((Number) token.value());
             case BOOLEAN -> new SudoElements.Bool((Boolean) token.value());
-            case FULL_PREN -> new SudoElements.Op(getConditional((List<Token>) token.value()));
+            case FULL_PREN -> new SudoElements.Op(getConditional((List<Token>) token.value(), false));
             case FUNCTION -> {
                 Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
-                yield new SudoElements.Op(new Operation.Func(pair.getLeft(), getConditional(pair.getRight())));
+                yield new SudoElements.Op(new Operation.Func(pair.getLeft(), getConditional(pair.getRight(), false)));
             }
             case TERNARY -> {
                 TernaryTokens tokens = (TernaryTokens) token.value();
                 yield new SudoElements.Op( new Operation.Ternary(
-                        getConditional( tokens.conditional),
-                        getConditional( tokens.left),
-                        getConditional( tokens.right)
+                        getConditional( tokens.conditional, true),
+                        getConditional( tokens.left, false),
+                        getConditional( tokens.right, false)
                 ) );
             }
             case IF -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "? (IF)");
@@ -479,21 +484,21 @@ public class ExpressionParser {
     @SuppressWarnings("unchecked")
     private static Operation getPrimitiveOperation(Token token) throws ErrorException {
         return switch (token.type) {
-            case FULL_PREN -> getConditional((List<Token>) token.value());
+            case FULL_PREN -> getConditional((List<Token>) token.value(), false);
             case BOOLEAN -> new Operation.Literal(((Boolean) token.value()) ? 1 : 0);
             case NUMBER -> new Operation.Literal((Double) token.value());
             case VARIABLE -> new Operation.Element((HudElement) token.value());
             case NEGATED_VARIABLE -> new Operation.Negate((HudElement) token.value());
             case FUNCTION -> {
                 Pair<Function<Double,Double>,List<Token>> pair = (Pair<Function<Double, Double>, List<Token>>) token.value();
-                yield new Operation.Func(pair.getLeft(), getConditional(pair.getRight()));
+                yield new Operation.Func(pair.getLeft(), getConditional(pair.getRight(), false));
             }
             case TERNARY -> {
                 TernaryTokens tokens = (TernaryTokens) token.value();
                 yield new Operation.Ternary(
-                        getConditional( tokens.conditional),
-                        getConditional( tokens.left),
-                        getConditional( tokens.right)
+                        getConditional( tokens.conditional, true),
+                        getConditional( tokens.left, false),
+                        getConditional( tokens.right, false)
                 );
             }
             case IF -> throw new ErrorException(ErrorType.CONDITIONAL_UNEXPECTED_VALUE, "? (IF)");

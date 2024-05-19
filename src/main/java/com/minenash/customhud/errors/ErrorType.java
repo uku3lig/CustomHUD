@@ -8,6 +8,12 @@ public enum ErrorType {
     HEADER ("Help", null, "Details"),
     TEST ("Uhhh", "", "The bee movie script The bee movie script The bee movie script The bee movie script The bee movie script The bee movie script The bee movie script The bee movie script The bee movie script"),
     IO ("Help", "../help", "Could not load file: §c"),
+
+    VARIABLE_ERROR ("Report", "CHANGE ME", "An error has accord trying to parse this variable. " +
+            "Please report this along with log. You might want to double check your profile though"),
+    PROFILE_ERROR ("Report", "CHANGE ME", "A fatal error has accord trying to parse this profile." +
+            "Please report this along with log. You might want to double check your profile though"),
+
     EMPTY_VARIABLE ("Variables", "variables", "No Variable Given"),
     UNKNOWN_VARIABLE ("Variables", "variables", "Unknown Variable: §e"),
     UNKNOWN_LIST ("CHANGE ME", "CHANGE ME", "Unknown List Variable: §e"),
@@ -32,7 +38,9 @@ public enum ErrorType {
     UNKNOWN_DATA_PACK ("CHANGE ME", "references/CHANGE ME", "Datapack not installed: §e"),
     UNKNOWN_ITEM_PROPERTY ("Item Properties", "variables#items", "Unknown Item Property: §e"),
     UNKNOWN_ATTRIBUTE ("CHANGE ME", "references/CHANGE ME", "Unknown Attribute: §e"),
+    UNKNOWN_EFFECT_ID ("CHANGE ME", "references/CHANGE ME", "Unknown Effect ID: §e"),
     UNKNOWN_ATTRIBUTE_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Attribute Property: §e"),
+    UNKNOWN_EFFECT_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Effect Property: §e"),
     UNKNOWN_TEAM_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Team Property: §e"),
     UNKNOWN_OBJECTIVE_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Objective Property: §e"),
     UNKNOWN_BOSSBAR_PROPERTY ("CHANGE ME", "references/CHANGE ME", "Unknown Bossbar Property: §e"),

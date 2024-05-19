@@ -20,13 +20,15 @@ public class FilteredListElement implements HudElement, MultiElement {
     private final List<HudElement> main;
     private final List<HudElement> last;
     private final Operation operation;
+    private final boolean multiline;
 
-    public FilteredListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation) {
+    public FilteredListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation, boolean multiline) {
         this.provider = provider;
         this.providerID = providerID;
         this.operation = operation;
         this.popList = new FunctionalElement.PopList(providerID);
         this.advanceList = new FunctionalElement.AdvanceList(providerID);
+        this.multiline = multiline;
         last = format;
 
         if (format == null)
@@ -68,6 +70,11 @@ public class FilteredListElement implements HudElement, MultiElement {
 
         expanded.set(expanded.size()-1, popList);
         return expanded;
+    }
+
+    @Override
+    public boolean ignoreNewlineIfEmpty() {
+        return !multiline;
     }
 
     @Override

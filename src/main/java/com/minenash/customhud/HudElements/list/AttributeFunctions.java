@@ -63,20 +63,20 @@ public class AttributeFunctions {
 
 
     // STATUS EFFECTS
-    public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> I18n.translate(status.getTranslationKey());
-    public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> Registries.STATUS_EFFECT.getId(status.getEffectType());
-    public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(HMS, StatusEffectInstance::getDuration);
-    public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status.getDuration() == -1;
-    public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = StatusEffectInstance::getAmplifier;
-    public static final Function<StatusEffectInstance,Number> STATUS_LEVEL = (status) -> status.getAmplifier() + (status.getAmplifier() >= 0 ? 1 : 256);
-    public static final Function<StatusEffectInstance,Boolean> STATUS_AMBIENT = StatusEffectInstance::isAmbient;
-    public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_PARTICLES = StatusEffectInstance::shouldShowParticles;
-    public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_ICON = StatusEffectInstance::shouldShowIcon;
-    public static final Function<StatusEffectInstance,Number> STATUS_COLOR = (status) -> status.getEffectType().getColor();
+    public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> status == null ? null : I18n.translate(status.getTranslationKey());
+    public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> status == null ? null : Registries.STATUS_EFFECT.getId(status.getEffectType());
+    public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(HMS, (status) -> status == null ? null : status.getDuration());
+    public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status == null ? null : status.getDuration() == -1;
+    public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = (status) -> status == null ? null : status.getAmplifier();
+    public static final Function<StatusEffectInstance,Number> STATUS_LEVEL = (status) -> status == null ? null : status.getAmplifier() + (status.getAmplifier() >= 0 ? 1 : 256);
+    public static final Function<StatusEffectInstance,Boolean> STATUS_AMBIENT = (status) -> status == null ? null : status.isAmbient();
+    public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_PARTICLES = (status) -> status == null ? null : status.shouldShowParticles();
+    public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_ICON = (status) -> status == null ? null : status.shouldShowIcon();
+    public static final Function<StatusEffectInstance,Number> STATUS_COLOR = (status) -> status == null ? null : status.getEffectType().getColor();
     public static final Entry<StatusEffectInstance> STATUS_CATEGORY = new Entry<>(
-            (status) -> WordUtils.capitalize(status.getEffectType().getCategory().name().toLowerCase()),
-            (status) -> status.getEffectType().getCategory().ordinal(),
-            (status) -> status.getEffectType().getCategory().ordinal() != 1);
+            (status) -> status == null ? null : WordUtils.capitalize(status.getEffectType().getCategory().name().toLowerCase()),
+            (status) -> status == null ? null : status.getEffectType().getCategory().ordinal(),
+            (status) -> status == null ? null : status.getEffectType().getCategory().ordinal() != 1);
 
 
     // PLAYERS (From PlayerList)

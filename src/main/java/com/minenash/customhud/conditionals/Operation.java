@@ -298,6 +298,22 @@ public interface Operation {
         }
     }
 
+    record ElementUseBool(HudElement element) implements Operation {
+        public double getValue() {
+            return element.getBoolean() ? 1 : 0;
+        }
+
+        @Override
+        public boolean getBooleanValue() {
+            return element.getBoolean();
+        }
+
+        @Override
+        public void printTree(int indent) {
+            CustomHud.logInDebugMode(indent(indent) + "- Element: " + element);
+        }
+    }
+
     static String indent(int indent) {
         return " ".repeat(indent);
     }

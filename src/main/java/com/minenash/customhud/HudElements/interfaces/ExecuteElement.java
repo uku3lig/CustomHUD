@@ -1,4 +1,4 @@
-package com.minenash.customhud.HudElements.functional;
+package com.minenash.customhud.HudElements.interfaces;
 
 public interface ExecuteElement {
 

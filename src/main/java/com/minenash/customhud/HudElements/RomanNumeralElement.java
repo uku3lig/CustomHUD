@@ -47,6 +47,11 @@ public class RomanNumeralElement implements HudElement, MultiElement {
         );
     }
 
+    @Override
+    public boolean ignoreNewlineIfEmpty() {
+        return true;
+    }
+
     public static String convert(int num) {
         return num == 0 ? "N" : num < 0 ? "-" + _convert(-1 * num) : _convert(num);
     }

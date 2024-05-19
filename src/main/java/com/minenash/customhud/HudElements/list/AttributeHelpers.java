@@ -55,6 +55,7 @@ public class AttributeHelpers {
                 case "mainhand", "offhand" -> "weapon." + src;
                 case "main", "off" -> "weapon." + src + "hand";
                 default -> {
+                    if (src.length() < 2) yield src;
                     if (src.charAt(0) == 'h' && src.charAt(1) != 'o') yield "hotbar." + src.substring(1);
                     if (src.charAt(0) == 'i' && src.charAt(1) != 'n') yield "inventory." + src.substring(1);
                     yield src;

@@ -67,7 +67,6 @@ public class IntegerSuppliers {
     public static final Supplier<Number> PROFILE_ERRORS = () -> ProfileManager.getActive() == null ? 0 : Errors.getErrors(ProfileManager.getActive().name).size();
 
     public static final Supplier<Number> FPS = client::getCurrentFps;
-    public static final Supplier<Number> MAX_FPS = () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE ? null : client.options.getMaxFps().getValue();
     public static final Supplier<Number> BIOME_BLEND = () -> client.options.getBiomeBlendRadius().getValue();
     public static final Supplier<Number> SIMULATION_DISTANCE = () -> client.options.getSimulationDistance().getValue();
 

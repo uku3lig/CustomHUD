@@ -76,4 +76,9 @@ public class MacroElement implements HudElement, MultiElement {
 
         return Collections.singletonList( new StringElement( NumElement.formatString(macro.op().getValue() * scale, null, precision, zerofill, base) ) );
     }
+
+    @Override
+    public boolean ignoreNewlineIfEmpty() {
+        return true;
+    }
 }

@@ -18,12 +18,14 @@ public class ListElement implements HudElement, MultiElement {
     private final ListProvider provider;
     private final List<HudElement> main;
     private final List<HudElement> last;
+    private final boolean multiline;
 
-    public ListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator) {
+    public ListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, boolean multiline) {
         this.provider = provider;
         this.providerID = providerID;
         this.popList = new FunctionalElement.PopList(providerID);
         this.advanceList = new FunctionalElement.AdvanceList(providerID);
+        this.multiline = multiline;
         last = format;
 
         if (format == null)
@@ -37,8 +39,8 @@ public class ListElement implements HudElement, MultiElement {
     }
 
     public static HudElement of(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation) {
-        return operation == null ? new ListElement(provider, providerID, format, separator)
-                : new FilteredListElement(provider, providerID, format, separator, operation);
+        return operation == null ? new ListElement(provider, providerID, format, separator, false)
+                : new FilteredListElement(provider, providerID, format, separator, operation, false);
     }
 
     public List<HudElement> expand() {
@@ -58,6 +60,11 @@ public class ListElement implements HudElement, MultiElement {
 
         expanded.set(expanded.size()-1, popList);
         return expanded;
+    }
+
+    @Override
+    public boolean ignoreNewlineIfEmpty() {
+        return !multiline;
     }
 
     @Override
@@ -104,8 +111,8 @@ public class ListElement implements HudElement, MultiElement {
         }
 
         public HudElement build() {
-            return filter == null ? new ListElement(provider, providerID, elements, separator)
-                    : new FilteredListElement(provider, providerID, elements, separator, filter);
+            return filter == null ? new ListElement(provider, providerID, elements, separator, true)
+                    : new FilteredListElement(provider, providerID, elements, separator, filter, true);
         }
 
     }

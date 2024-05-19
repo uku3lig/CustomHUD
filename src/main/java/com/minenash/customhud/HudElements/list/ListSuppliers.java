@@ -68,12 +68,26 @@ public class ListSuppliers {
 
         ITEMS = () -> AttributeHelpers.compactItems(CLIENT.player.getInventory().main),
         INV_ITEMS = () -> CLIENT.player.getInventory().main.subList(9, CLIENT.player.getInventory().main.size()),
-        ARMOR_ITEMS = () -> CLIENT.player.getInventory().armor,
+        ARMOR_ITEMS = () -> {List<ItemStack> a = CLIENT.player.getInventory().armor; return List.of(a.get(3),a.get(2),a.get(1),a.get(0));},
         HOTBAR_ITEMS = () -> CLIENT.player.getInventory().main.subList(0,9),
         ALL_ITEMS = () -> {
             PlayerInventory inv = CLIENT.player.getInventory();
             List<ItemStack> items = new ArrayList<>( inv.main );
-            items.addAll(inv.armor);
+            items.add(inv.armor.get(3));
+            items.add(inv.armor.get(2));
+            items.add(inv.armor.get(1));
+            items.add(inv.armor.get(0));
+            items.add(inv.offHand.get(0));
+            return items;
+        },
+        EQUIPPED_ITEMS = () -> {
+            PlayerInventory inv = CLIENT.player.getInventory();
+            List<ItemStack> items = new ArrayList<>( 5 );
+            items.add(inv.armor.get(3));
+            items.add(inv.armor.get(2));
+            items.add(inv.armor.get(1));
+            items.add(inv.armor.get(0));
+            items.add(inv.getMainHandStack());
             items.add(inv.offHand.get(0));
             return items;
         },

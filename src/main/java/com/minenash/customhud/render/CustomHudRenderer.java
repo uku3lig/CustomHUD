@@ -3,7 +3,7 @@ package com.minenash.customhud.render;
 import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
-import com.minenash.customhud.HudElements.functional.ExecuteElement;
+import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
 import com.minenash.customhud.HudElements.text.TextElement;
@@ -72,9 +72,9 @@ public class CustomHudRenderer {
             for (HudElement e : section.elements)
                 lineCount += addElement(elements, e);
             outer:
-            for (int j = 1; j < elements.size()-1; j++) {
+            for (int j = 0; j < elements.size()-1; j++) {
                 if (elements.get(j) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine
-                && elements.get(j-1) instanceof FunctionalElement.NewLine) {
+                && (j == 0 || elements.get(j-1) instanceof FunctionalElement.NewLine)) {
                     for (int k = j+1; k < elements.size(); k++) {
                         if (elements.get(k) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine)
                             continue;
@@ -87,8 +87,6 @@ public class CustomHudRenderer {
                     }
                 }
             }
-
-
             boolean removeExtraNewLines = false;
             for (int i = elements.size() - 1; i >= 0; i--) {
                 if (!(elements.get(i) instanceof FunctionalElement.NewLine))
@@ -124,6 +122,7 @@ public class CustomHudRenderer {
                         xOffset = 0;
                         formatting = theme.fgColor.copy();
                     } else if (e instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine) {
+                        outer:
                         if ( (ei+1 >= elements.size() || elements.get(ei+1) instanceof FunctionalElement.NewLine) ) {
                             for (int j = ei-1; j >= 0; j--) {
                                 HudElement element = elements.get(j);
@@ -131,8 +130,9 @@ public class CustomHudRenderer {
                                     continue;
                                 if (element instanceof FunctionalElement.NewLine)
                                     ei++;
-                                break;
+                                break outer;
                             }
+                            ei++;
                         }
 
                     } else if (e instanceof FunctionalElement.ChangeFormatting cfe && cfe.getFormatting() != null) {
@@ -219,7 +219,7 @@ public class CustomHudRenderer {
         if (element instanceof MultiElement me) {
             int nl = 0;
             List<HudElement> elements = me.expand();
-            if (elements.isEmpty()) {
+            if (elements.isEmpty() && me.ignoreNewlineIfEmpty()) {
                 allElements.add(new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine());
                 return nl;
             }

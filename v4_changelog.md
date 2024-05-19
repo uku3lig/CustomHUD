@@ -159,8 +159,13 @@ Child variables will be given in the next section.
 - `item:<slot>:attributes`/`item:<slot>:attrs`
 - `item:<slot>:can_destroy`, `item:<slot>:can_place_on`
 - `item:<slot>:info_shown`, `item:<slot>:info_hidden`
-- `items`, `hotbar_items`, `armor_items`
-- `inventory_items`/`inv_items` (the 3 rows in your inventory)
+- Items:
+  - `items`: Hotbar + Inventory slots with stackable stacks combined
+  - `all_items`: Hotbar + Inventory + Armor + Offhand
+  - `quipped_items`: Armor + Mainhand + Offhand
+  - `armor_items`: Armor
+  - `inv_items`: Inventory
+  - `hotbar_items`: Hotbar
 - `objectives`
 - `scores`, `score:<player>`
 - `bossbars`
@@ -384,7 +389,7 @@ Attribute Modifier Info
     - Runs the expression on **get**, not set
   - `{setmacro:<name>, "stuff here"}`
     - `"stuff here"` the same as `{{<condition>, "stuff here if true"}}`
-    - Example: `{setmacro:cords, "&c{x} &a{y} &b{z}"}`
+    - Example: `{setmacro:coords, "&c{x} &a{y} &b{z}"}`
   - `{getmacro:<name>}`
 - `{slime_chunk:<seed>}`
   - You should still use `{slime_chunk}` in singleplayer

@@ -214,38 +214,45 @@ public class VariableParser {
     }
 
     public static HudElement parseElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listProviders) {
-        if (part == null || part.isEmpty())
-            return null;
+        try {
+            if (part == null || part.isEmpty())
+                return null;
 
-        if (part.equals("\n"))
-            return new FunctionalElement.NewLine();
+            if (part.equals("\n"))
+                return new FunctionalElement.NewLine();
 
-        if (part.startsWith("§")) {
-            CHFormatting formatting = HudTheme.parseColorCode(part);
-            if (formatting != null)
-                return new FunctionalElement.ChangeFormatting(formatting);
+            if (part.startsWith("§")) {
+                CHFormatting formatting = HudTheme.parseColorCode(part);
+                if (formatting != null)
+                    return new FunctionalElement.ChangeFormatting(formatting);
+            }
+
+            if (part.startsWith("&{")) {
+                Matcher m = HEX_COLOR_VARIABLE_PATTERN.matcher(part);
+                if (m.matches())
+                    return new FunctionalElement.ChangeFormatting(HudTheme.parseHexNumber(m.group(1)));
+                HudElement element = parseElement2(part.substring(1), profile, debugLine, enabled, listProviders);
+                if (element instanceof FunctionalElement.ChangeFormatting)
+                    return element;
+                if (element instanceof IntElement ie)
+                    return new FunctionalElement.ChangeFormatting(ie.getNumber().intValue());
+                if (element != null)
+                    return new FunctionalElement.ChangeFormattingFromElement(element);
+
+                Errors.addError(profile.name, debugLine, part, ErrorType.UNKNOWN_COLOR, part.substring(2, part.length() - 1).trim());
+                return null;
+            }
+            return parseElement2(part, profile, debugLine, enabled, listProviders);
         }
-
-        if (part.startsWith("&{")) {
-            Matcher m = HEX_COLOR_VARIABLE_PATTERN.matcher(part);
-            if (m.matches())
-                return new FunctionalElement.ChangeFormatting(HudTheme.parseHexNumber(m.group(1)));
-            HudElement element = parseElement2(part.substring(1), profile, debugLine, enabled, listProviders);
-            if (element instanceof FunctionalElement.ChangeFormatting)
-                return element;
-            if (element instanceof IntElement ie)
-                return new FunctionalElement.ChangeFormatting(ie.getNumber().intValue());
-            if (element != null)
-                return new FunctionalElement.ChangeFormattingFromElement(element);
-
-            Errors.addError(profile.name, debugLine, part, ErrorType.UNKNOWN_COLOR, part.substring(2, part.length()-1).trim());
+        catch (Exception e) {
+            Errors.addError(profile.name, debugLine, part, ErrorType.VARIABLE_ERROR, "");
+            CustomHud.LOGGER.catching(e);
             return null;
         }
-        return parseElement2(part, profile, debugLine, enabled,listProviders);
 
     }
     public static boolean inQuotes(String part) {
-        return (part.startsWith("\"") && part.endsWith("\"")) || (part.startsWith("'") && part.endsWith("'"));
+        return part.length() > 1 && (part.startsWith("\"") && part.endsWith("\"")) || (part.startsWith("'") && part.endsWith("'"));
     }
     public static HudElement parseElement2(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listProviders) {
         if (!part.startsWith("{") || part.length() < 2)
@@ -287,7 +294,7 @@ public class VariableParser {
                 result = result.substring(1, result.length()-1);
 
                 pairs.add(new ConditionalElement.ConditionalPair(
-                        ExpressionParser.parseExpression(cond, original, profile, debugLine, enabled, listProviders),
+                        ExpressionParser.parseExpression(cond, original, profile, debugLine, enabled, listProviders, true),
                         addElements(result, profile, debugLine, enabled, false, listProviders)));
             }
             if (ps.size() % 2 == 1) {
@@ -305,7 +312,7 @@ public class VariableParser {
                 Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "No pairs");
                 return null;
             }
-            return new ConditionalElement(pairs);
+            return new ConditionalElement(pairs, false);
         }
 
         if (part.startsWith("$")) {
@@ -313,7 +320,7 @@ public class VariableParser {
                 Matcher matcher = EXPRESSION_WITH_PRECISION.matcher(part);
                 matcher.matches();
                 int precision = matcher.group(1) == null ? -1 : Integer.parseInt(matcher.group(1));
-                return new ExpressionElement( ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProviders), precision );
+                return new ExpressionElement( ExpressionParser.parseExpression(matcher.group(2), original, profile, debugLine, enabled, listProviders, false), precision );
             }
             catch (Exception e) {
                 CustomHud.LOGGER.catching(e);
@@ -352,7 +359,7 @@ public class VariableParser {
             if (matcher.matches())
                 op = new Operation.Length(addElements(matcher.group(1), profile, debugLine, enabled, false, listProviders));
             else
-                op = ExpressionParser.parseExpression(widthStr.trim(), part, profile, debugLine, enabled, listProviders);
+                op = ExpressionParser.parseExpression(widthStr.trim(), part, profile, debugLine, enabled, listProviders, false);
             return new SpaceElement( op );
         }
 
@@ -362,7 +369,7 @@ public class VariableParser {
                 String valueName = part.substring(4).trim();
                 return new SetValueElement(valueName, new Operation.Literal(0));
             }
-            Operation op = ExpressionParser.parseExpression(part.substring(commaIndex+1).trim(), part, profile, debugLine, enabled, listProviders);
+            Operation op = ExpressionParser.parseExpression(part.substring(commaIndex+1).trim(), part, profile, debugLine, enabled, listProviders, false);
             return new SetValueElement(part.substring(4,commaIndex), op);
         }
 
@@ -381,7 +388,7 @@ public class VariableParser {
             if (matcher.matches())
                 macro = new Macro(addElements(matcher.group(1), profile, debugLine, enabled, false, listProviders), null);
             else
-               macro = new Macro(null, ExpressionParser.parseExpression(macroStr.trim(), part, profile, debugLine, enabled, listProviders));
+               macro = new Macro(null, ExpressionParser.parseExpression(macroStr.trim(), part, profile, debugLine, enabled, listProviders, false));
             profile.macros.put(macroName, macro);
 
             return new FunctionalElement.IgnoreNewLineIfSurroundedByNewLine();
@@ -436,13 +443,13 @@ public class VariableParser {
 
             String[] mainParts = matcher.group(1).split(" ");
             Identifier id = new Identifier(mainParts[0].endsWith(".png") ? mainParts[0] : mainParts[0] + ".png");
-            Operation u = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders);
-            Operation v = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders);
-            Operation w = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders);
-            Operation h = matcher.group(6) == null || matcher.group(6).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(6), original, profile, debugLine, enabled, listProviders);
-            Operation width = matcher.group(8) == null || matcher.group(7).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(7), original, profile, debugLine, enabled, listProviders);
+            Operation u = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders, false);
+            Operation v = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders, false);
+            Operation w = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders, false);
+            Operation h = matcher.group(6) == null || matcher.group(6).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(6), original, profile, debugLine, enabled, listProviders, false);
+            Operation width = matcher.group(8) == null || matcher.group(7).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(7), original, profile, debugLine, enabled, listProviders, false);
             int hg = matcher.group(8) == null ? 7 : 8;
-            Operation height = matcher.group(hg) == null || matcher.group(hg).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(hg), original, profile, debugLine, enabled, listProviders);
+            Operation height = matcher.group(hg) == null || matcher.group(hg).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(hg), original, profile, debugLine, enabled, listProviders, false);
 
             Flags flags = Flags.parse(profile.name, debugLine, mainParts);
             if (!matcher.group(2).isEmpty() && u == null && v == null && w == null && h == null && width == null && height == null) {
@@ -491,7 +498,7 @@ public class VariableParser {
         Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
 
         if (!listProviders.isEmpty()) {
-            HudElement element = Attributers.getFromPrefix(listProviders, part.endsWith(",") ? part.substring(0, part.length()-1) : part, flags, profile.name, debugLine );
+            HudElement element = Attributers.getFromPrefix(listProviders, part.endsWith(",") ? part.substring(0, part.length()-1) : part, flags, profile, debugLine );
             if (element instanceof FunctionalElement.CreateListElement cle) {
                 String p = original.substring(1, original.length() - 1);
                 return listElement(cle.entry, p, p.indexOf(','), profile, debugLine, enabled, original, listProviders);
@@ -559,7 +566,7 @@ public class VariableParser {
 
         if (part.startsWith("pteam:") || part.startsWith("player_team:")) {
             String method = part.substring(part.indexOf(':')+1);
-            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(flags.listPrefix, null, () -> CLIENT.player.getScoreboardTeam(), method, flags );
+            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(flags.listPrefix, null, () -> CLIENT.player.getScoreboardTeam(), method, flags, null );
             if (element == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, method);
             return element;
@@ -687,9 +694,9 @@ public class VariableParser {
                 return null;
             }
 
-            Operation end = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders);
+            Operation end = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders, false);
             Operation interval = parts.size() != 2 ? new Operation.Literal(1) :
-                ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders);
+                ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders, false);
             return Flags.wrap(new TimerElement(end, interval, flags), flags);
         }
 
@@ -727,7 +734,7 @@ public class VariableParser {
         if (element != null)
             return Flags.wrap(element, flags);
 
-        element = Attributers.get(listProviders, part, flags, profile.name, debugLine);
+        element = Attributers.get(listProviders, part, flags, profile, debugLine);
         if (element instanceof FunctionalElement.CreateListElement cle) {
             String p = original.substring(1, original.length() - 1);
             return listElement(cle.entry, p, p.indexOf(','), profile, debugLine, enabled, original, listProviders);
@@ -927,7 +934,6 @@ public class VariableParser {
         return switch (element) {
             case "profile_errors" -> PROFILE_ERRORS;
             case "fps" -> FPS;
-            case "max_fps" -> MAX_FPS;
             case "biome_blend" -> BIOME_BLEND;
             case "simulation_distance", "sd" -> SIMULATION_DISTANCE;
             case "packets_sent", "tx" -> PACKETS_SENT;
@@ -1188,6 +1194,7 @@ public class VariableParser {
 
     private static SpecialSupplierElement.Entry getSpecialSupplierElements(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "max_fps" -> MAX_FPS;
             case "profile_keybind" -> PROFILE_KEYBIND;
             case "hour24", "hours25" -> { enabled.time = true; yield TIME_HOUR_24; }
             case "minute", "minutes" -> { enabled.time = true; yield TIME_MINUTES; }
@@ -1249,7 +1256,7 @@ public class VariableParser {
         }
         if (parts.size() == 1) {
             String attr = dotIndex == -1 ? "" : parts.get(0).substring(dotIndex+1);
-            HudElement attribute = Attributers.get(listProviders, attr, new Flags(), profile.name, debugLine);
+            HudElement attribute = Attributers.get(listProviders, attr, new Flags(), profile, debugLine);
             if (attribute == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
             return new ListCountElement(provider, attribute);
@@ -1269,7 +1276,7 @@ public class VariableParser {
 
         if (parts.size() > 2) {
             if ( parts.size() > 3 ) {
-                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, listProviders);
+                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, listProviders, true);
                 CustomHud.logInDebugMode( "Filter:");
                 operation.printTree(2);
             }
@@ -1281,7 +1288,7 @@ public class VariableParser {
                 CustomHud.logInDebugMode("Separator: " + sep);
             }
             else if ( parts.size() == 3 ) {
-                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders);
+                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders, true);
                 CustomHud.logInDebugMode( "Filter:");
                 operation.printTree(2);
             }
@@ -1325,6 +1332,7 @@ public class VariableParser {
             case "items" -> ITEMS;
             case "inventory_items", "inv_items" -> INV_ITEMS;
             case "armor_items" -> ARMOR_ITEMS;
+            case "equipped_items" -> EQUIPPED_ITEMS;
             case "hotbar_items" -> HOTBAR_ITEMS;
             case "all_items" -> ALL_ITEMS;
             case "objectives" -> SCOREBOARD_OBJECTIVES;
@@ -1382,18 +1390,18 @@ public class VariableParser {
         Operation startO, endO, stepO;
         if (parts.size() == 1) {
             startO = new Operation.Literal(0);
-            endO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders);
+            endO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders, false);
             stepO = new Operation.Literal(1);
         }
         else if (parts.size() == 2) {
-            startO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders);
-            endO = ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders);
+            startO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders, false);
+            endO = ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders, false);
             stepO = new Operation.Literal(1);
         }
         else {
-            startO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders);
-            endO = ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders);
-            stepO = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders);
+            startO = ExpressionParser.parseExpression(parts.get(0), original, profile, debugLine, enabled, listProviders, false);
+            endO = ExpressionParser.parseExpression(parts.get(1), original, profile, debugLine, enabled, listProviders, false);
+            stepO = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders, false);
         }
 
         ListProvider provider = () -> {
@@ -1434,8 +1442,8 @@ public class VariableParser {
             return null;
         }
 
-        Operation op1 = ExpressionParser.parseExpression(parts.get(1).trim(), part, profile, debugLine, enabled, listProviders);
-        Operation op2 = ExpressionParser.parseExpression(parts.get(2).trim(), part, profile, debugLine, enabled, listProviders);
+        Operation op1 = ExpressionParser.parseExpression(parts.get(1).trim(), part, profile, debugLine, enabled, listProviders, false);
+        Operation op2 = ExpressionParser.parseExpression(parts.get(2).trim(), part, profile, debugLine, enabled, listProviders, false);
         Flags flags;
         if (parts.size() < 4)
             flags = new Flags();
@@ -1473,7 +1481,7 @@ public class VariableParser {
         if (commaIndex == -1) {
             int dotIndex = part.indexOf('.');
             String attr = dotIndex == -1 ? "" : part.substring(dotIndex+1);
-            HudElement attribute = Attributers.get(new ListProviderSet().with(provider), attr, new Flags(), profile.name, debugLine);
+            HudElement attribute = Attributers.get(new ListProviderSet().with(provider), attr, new Flags(), profile, debugLine);
             if (attribute == null)
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE, attr);
             return new ListCountElement(provider, attribute);
@@ -1501,8 +1509,11 @@ public class VariableParser {
         String seperator = "";
 
         if (parts.size() > 2) {
-            if ( parts.size() > 3 )
-                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, listProviders);
+            if ( parts.size() > 3 ) {
+                operation = ExpressionParser.parseExpression(parts.get(3), original, profile, debugLine, enabled, listProviders, true);
+                CustomHud.logInDebugMode("Filter: ");
+                operation.printTree(2);
+            }
 
             String sep = parts.get(2).trim();
 
@@ -1511,7 +1522,9 @@ public class VariableParser {
                 CustomHud.logInDebugMode("Separator: " + sep);
             }
             else if ( parts.size() == 3 ) {
-                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders);
+                operation = ExpressionParser.parseExpression(parts.get(2), original, profile, debugLine, enabled, listProviders, true);
+                CustomHud.logInDebugMode("Filter: ");
+                operation.printTree(2);
             }
             else {
                 Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_LIST, "separator part not in quotations");
@@ -1536,7 +1549,7 @@ public class VariableParser {
     public static HudElement getAttributeElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         if (part.startsWith("item:"))
             return attrElement(part, SLOT_READER, false, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
-                    ITEM, ErrorType.UNKNOWN_ITEM_ID, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
+                    ITEM, ErrorType.UNKNOWN_SLOT, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("attribute:"))
             return attrElement(part, ENTITY_ATTR_READER, true, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
@@ -1562,6 +1575,10 @@ public class VariableParser {
         if (part.startsWith("bossbar:"))
             return attrElement(part, src -> src, true, (name) -> () -> AttributeHelpers.getBossBar(name),
                     BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_PROPERTY, profile, debugLine, enabled, original);
+
+        if (part.startsWith("effect:"))
+            return attrElement(part, src -> Registries.STATUS_EFFECT.get(Identifier.tryParse(src)), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
+                    EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_PROPERTY, profile, debugLine, enabled, original);
 
         if (part.startsWith("mod:"))
             return attrElement(part, ModMenu.MODS::get, false, (mod) -> () -> mod,
@@ -1609,7 +1626,8 @@ public class VariableParser {
 
         String[] flagParts = method.split(" ");
         Flags flags = Flags.parse(profile.name, debugLine, flagParts);
-        HudElement element = attributer.get(flags.listPrefix, null, supplier.apply(value), flagParts[0], flags);
+        ParseContext context = new ParseContext(profile, debugLine, enabled, null);
+        HudElement element = attributer.get(flags.listPrefix, null, supplier.apply(value), flagParts[0], flags, context);
 
         if (element == null) {
             Errors.addError(profile.name, debugLine, original, unknownAttribute, method);

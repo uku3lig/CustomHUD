@@ -27,7 +27,7 @@ public class MultiLineStacker {
     private final ListProviderSet listProviders = new ListProviderSet();
 
     public void startIf(String cond, Profile profile, int line, String source, ComplexData.Enabled enabled) {
-        Operation op = ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders);
+        Operation op = ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true);
         stack.push(new ConditionalElement.MultiLineBuilder(op));
     }
 
@@ -35,7 +35,7 @@ public class MultiLineStacker {
         if (stack.isEmpty())
             Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else if");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
-            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders));
+            mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true));
         else {
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
@@ -43,7 +43,7 @@ public class MultiLineStacker {
                     break;
                 }
             }
-            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders));
+            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true));
         }
     }
 
@@ -73,15 +73,21 @@ public class MultiLineStacker {
             addElement(element);
         }
         else {
+            boolean success = false;
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
                     mlb.addAll( finish(i+1, profile, line, false) );
+                    HudElement element = ( (ConditionalElement.MultiLineBuilder)stack.peek() ).build();
+                    stack.pop();
+                    addElement(element);
+                    success = true;
                     break;
                 }
             }
-            HudElement element = ( (ConditionalElement.MultiLineBuilder)stack.peek() ).build();
-            stack.pop();
-            addElement(element);
+            if (!success) {
+                Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "end");
+            }
+
         }
     }
 
@@ -110,7 +116,7 @@ public class MultiLineStacker {
         }
 
         if (provider == null && !listProviders.isEmpty()) {
-            HudElement e = Attributers.get(listProviders, list, new Flags(), profile.name, line);
+            HudElement e = Attributers.get(listProviders, list, new Flags(), profile, line);
             if (e instanceof FunctionalElement.CreateListElement cle) {
                 provider = cle.entry;
             }
@@ -126,7 +132,7 @@ public class MultiLineStacker {
 
         Operation filter = null;
         if (parts.size() > 1) {
-            filter = ExpressionParser.parseExpression(parts.get(1), source, profile, line, enabled, listProviders);
+            filter = ExpressionParser.parseExpression(parts.get(1), source, profile, line, enabled, listProviders, true);
             CustomHud.logInDebugMode("Filter:");
             filter.printTree(2);
         }
@@ -161,15 +167,20 @@ public class MultiLineStacker {
             addElement(element);
         }
         else {
+            boolean success = false;
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ListElement.MultiLineBuilder mlb) {
                     mlb.addAll( finish(i+1, profile, line, false) );
+                    HudElement element = ( (ListElement.MultiLineBuilder)stack.peek() ).build();
+                    stack.pop();
+                    addElement(element);
+                    success = true;
                     break;
                 }
             }
-            HudElement element = ( (ListElement.MultiLineBuilder)stack.peek() ).build();
-            stack.pop();
-            addElement(element);
+            if (!success) {
+                Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "end");
+            }
         }
         listProviders.pop();
     }

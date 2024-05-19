@@ -1,7 +1,7 @@
 package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.CustomHud;
-import com.minenash.customhud.HudElements.functional.ExecuteElement;
+import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.conditionals.ExpressionParser;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;

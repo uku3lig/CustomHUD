@@ -69,7 +69,7 @@ public class SettingsElement {
         setting = setting.toLowerCase();
 
         if (setting.equals("max_fps"))
-            return new Pair<>(new NumberSupplierElement(IntegerSuppliers.MAX_FPS, flags), null);
+            return new Pair<>(new SpecialSupplierElement(SpecialSupplierElement.MAX_FPS), null);
 
         if (setting.startsWith("lang")) {
             String code = client.getLanguageManager().getLanguage();
