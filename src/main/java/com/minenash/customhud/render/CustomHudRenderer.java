@@ -134,8 +134,8 @@ public class CustomHudRenderer {
                 font = piece.font;
                 context.drawText(client.textRenderer, value, piece.x, piece.y, piece.color, piece.shadow);
             }
-
         }
+        font = null;
 
         for (RenderPiece piece : pieces) {
             if (piece.element instanceof IconElement ie )

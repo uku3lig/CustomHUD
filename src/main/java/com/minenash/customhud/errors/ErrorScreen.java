@@ -79,11 +79,11 @@ public class ErrorScreen extends Screen {
         profiles[1].active = Errors.hasErrors(2);
         profiles[2].active = Errors.hasErrors(3);
 
+        super.render(context, mouseX, mouseY, delta);
+
         y_offset = 0;
         this.listWidget.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 8, 16777215);
-
-        super.render(context, mouseX, mouseY, delta);
 
         int x = this.width / 2 + (profile == 1 ? -90 : profile == 2 ? 0 : 90);
         context.fill(x - 30, 47, x + 30, 48, 0xFFFFFFFF);
@@ -92,7 +92,7 @@ public class ErrorScreen extends Screen {
     class ErrorListWidget extends EntryListWidget<ErrorListWidget.ErrorEntry> {
 
         public ErrorListWidget(MinecraftClient client, int profile) {
-            super(client, ErrorScreen.this.width, ErrorScreen.this.height, 52, 18);
+            super(client, ErrorScreen.this.width, ErrorScreen.this.height - 52 - 33, 52, 18);
 
             this.addEntry( new ErrorEntryHeader() );
             if (!Errors.hasErrors(profile))
