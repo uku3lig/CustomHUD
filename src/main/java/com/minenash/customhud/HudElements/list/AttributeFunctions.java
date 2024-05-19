@@ -149,17 +149,21 @@ public class AttributeFunctions {
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant.getKey().getRarity().toString().toLowerCase();
     public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant.getValue();
     public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant.getKey().getMaxLevel();
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL =
-            (enchant) -> enchant.getKey().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().getTranslationKey())
-            : I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
-    public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
-            (enchant) -> I18n.translate("enchantment.level." + enchant.getValue()),
+    public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_FULL = new Entry<> (
+            (enchant) -> {
+                String enchantName = I18n.translate(enchant.getKey().getTranslationKey());
+                return enchant.getValue() == 0 ? "No " + enchantName : enchant.getKey().getMaxLevel() == 1 ? enchantName
+                    : enchantName + " " + I18n.translate("enchantment.level." + enchant.getValue());},
             (enchant) -> enchant.getValue(),
-            (enchant) -> true);
+            (enchant) -> enchant.getValue() > 0);
+    public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
+            (enchant) -> enchant.getValue() == 0 ? "0" : I18n.translate("enchantment.level." + enchant.getValue()),
+            (enchant) -> enchant.getValue(),
+            (enchant) -> enchant.getValue() > 0);
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_MAX_LEVEL = new Entry<> (
             (enchant) -> I18n.translate("enchantment.level." + enchant.getKey().getMaxLevel()),
             (enchant) -> enchant.getKey().getMaxLevel(),
-            (enchant) -> true);
+            (enchant) -> enchant.getValue() > 0);
 
 
     // ITEMS

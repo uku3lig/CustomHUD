@@ -122,8 +122,8 @@ public class Attributers {
     public static final Attributer ENCHANTMENT = (sbp, pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Str(sup,ENCHANT_NAME);
         case "", "id" -> new Id(sup,ENCHANT_ID, flags);
-        case "full" -> new Str(sup,ENCHANT_FULL);
-        case "level" -> new Special(sup,ENCHANT_LEVEL);
+        case "full" -> new Special(sup,ENCHANT_FULL);
+        case "level","lvl" -> new Special(sup,ENCHANT_LEVEL);
         case "max_level" -> new Special(sup,ENCHANT_MAX_LEVEL);
         case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
         case "max_num", "max_number" -> new Num(sup,ENCHANT_MAX_NUM, flags);
@@ -161,7 +161,7 @@ public class Attributers {
             return VariableParser.attrElement(name, src -> Registries.ENCHANTMENT.get(Identifier.tryParse(src)), true,
                     (enchant) -> () -> {
                         var enchants = EnchantmentHelper.get((ItemStack)sup.get());
-                        return !enchants.containsKey(enchant) ? null : Map.entry(enchant, enchants.get(enchant));
+                        return Map.entry(enchant, enchants.getOrDefault(enchant, 0));
                     },
                     ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_PROPERTY, context.profile(), context.line(), context.enabled(), name);
         return switch (name) {
