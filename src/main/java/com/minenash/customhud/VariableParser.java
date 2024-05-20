@@ -651,7 +651,11 @@ public class VariableParser {
             }
             return new TextSupplierElement( () -> {
                 Toggle toggle = ProfileManager.getActive().toggles.get(name);
-                return toggle == null ? null : toggle.key.getBoundKeyLocalizedText();
+                if (toggle == null) return null;
+                Text out = toggle.key.getBoundKeyLocalizedText();
+                if (!toggle.modifier.isUnbound())
+                    out = toggle.modifier.getBoundKeyLocalizedText().copy().append(" + ").append(out);
+                return out;
             }, flags );
         }
 

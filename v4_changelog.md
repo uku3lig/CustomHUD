@@ -45,7 +45,7 @@
         - Example: `{{items has "Stone", "I have Stone"}}`
         - Can use child var to test for a specific value
           - `<list>.<child> has <value>`
-          - Example: `{{items.count has 64, "I have at least 1 full stack"}}`
+          - Example: `{{all_items.count has 64, "I have at least 1 full stack"}}`
       - Or checks to see if a string has a string in it
         - Example `{{item:main:name has "wool", "This has wool in the name"}}`
       - Math Symbol aliases (just for the lols)
@@ -113,28 +113,42 @@
   - `#9A5CC6` → `&u`, `&{material_amethyst}`, `&{amethyst}`
 
 ### New Variable Flags
-- `-sub`/`-subscript`: Numbers are replaced with their subscript counterpart
-- `-sup`/`-superscript`: Numbers are replaced with their subscript counterpart
 - `-r<degrees>`/`-rotate<degrees>`: Rotates Icons
   - Ex: `{item:main:icon -r45}` will rotate the icon 45 degrees
-- `-hex`: Numbers are shown as hexadecimal numbers
 - `-zf#`/`-zerofill#`: Pad the left with zeros when needed
   - Ex: `{x -zf3}` (5 would be 005)
-- For Identifier Variables
-  - `-ns`/`-namespace`: Only shows the namespace
-  - `-path`: Only shows the path
 - `-v#`/`-freq#`/`-frequency#`
   - Sets how often the variable updates in seconds. Doesn't work on lists
   - Ex: `-v2`, `-v0.5`, `-v1/20`
+- For Identifier Variables
+  - `-ns`/`-namespace`: Only shows the namespace
+  - `-path`: Only shows the path
+- `-sub`/`-subscript`: Numbers are replaced with their subscript counterpart
+- `-sup`/`-superscript`: Numbers are replaced with their subscript counterpart
+- Flag that changes the number's base:
+  - `-hex`: Numbers are shown in hexadecimal
+  - `-oct`: Numbers are shown in octal
+  - `-bin`: Numbers are shown in binary
+  - `-base#`: Numbers are show in the base specificed.
+    - Ex: `{x -base7}`
 - `-rn`/`-roman`: Displays the number in Roman Numberals
-  ![SCREENSHOT HERE]()
+  - ![SCREENSHOT HERE]()
 ### New Themeing
+All of these are global-only.
 - `==NiceScale: <(+/-) GUI Scale>==`
   - Since minecraft text rendering isn't great, a lot of scales look meh. However setting the scale to make in line with the GUI scale up or down does look good, but then you have to calculate what that scale is, and only works for 1 gui scale at a time. This adds a nicer way to do it.
   - `==NiceScale: +1==` with your GUI Scale set to 3 in Minecraft's settings, the profile will render as if it was set to 4.
   - `==NiceScale: 2==` will render as if it GUI Scale was set to 2.
 - `==HudScale: <(+/-) GUI Scale>==`
   - Same as NiceScale, but for minecraft's vanilla hud (hotbar, scoreboard, bossbar, etc)
+- `==ConvertLineBreak: <true|false>==`
+  - Default: `true` (same behavior as before)
+  - If true it treats line breaks in the profile file as NewLines in the hud.
+  - This means that you can also change theming part way through a line. 
+  - Quirks when using `=BackgroundColor:<color>=` part way through a line
+    - If the section's `width` is set to `fit` (default), it won't apply until after the next NewLine
+    - If the section's `width` is set to `max` or a specific amount, it'll apply to the entire line
+  - In a future release, there will be a local version of this
 
 ### List Variables
 List variables will be shown without the `{}` around them, as they are intended to be used in the syntax laid out above  
@@ -200,24 +214,24 @@ Example: `{effects -pre:eff, "{eff:name}"}`
 - `{e:icon}`, `{e:icon_no_bg}`
 
 `players`
-- `{pl:name}`/`{pl:display_name}`, `{pl:username}`
-- `{pl:id}`/`{pl:uuid}`
-- `{pl:latency}`, `{pl:list_score}`
-- `{pl:gamemode}`, `{pl:survival}`, `{pl:creative}`, `{pl:adventure}`, `{pl:spectator}`
-- `{pl:head}` (icon)
-- `{pl:team}`, `{pl:team:<team child var>}` (see `teams`)
-  - Example `{pl:team:id}`
+- `{p:name}`/`{p:display_name}`, `{p:username}`
+- `{p:id}`/`{p:uuid}`
+- `{p:latency}`, `{p:list_score}`
+- `{p:gamemode}`, `{p:survival}`, `{p:creative}`, `{p:adventure}`, `{p:spectator}`
+- `{p:head}` (icon)
+- `{p:team}`, `{p:team:<team child var>}` (see `teams`)
+  - Example `{p:team:id}`
 
 `subtitles`
-- `{su:id}`, `{su:name}`
-- `{su:age}`, `{su:time}`
-- `{su:x}`, `{su:y}`, `{su:z}`, `{su:dist}`/`{su:distance}`
-- `{su:dir}`/`{su:direction}`, `{su:left}`, `{su:right}`
-- `{su:dir_yaw}`/`{su:direction_yaw}`,`{su:dir_pitch}`, `{su:direction_pitch}`
-- `{su:alpha}` (allows you to control the fade, see new color feature)
+- `{s:id}`, `{s:name}`
+- `{s:age}`, `{s:time}`
+- `{s:x}`, `{s:y}`, `{s:z}`, `{s:dist}`/`{s:distance}`
+- `{s:dir}`/`{s:direction}`, `{s:left}`, `{s:right}`
+- `{s:dir_yaw}`/`{s:direction_yaw}`,`{s:dir_pitch}`, `{s:direction_pitch}`
+- `{s:alpha}` (allows you to control the fade, see new color feature)
 
 `target_block_properties`, `target_fluid_properties`
-- `{bp:name}`, `{bp:value}`, `{bp:type}`, `{bp:full_type}`
+- `{p:name}`, `{p:value}`, `{p:type}`, `{p:full_type}`
 
 `target_block_tags`, `target_fluid_tags`
 - `{t:name}`, `{t:id}`
@@ -238,54 +252,54 @@ Example: `{effects -pre:eff, "{eff:name}"}`
   - For the 4 above: See `items` child vars
 
 `item:<slot>:enchants`, `i:enchants`
-- `{en:name}`, `{en:id}`
-- `{en:level}` (like IV)
-- `{en:max_level}` (max level the enchantment can be)
-- `{en:full}` (like Sharpness IV)
-- `{en:num}`/`{en:number}` (0 indexed)
-- `{en:max_num}`, `{en:max_number}` (0 indexed)
-- `{en:rarity}`
+- `{e:name}`, `{e:id}`
+- `{e:level}`/`{e:lvl}` (like IV)
+- `{e:max_level}` (max level the enchantment can be)
+- `{e:full}` (like Sharpness IV)
+- `{e:num}`/`{e:number}` (0 indexed)
+- `{e:max_num}`, `{e:max_number}` (0 indexed)
+- `{e:rarity}`
 
 `item:<slot>:lore`
 - `{lore:line}`
 
 `attributes`, `target_entity_attributes`, `hooked_entity_attributes`  
 If not in singleplayer, you will only see tracked ones
-- `{at:name}`, `{at:id}`
-- `{at:value}`, `{at:base_value}`, `{at:default_value}`
-- `{at:tracked}` (if the server sends it to the client)
-- `at:modifiers` (a list variable, see the attribute modifiers)
+- `{a:name}`, `{a:id}`
+- `{a:value}`, `{a:base_value}`, `{a:default_value}`
+- `{a:tracked}` (if the server sends it to the client)
+- `a:modifiers` (a list variable, see the attribute modifiers)
 
-`at:modifiers`
+`a:modifiers`
 - `{am:name}`, `{am:id}`
 - `{am:value}`
 - `{am:op}`/`{am:operatopn}` (+ (addition), ☒ (multiply base), × (multiply total))
 - `{am:op_name}`, `{am:operation_name}` (Addition, Multiplication Base, Multiplication Total)
 
 `teams`
-- `{te:name}`, `{te:id}`
-- `{te:color}` (see new color feature)
-- `{te:friendly_fire}`, `{te:see_friendly_invis}`, `{te:collision}`
-- `{te:name_tag_visibility}`/`{te:name_tag}`, `{te:death_msg_visibility}`/`{te:death_msg}`
-- List Var `te:members` with child `{tm:member}` (members include offline players)
-- List Var `te:online_players`/`players` (See `players` child vars)
+- `{t:name}`, `{t:id}`
+- `{t:color}` (see new color feature)
+- `{t:friendly_fire}`, `{t:see_friendly_invis}`, `{t:collision}`
+- `{t:name_tag_visibility}`/`{t:name_tag}`, `{t:death_msg_visibility}`/`{t:death_msg}`
+- List Var `t:members` with child `{m:member}` (members include offline players)
+- List Var `t:online_players`/`players` (See `players` child vars)
 
 `item:<slot>:attributes` (Item Attribute Modifiers)
-- `{im:slot}` (where the item has to be for the attr to apply)
+- `{am:slot}` (where the item has to be for the attr to apply)
 Attribute Info
-- `{im:attribute}`/`{im:attr}` (attribute name)
-- `{im:attribute_id}`, `{im:attr_id}`
-- `{im:attribute_value}`, `{im:attr_value}`
-- `{im:default_value}`, `{im:tracked}`
+- `{am:attribute}`/`{am:attr}` (attribute name)
+- `{am:attribute_id}`, `{am:attr_id}`
+- `{am:attribute_value}`, `{am:attr_value}`
+- `{am:default_value}`, `{am:tracked}`
 Attribute Modifier Info
-- `{im:modifier_name}`/`{im:mod_name}`
-- `{im:modifier_id}`/`{im:mod_id}`
-- `{im:mod_amount}`, `{im:amount}`
-- `{im:op}`, `{im:operation}` (+ (addition), ☒ (multiply base), × (multiply total))
-- `{im:op_name}`, `{im:operation_name}` (Addition, Multiplication Base, Multiplication Total)
+- `{am:modifier_name}`/`{am:mod_name}`
+- `{am:modifier_id}`/`{am:mod_id}`
+- `{am:mod_amount}`, `{am:amount}`
+- `{am:op}`, `{am:operation}` (+ (addition), ☒ (multiply base), × (multiply total))
+- `{am:op_name}`, `{am:operation_name}` (Addition, Multiplication Base, Multiplication Total)
 
 `can_destroy`, `can_place_on`
-- `{cx:name}`, `{cx:id}`
+- `{c:name}`, `{c:id}`
 
 `info_shown`, `info_hidden`
 - `{ii:info}`
@@ -305,8 +319,18 @@ Attribute Modifier Info
 - List Var `i:attributes`/`i:attrs` (See Item Attribute Modifiers child vars)
 - List Var `i:info_shown` and `i:info_hidden` with child `{ii:info}`
 - List Var `i:can_destroy` and `i:can_place_on`
-  - Children `{cx:name}`, `{cx:id}`
+  - Children `{c:name}`, `{c:id}`
 - List Var `tags` with children `{t:name}` and `{t:id}`
+- `i:enchant:<id>:<method>`
+  - Ex: `i:enchant:sharpness:full`
+  - Methods:
+    - `name`, `id`
+    - `level`/`lvl` (like IV)
+    - `max_level` (max level the enchantment can be)
+    - `full` (like Sharpness IV)
+    - `num`/`number` (0 indexed)
+    - `max_num`, `max_number` (0 indexed)
+    - `rarity`
 
 `objectives`
 - `{o:name}`, `{o:id}`
@@ -394,10 +418,11 @@ Attribute Modifier Info
 - `{slime_chunk:<seed>}`
   - You should still use `{slime_chunk}` in singleplayer
 - Target Block and Target Fluid:
-  - `{target_block_color}`/`{target_color}`/`{tbc}`
+  - `{target_block_color}`/`{target_color}`/`{tbc}` (Map Color)
   - `{target_fluid_color}`/`{tfc}`
   - `{target_block_icon}`/`{target_icon}`/ `{tbicon}`
   - `{target_fluid_icon}`/ `{tficon}`
+  - `{target_block_luminance}`/`{target_luminance}`/`{tbl}`
 - Information about the entity you last hit:
   - `{last_hit}`/`{lh}` (Pig, Player)
   - `{last_hit_id}`/`{lhi}` (minecraft:pig, minecraft:player)
@@ -431,6 +456,9 @@ Attribute Modifier Info
   - `{real_am}`, `{real_pm}`
 - Added Profile Variables
   - `{profile_name}`, `{profile_errors}`, `{profile_keybind}`, `{profile_in_cycle}`
+- Added World-Related Variables
+  - `{world_height}`, `{min_y}`/`{world_min_y}`, `{max_y}`/`{world_max_y}`
+  - `{coord_scale}`/`{world_coord_scale}`
 - Title and Actionbar Variables
   - `{title_msg}`/`{title}`, `{subtitle_msg}`/`{subtitle}` (not to be confused with audio subtitles)
   - `{actionbar_msg}`/`{actionbar}`
@@ -446,7 +474,7 @@ Attribute Modifier Info
     - `color` (see new color feature)
     - `friendly_fire`, `see_friendly_invis`, `collision`
     - `name_tag_visibility`/`name_tag`, `death_msg_visibility`/`death_msg`
-    - List Var `members` with child `{tm:member}` (members include offline players)
+    - List Var `members` with child `{m:member}` (members include offline players)
     - List Var `online_players`/`players` (See `players` child vars)
 - (Non-list) Attribute Variables
   - You (the player): `{attribute:<attr>:<method>}`
@@ -477,8 +505,19 @@ Attribute Modifier Info
   - List `attributes`/`attrs` (See Item Attribute Modifiers child vars)
   - List `info_shown` and `info_hidden` with child `{ii:info}`
   - List `can_destroy` and `can_place_on`
-    - Children `{cx:name}`, `{cx:id}`
+    - Children `{c:name}`, `{c:id}`
   - List `tags` with children `{t:name}` and `{t:id}`
+  - `effect:<id>:<method>`
+    - Ex: `item:main:enchant:sharpness:full`
+      - If the item doesn't have sharpness, it's level is 0
+      - Methods:
+        - `name`, `id`
+        - `level`/`lvl` (like IV)
+        - `max_level` (max level the enchantment can be)
+        - `full` (like Sharpness IV)
+        - `num`/`number` (0 indexed)
+        - `max_num`, `max_number` (0 indexed)
+        - `rarity`
 - (Non-list) Objective Variables
   - `{objective:<objective_id>:<method>}`
   - Methods:
@@ -504,6 +543,7 @@ Attribute Modifier Info
     - List `players` (See `players` child vars)
       - A list of players that can see the bossbar, Singleplayer only
 - (Non-list) Mod Variables
+  - `{mod_loaded:<modid>}` 
   - `{mod:<id>:<method>}`
   - `{mod:<id>:parent:<method>}`
   - Methods:
@@ -554,7 +594,7 @@ Attribute Modifier Info
     - `{gpu_vendor}`, `{gl_version}`, `{gpu_driver}`
   - Tick related stuff
     - Minecraft added the ability to change and freeze the tick rate in a recent version
-      - `{ms_per_tick}`
+      - `{ms_per_tick}`, `{max_tps}`
       - `{is_tick_sprinting}`/`{tick_sprinting}` (Singleplayer only for some reason)
       - `{is_tick_frozen}`/`{tick_frozen}`
       - `{is_tick_stepping}`/`{tick_stepping}`
@@ -619,6 +659,7 @@ These variables are now Identifier variables:
 ### Other Changes
 - Profiles will reload on resource reload
 - If the error screen is opened via the keybind, there's now a button that go to profiles (new config screen)
+- Better error resiliency. If an unexpected exception is thrown while reading profiles, it is now caught and properly put into the errors screen
 
 ### New Registry System
 - Breaks old addon mods (the non-existent ones)

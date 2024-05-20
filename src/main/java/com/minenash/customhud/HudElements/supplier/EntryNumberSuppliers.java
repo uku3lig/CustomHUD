@@ -27,7 +27,7 @@ public class EntryNumberSuppliers {
 
     private static Entity cameraEntity() { return client.getCameraEntity(); }
     private static boolean inNether() { return client.world.getRegistryKey().getValue().equals(World.NETHER.getValue()); }
-    private static double toMiB(long bytes) { return bytes / 1024D / 1024L; }
+    private static double toMiB(long bytes) { return bytes / 1024D / 1024D; }
 
     public static boolean isNoise() { return ComplexData.serverWorld.getChunkManager().getChunkGenerator() instanceof NoiseChunkGenerator; }
     public static NoiseRouter sampler() { return ComplexData.serverWorld.getChunkManager().getNoiseConfig().getNoiseRouter(); }
