@@ -9,7 +9,9 @@
 - Ability to reorder profiles
 - Decide which profiles are used when using the cycle profiles keybind
 - Buttons to go to the docs and discord
-![SCREENSHOT HERE]()
+- <deltails><summary>SumInline</summary>test_inline</details>
+
+<deltails><summary>Sum</summary>test</details>
 
 ### Language Features
 - Added List Variable Support
