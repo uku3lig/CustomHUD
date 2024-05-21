@@ -457,7 +457,7 @@ public class Attributers {
         DEFAULT_PREFIX.put(MOD_LICENSE, "ml");
         DEFAULT_PREFIX.put(MOD_BADGE, "mb");
         DEFAULT_PREFIX.put(MOD, "m");
-        DEFAULT_PREFIX.put(MOD2, "mm");
+        DEFAULT_PREFIX.put(MOD2, "m");
         DEFAULT_PREFIX.put(PACK, "p");
         DEFAULT_PREFIX.put(RECORD, "r");
         DEFAULT_PREFIX.put(OFFER, "o");

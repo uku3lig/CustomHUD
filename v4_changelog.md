@@ -9,9 +9,6 @@
 - Ability to reorder profiles
 - Decide which profiles are used when using the cycle profiles keybind
 - Buttons to go to the docs and discord
-- <deltails><summary>SumInline</summary>test_inline</details>
-
-<deltails><summary>Sum</summary>test</details>
 
 ### Language Features
 - Added List Variable Support
@@ -131,9 +128,9 @@
   - `-hex`: Numbers are shown in hexadecimal
   - `-oct`: Numbers are shown in octal
   - `-bin`: Numbers are shown in binary
-  - `-base#`: Numbers are show in the base specificed.
+  - `-base#`: Numbers are show in the base specified.
     - Ex: `{x -base7}`
-- `-rn`/`-roman`: Displays the number in Roman Numberals
+- `-rn`/`-roman`: Displays the number in Roman Numerals
   - ![SCREENSHOT HERE]()
 ### New Themeing
 All of these are global-only.
@@ -589,17 +586,28 @@ Attribute Modifier Info
     - `{timer[100, 1/health]}`
     - Counts to 100. counts faster if you have less health
 - F3 Parity:
-  - Client/Server Chunk Variables (don't ask me what the actual numbers mean)
-    - `{ccw1}`, `{ccw2}`, `{cce1}`, `{cce2}`, `{cce3}`
-    - `{scw1}`, `{sce1}`, `{sce2}`, `{sce3}`, `{sce4}`, `{sce5}`, `{sce6}`, `{sce7}`
+  - Client/Server Chunk Variables
+    - `{ccw1}` / `{client_chunks_w1}` / `{client_chunks_cached}`
+    - `{ccw2}` / `{client_chunks_w2}` / `{client_chunks_loaded}`
+    - `{cce1}` / `{client_chunks_e1}` / `{client_entities_loaded}`
+    - `{cce2}` / `{client_chunks_e2}` / `{client_entities_cached_sections}`
+    - `{cce3}` / `{client_chunks_e3}` / `{client_entities_ticking_chunks}`
+    - `{scw1}` / `{server_chunks_w1}` / `{server_chunks_loaded}`
+    - `{sce1}` / `{server_chunks_e1}` / `{server_entities_registered}`
+    - `{sce2}` / `{server_chunks_e2}` / `{server_entities_loaded}`
+    - `{sce3}` / `{server_chunks_e3}` / `{server_entities_cached_sections}`
+    - `{sce4}` / `{server_chunks_e4}` / `{server_entities_managed}`
+    - `{sce5}` / `{server_chunks_e5}` / `{server_entities_tracked}`
+    - `{sce6}` / `{server_chunks_e6}` / `{server_entities_loading}`
+    - `{sce7}` / `{server_chunks_e7}` / `{server_entities_unloading}`
   - Display/GPU/GL
     - `{gpu_vendor}`, `{gl_version}`, `{gpu_driver}`
   - Tick related stuff
     - Minecraft added the ability to change and freeze the tick rate in a recent version
-      - `{ms_per_tick}`, `{max_tps}`
-      - `{is_tick_sprinting}`/`{tick_sprinting}` (Singleplayer only for some reason)
-      - `{is_tick_frozen}`/`{tick_frozen}`
-      - `{is_tick_stepping}`/`{tick_stepping}`
+    - `{ms_per_tick}`, `{max_tps}`
+    - `{is_tick_sprinting}`/`{tick_sprinting}` (Singleplayer only for some reason)
+    - `{is_tick_frozen}`/`{tick_frozen}`
+    - `{is_tick_stepping}`/`{tick_stepping}`
   - `{memory_allocation_rate}`
   - Fabric's `{active_renderer}`
 - Math constants:
