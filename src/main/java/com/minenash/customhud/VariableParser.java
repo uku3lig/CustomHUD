@@ -1068,6 +1068,9 @@ public class VariableParser {
             case "bb_temp","biome_builder_temperature" -> {enabled.serverWorld = true; yield BIOME_BUILDER_TEMPERATURE;}
             case "bb_veg","biome_builder_vegetation" -> {enabled.serverWorld = true; yield BIOME_BUILDER_VEGETATION;}
 
+            case "hotbar_slot" -> HOTBAR_SLOT;
+            case "hotbar_index" -> HOTBAR_INDEX;
+
             case "item_durability", "item_dur" -> ITEM_DURABILITY;
             case "item_max_durability", "item_max_dur" -> ITEM_MAX_DURABILITY;
             case "offhand_item_durability", "oitem_dur" -> OFFHAND_ITEM_DURABILITY;
