@@ -914,6 +914,7 @@ public class VariableParser {
             case "sneaking" -> SNEAKING;
             case "swimming" -> SWIMMING;
             case "flying" -> FLYING;
+            case "gliding", "flying_with_style" -> FALLING_WITH_STYLE;
             case "on_ground" -> ON_GROUND;
             case "sprint_held" -> SPRINT_HELD;
             case "screen_open" -> SCREEN_OPEN;

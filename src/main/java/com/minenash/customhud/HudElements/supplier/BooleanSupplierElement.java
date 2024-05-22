@@ -52,6 +52,7 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> SNEAKING = () -> client.player.isSneaking();
     public static final Supplier<Boolean> SWIMMING = () -> client.player.isSwimming();
     public static final Supplier<Boolean> FLYING = () -> client.player.getAbilities().flying;
+    public static final Supplier<Boolean> FALLING_WITH_STYLE = () -> client.player.isFallFlying();
     public static final Supplier<Boolean> ON_GROUND = () -> client.player.isOnGround();
     public static final Supplier<Boolean> SPRINT_HELD = () -> client.options.sprintKey.isPressed();
 
