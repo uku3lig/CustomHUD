@@ -43,7 +43,6 @@ public class Attributers {
         HudElement get(String prefixForSubList, UUID pid, Supplier supplier, String attr, Flags flags, ParseContext context);
     }
 
-    //TODO: IS ONLY LIST ONLY
     public static final Attributer EFFECT = (sbp, pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Str(sup,STATUS_NAME);
         case "", "id" -> new Id(sup,STATUS_ID,flags);
@@ -56,8 +55,8 @@ public class Attributers {
         case "show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
         case "color" -> new Num(sup, STATUS_COLOR, flags);
         case "category", "cat" -> new Special(sup,STATUS_CATEGORY);
-        case "icon" -> new StatusEffectIconElement(pid, flags, true); //LIST ONLY
-        case "icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //LIST ONLY
+        case "icon" -> new StatusEffectIconElement(pid, flags, true); //TODO: LIST ONLY
+        case "icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //TODO: LIST ONLY
         default -> null;
     };
 
@@ -179,6 +178,7 @@ public class Attributers {
             case "icon" -> new RichItemSupplierIconElement(pid, sup, flags);
             case "hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
             case "rarity" -> new Special(sup, ITEM_RARITY);
+            case "armor_slot" -> new Special(sup, ITEM_ARMOR_SLOT);
 
             case "enchants" -> new CreateListElement(sbp, sup, ITEM_ENCHANTS, ENCHANTMENT);
             case "lore" -> new CreateListElement(sbp, sup, ITEM_LORE_LINES, ITEM_LORE_LINE);

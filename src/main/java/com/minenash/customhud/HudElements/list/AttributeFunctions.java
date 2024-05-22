@@ -20,6 +20,7 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -193,6 +194,16 @@ public class AttributeFunctions {
             (stack) -> stack.getItem().getRarity(stack).formatting.getColorValue(),
             (stack) -> stack.getItem().getRarity(stack) != Rarity.COMMON
     );
+    public static final Entry<ItemStack> ITEM_ARMOR_SLOT = new Entry<>(
+            (stack) -> {
+                if ( !(stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot())) return "None";
+                String name = eq.getSlotType().getName();
+                return name.substring(0,1).toUpperCase() + name.substring(1);
+            },
+            (stack) -> stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot() ? 5 - ((eq.getSlotType().getArmorStandSlotId()-1) % 4) : 0,
+            (stack) -> stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot()
+    );
+
 
     // CAN X
     public static final Function<Block, Identifier> BLOCK_ID = (block) -> Registries.BLOCK.getId(block);
