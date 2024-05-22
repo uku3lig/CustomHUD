@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.list;
 
 import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.FuncElements.*;
 import com.minenash.customhud.HudElements.functional.FunctionalElement.CreateListElement;
@@ -500,6 +501,7 @@ public class Attributers {
             case "size", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
             case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(finalProviderID), flags);
             case "raw": return new StringSupplierElement( () -> ListManager.getValue(finalProviderID).toString() );
+            case "break": return new FunctionalElement.BreakList( finalProviderID );
         };
 
         Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());

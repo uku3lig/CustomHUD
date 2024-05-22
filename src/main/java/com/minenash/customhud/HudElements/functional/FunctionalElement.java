@@ -64,6 +64,11 @@ public class FunctionalElement implements HudElement {
         public PushList(UUID providerID, List<?> values) { this.providerID = providerID; this.values = values; }
         @Override public void run() { ListManager.push(providerID, values); }
     }
+    public static class BreakList extends FunctionalElement {
+        public final UUID providerID;
+        public BreakList(UUID providerID) { this.providerID = providerID; }
+    }
+
     public static class CreateListElement extends FunctionalElement {
         public final ListProviderSet.Entry entry;
         public final Attributers.Attributer attributer;

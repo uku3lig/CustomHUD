@@ -1385,7 +1385,7 @@ public class VariableParser {
                 prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
             }
             else {
-                Errors.addError(profile, line, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, part);
+                Errors.addError(profile, line, part, ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, flagParts[i]);
             }
         }
         return prefix;
@@ -1432,13 +1432,13 @@ public class VariableParser {
         };
         ATTRIBUTER_MAP.put(provider, LOOP_ITEM);
 
-        String[] flagParts = ("loop " + argsStr.substring(endIndex+1)).split(" ");
+        String[] flagParts = ("loop" + argsStr.substring(endIndex+1)).split(" ");
         String prefix = Attributers.DEFAULT_PREFIX.get(LOOP_ITEM);
         for (int i = 1; i < flagParts.length; i++) {
             if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:"))
                 prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
             else
-                Errors.addError(profile.name, debugLine, flagParts[i], ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, variable);
+                Errors.addError(profile.name, debugLine, variable, ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, flagParts[i]);
         }
 
         return new ListProviderSet.Entry(provider, randomUUID(), prefix);

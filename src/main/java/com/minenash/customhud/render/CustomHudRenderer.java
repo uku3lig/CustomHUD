@@ -155,6 +155,12 @@ public class CustomHudRenderer {
                     } else if (e instanceof TextElement te) {
                         pieces.add( new RenderPiece(te.getText(), null, font, xOffset, y, te.getColor(formatting.getColor()), theme.bgColor, theme.textShadow, theme.lineSpacing == 0) );
                         xOffset += te.getTextWidth();
+                    } else if (e instanceof FunctionalElement.BreakList bl) {
+                        for (int j = ei+1; j < elements.size(); j++) {
+                            if (elements.get(j) instanceof FunctionalElement.PopList pl && pl.providerID.equals(bl.providerID))
+                                break;
+                            ei++;
+                        }
                     }
                     if (e instanceof ExecuteElement ee) ee.run();
 
