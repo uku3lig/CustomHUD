@@ -21,6 +21,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackManager;
@@ -66,24 +67,24 @@ public class ListSuppliers {
         TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
         TARGET_FLUID_STATES = () ->  ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetFluid.getEntries().entrySet().toArray()),
         TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : ComplexData.targetFluid.streamTags().toList(),
-        TARGET_BLOCK_ITEMS = () -> {
-            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
-            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
-            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
-            List<ItemStack> items = new ArrayList<>(inv.size());
-            for (int i = 0; i < inv.size(); i++)
-                items.add(inv.getStack(i));
-            return items;
-        },
-        TARGET_BLOCK_COMPACT_ITEMS = () -> {
-            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
-            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
-            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
-            List<ItemStack> items = new ArrayList<>(inv.size());
-            for (int i = 0; i < inv.size(); i++)
-                items.add(inv.getStack(i));
-            return AttributeHelpers.compactItems(items);
-        },
+//        TARGET_BLOCK_ITEMS = () -> {
+//            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
+//            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
+//            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
+//            List<ItemStack> items = new ArrayList<>(inv.size());
+//            for (int i = 0; i < inv.size(); i++)
+//                items.add(inv.getStack(i));
+//            return items;
+//        },
+//        TARGET_BLOCK_COMPACT_ITEMS = () -> {
+//            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
+//            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
+//            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
+//            List<ItemStack> items = new ArrayList<>(inv.size());
+//            for (int i = 0; i < inv.size(); i++)
+//                items.add(inv.getStack(i));
+//            return AttributeHelpers.compactItems(items);
+//        },
 
         PLAYER_ATTRIBUTES = () -> getEntityAttributes(CLIENT.player),
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
@@ -166,17 +167,16 @@ public class ListSuppliers {
     public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
     public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> {
         NbtCompound nbt = stack.getNbt();
-        if (nbt == null || !nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
-        DefaultedList<ItemStack> list = DefaultedList.of();
-        Inventories.readNbt(nbt,list);
-        return list;
-    };
-    public static final Function<ItemStack,List<?>> ITEM_COMPACT_ITEMS = (stack) -> {
-        NbtCompound nbt = stack.getNbt();
-        if (nbt == null || !nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
-        DefaultedList<ItemStack> list = DefaultedList.of();
-        Inventories.readNbt(nbt,list);
-        return AttributeHelpers.compactItems(list);
+        if (nbt == null || !nbt.contains("BlockEntityTag")) return Collections.EMPTY_LIST;
+        nbt = nbt.getCompound("BlockEntityTag");
+        if (!nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
+        NbtList list = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
+        List<ItemStack> items = new ArrayList<>(list.size());
+
+        for(int i = 0; i < list.size(); ++i)
+            items.add(ItemStack.fromNbt( list.getCompound(i) ));
+
+        return compactItems(items);
     };
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {

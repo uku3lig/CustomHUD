@@ -1338,8 +1338,8 @@ public class VariableParser {
             case "subtitles" -> {enabled.subtitles = true; yield SUBTITLES;}
             case "target_block_props", "target_block_properties", "tbp" -> {enabled.targetBlock = true; yield TARGET_BLOCK_STATES;}
             case "target_block_tags", "tbt" -> {enabled.targetBlock = true; yield TARGET_BLOCK_TAGS;}
-            case "target_block_items", "tbitems" -> {enabled.targetBlock = true; yield TARGET_BLOCK_ITEMS;}
-            case "target_block_items_compact", "tbic" -> {enabled.targetBlock = true; yield TARGET_BLOCK_COMPACT_ITEMS;}
+//            case "target_block_items", "tbitems" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_ITEMS;}
+//            case "target_block_items_compact", "tbic" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_COMPACT_ITEMS;}
             case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
             case "target_fluid_tags", "tft" -> {enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
             case "attributes" -> PLAYER_ATTRIBUTES;

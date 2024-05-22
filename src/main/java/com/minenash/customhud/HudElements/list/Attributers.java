@@ -190,7 +190,6 @@ public class Attributers {
             case "info_hidden" -> new CreateListElement(sbp, sup, ITEM_HIDDEN, ITEM_INFO_INFO);
             case "tags" -> new CreateListElement(sbp, sup, ITEM_TAGS, TAG);
             case "items" -> new CreateListElement(sbp, sup, ITEM_ITEMS, ITEM2);
-            case "items_compact" -> new CreateListElement(sbp, sup, ITEM_COMPACT_ITEMS, ITEM2);
             default -> null;
         };
     };
@@ -403,6 +402,7 @@ public class Attributers {
     static {
         ATTRIBUTER_MAP.put(STATUS_EFFECTS, EFFECT);
         ATTRIBUTER_MAP.put(STATUS_EFFECTS_POSITIVE, EFFECT);
+        ATTRIBUTER_MAP.put(STATUS_EFFECTS_POSITIVE, EFFECT);
         ATTRIBUTER_MAP.put(STATUS_EFFECTS_NEGATIVE, EFFECT);
         ATTRIBUTER_MAP.put(STATUS_EFFECTS_NEUTRAL, EFFECT);
         ATTRIBUTER_MAP.put(ONLINE_PLAYERS, PLAYER);
@@ -411,6 +411,8 @@ public class Attributers {
         ATTRIBUTER_MAP.put(TARGET_BLOCK_TAGS, TAG);
         ATTRIBUTER_MAP.put(TARGET_FLUID_STATES, BLOCK_STATE);
         ATTRIBUTER_MAP.put(TARGET_FLUID_TAGS, TAG);
+//        ATTRIBUTER_MAP.put(TARGET_BLOCK_ITEMS, ITEM);
+//        ATTRIBUTER_MAP.put(TARGET_BLOCK_COMPACT_ITEMS, ITEM);
         ATTRIBUTER_MAP.put(PLAYER_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(TARGET_ENTITY_ATTRIBUTES, ATTRIBUTE);
         ATTRIBUTER_MAP.put(HOOKED_ENTITY_ATTRIBUTES, ATTRIBUTE);
@@ -447,6 +449,7 @@ public class Attributers {
         DEFAULT_PREFIX.put(ITEM_ATTRIBUTE_MODIFIER, "am");
         DEFAULT_PREFIX.put(ITEM_CAN_X, "c");
         DEFAULT_PREFIX.put(ITEM, "i");
+        DEFAULT_PREFIX.put(ITEM2, "i");
         DEFAULT_PREFIX.put(ATTRIBUTE_MODIFIER, "am");
         DEFAULT_PREFIX.put(ATTRIBUTE, "a");
         DEFAULT_PREFIX.put(TEAM_MEMBER, "m");
@@ -494,7 +497,7 @@ public class Attributers {
         part = part.substring(part.indexOf(':')+1);
 
         switch (part) {
-            case "count", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
+            case "size", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
             case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(finalProviderID), flags);
             case "raw": return new StringSupplierElement( () -> ListManager.getValue(finalProviderID).toString() );
         };
