@@ -65,13 +65,28 @@
   .sidebar {
     position: -webkit-sticky;
     position: sticky;
-    top: 6px;
+    top: 8px;
     min-width: 200px;
-    height: 20px;
-    min-height: 20px;
-    color: #444;
+    height: 280px;
+    color: #555;
     padding-left: 16px;
   }
+
+  @media (max-width: 1000px) {
+    .sidebar {
+      display: none;
+    }
+  }
+
+  .sidebar a {
+    color: #555;
+    text-decoration: none;
+  }
+  .sidebar a:hover, .sidebar a:active {
+    color: #333;
+    text-decoration: underline;
+  }
+
 </style>
 </head>
 <body>
@@ -86,7 +101,7 @@
   <li>Decide which profiles are used when using the cycle profiles keybind</li>
   <li>Buttons to go to the docs and discord</li>
 </ul>
-<h3 id="language-features">New Language Features</h3>
+<h3 id="new-language-features">New Language Features</h3>
 <ul>
   <li><details><summary>Added List Variable Support</summary><ul>
     <li><code>{&lt;list&gt;}</code> alone will just show how many there are <ul>
@@ -295,7 +310,7 @@
   <ul style="padding-left: 28px"><li>Default: <code>true</code> (same behavior as before)</li></ul>
 </ul>
 
-<h3 id="list-variables">New List Variables</h3>
+<h3 id="new-list-variables">New List Variables</h3>
 <p>List variables will be shown without the <code>{}</code> around them, as they are intended to be used in the syntax laid out above<br>Child variables will be given in the next section.</p>
 <p>The <code>e:</code> and likewise can be changed with the <code>-pre:&lt;prefix&gt;</code> list flag.<br>Example: <code>{effects -pre:eff, &quot;{eff:name}&quot;}</code></p>
 
@@ -981,7 +996,7 @@
 </ul>
 
 
-<h3> Variable Changes </h3>
+<h3 id="variable-changes"> Variable Changes </h3>
 <ul>
   <li> <code>{tps}</code> and <code>{ms_ticks}</code> / <code>{ticks_ms}</code> are now estimated when on servers!!! </li>
   <li> <code>{ms_ticks}</code> no longer bottoms out at 50ms in singleplayer </li>
@@ -1021,14 +1036,14 @@
   </ul></li>
 </ul>
 
-<h3> Other Changes </h3>
+<h3 id="other-changes"> Other Changes </h3>
 <ul>
   <li> Profiles will reload on resource reload </li>
   <li> If the error screen is opened via the keybind, there's now a button that go to profiles (new config screen) </li>
   <li> Better error resiliency. If an unexpected exception is thrown while reading profiles, it is now caught and properly put into the errors screen </li>
 </ul>
 
-<h3> New Registry System </h3>
+<h3 id="new-registry-system"> New Registry System </h3>
 <ul>
   <li> Breaks old addon mods (the non-existent ones)</li>
   <li> <code>CustomHudRegistry.registerElement("name", (flags, context) -> &lt;ELEMENT&gt;)</code>
@@ -1038,7 +1053,7 @@
   <li> Also <code>unregister()</code> and <code>has()</code> for all 3 kinds of registries </li>
 </ul>
 
-<h3> Fixes </h3>
+<h3 id="fixes"> Fixes </h3>
 <ul>
   <li> If lines only contains conditionals (and now set/setmacro) that produces nothing, the lines are properly skipped again </li>
   <li> Built-in-fonts now work again (also fixes enchanting table text) </li>
@@ -1055,16 +1070,16 @@
 <div class="sidebar">
   <h3>Table of Contents</h3>
   <ul>
-    <li>New Config Screen</li>
-    <li>New Language Features</li>
-    <li>New Colors and Formatting</li>
-    <li>New Variable Flags</li>
-    <li>New List Variables</li>
-    <li>New Variables</li>
-    <li>Variable Changes</li>
-    <li>Other Changes</li>
-    <li>New Registry System</li>
-    <li>Fixes</li>
+    <li><a href="#new-config-screen">New Config Screen</a></li>
+    <li><a href="#new-language-features">New Language Features</a></li>
+    <li><a href="#new-colors-and-formatting">New Colors and Formatting</a></li>
+    <li><a href="#new-variable-flags">New Variable Flags</a></li>
+    <li><a href="#new-list-variables">New List Variables</a></li>
+    <li><a href="#new-variables">New Variables</a></li>
+    <li><a href="#variable-changes">Variable Changes</a></li>
+    <li><a href="#other-changes">Other Changes</a></li>
+    <li><a href="#new-registry-system">New Registry System</a></li>
+    <li><a href="#fixes">Fixes</a></li>
   </ul>
 </div>
 </body>
