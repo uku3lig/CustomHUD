@@ -60,6 +60,8 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> CHAT_OPEN = () -> client.currentScreen instanceof ChatScreen;
     public static final Supplier<Boolean> PLAYER_LIST_OPEN = () -> ((PlayerListHudAccess)client.inGameHud.getPlayerListHud()).getVisible();
 
+    public static final Supplier<Boolean> WINDOW_FOCUSED = client::isWindowFocused;
+
     public static final Supplier<Boolean> RECORD_PLAYING = () -> MusicAndRecordTracker.isRecordPlaying;
     public static final Supplier<Boolean> MUSIC_PLAYING = () -> MusicAndRecordTracker.isMusicPlaying;
 

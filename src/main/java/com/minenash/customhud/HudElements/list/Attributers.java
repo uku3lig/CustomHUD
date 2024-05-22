@@ -155,6 +155,7 @@ public class Attributers {
         default -> null;
     };
 
+    public static Attributer ITEM2;
     public static final Attributer ITEM = (sbp, pid, sup, name, flags, context) -> {
         if (name.startsWith("enchant:"))
             return VariableParser.attrElement(name, src -> Registries.ENCHANTMENT.get(Identifier.tryParse(src)), true,
@@ -188,9 +189,12 @@ public class Attributers {
             case "info_shown" -> new CreateListElement(sbp, sup, ITEM_SHOWN, ITEM_INFO_INFO);
             case "info_hidden" -> new CreateListElement(sbp, sup, ITEM_HIDDEN, ITEM_INFO_INFO);
             case "tags" -> new CreateListElement(sbp, sup, ITEM_TAGS, TAG);
+            case "items" -> new CreateListElement(sbp, sup, ITEM_ITEMS, ITEM2);
+            case "items_compact" -> new CreateListElement(sbp, sup, ITEM_COMPACT_ITEMS, ITEM2);
             default -> null;
         };
     };
+    static { ITEM2 = ITEM; }
 
     public static final Attributer ATTRIBUTE_MODIFIER = (sbp, pid, sup, name, flags, context) -> switch (name) {
         case "", "name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);

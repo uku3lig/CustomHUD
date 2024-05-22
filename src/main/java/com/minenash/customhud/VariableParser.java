@@ -920,6 +920,7 @@ public class VariableParser {
             case "screen_open" -> SCREEN_OPEN;
             case "chat_open" -> CHAT_OPEN;
             case "player_list_open","tab_open" -> PLAYER_LIST_OPEN;
+            case "window_focused" -> WINDOW_FOCUSED;
             case "item_has_durability", "item_has_dur" -> ITEM_HAS_DURABILITY;
             case "offhand_item_has_durability", "oitem_has_dur" -> OFFHAND_ITEM_HAS_DURABILITY;
             case "fishing_is_cast" -> FISHING_IS_CAST;
@@ -1337,6 +1338,8 @@ public class VariableParser {
             case "subtitles" -> {enabled.subtitles = true; yield SUBTITLES;}
             case "target_block_props", "target_block_properties", "tbp" -> {enabled.targetBlock = true; yield TARGET_BLOCK_STATES;}
             case "target_block_tags", "tbt" -> {enabled.targetBlock = true; yield TARGET_BLOCK_TAGS;}
+            case "target_block_items", "tbitems" -> {enabled.targetBlock = true; yield TARGET_BLOCK_ITEMS;}
+            case "target_block_items_compact", "tbic" -> {enabled.targetBlock = true; yield TARGET_BLOCK_COMPACT_ITEMS;}
             case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
             case "target_fluid_tags", "tft" -> {enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
             case "attributes" -> PLAYER_ATTRIBUTES;

@@ -6,6 +6,7 @@ import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.complex.SubtitleTracker;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -15,7 +16,11 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackManager;
@@ -24,6 +29,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 
@@ -60,6 +66,25 @@ public class ListSuppliers {
         TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
         TARGET_FLUID_STATES = () ->  ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetFluid.getEntries().entrySet().toArray()),
         TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : ComplexData.targetFluid.streamTags().toList(),
+        TARGET_BLOCK_ITEMS = () -> {
+            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
+            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
+            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
+            List<ItemStack> items = new ArrayList<>(inv.size());
+            for (int i = 0; i < inv.size(); i++)
+                items.add(inv.getStack(i));
+            return items;
+        },
+        TARGET_BLOCK_COMPACT_ITEMS = () -> {
+            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
+            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
+            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
+            List<ItemStack> items = new ArrayList<>(inv.size());
+            for (int i = 0; i < inv.size(); i++)
+                items.add(inv.getStack(i));
+            return AttributeHelpers.compactItems(items);
+        },
+
         PLAYER_ATTRIBUTES = () -> getEntityAttributes(CLIENT.player),
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
         HOOKED_ENTITY_ATTRIBUTES = () -> hooked() == null ? Collections.EMPTY_LIST : getEntityAttributes(hooked()),
@@ -139,6 +164,20 @@ public class ListSuppliers {
     public static final Function<ItemStack,List<?>> ITEM_HIDDEN = (stack) -> getHideFlagStrings(stack, false);
     public static final Function<ItemStack,List<?>> ITEM_SHOWN = (stack) -> getHideFlagStrings(stack, true);
     public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
+    public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> {
+        NbtCompound nbt = stack.getNbt();
+        if (nbt == null || !nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
+        DefaultedList<ItemStack> list = DefaultedList.of();
+        Inventories.readNbt(nbt,list);
+        return list;
+    };
+    public static final Function<ItemStack,List<?>> ITEM_COMPACT_ITEMS = (stack) -> {
+        NbtCompound nbt = stack.getNbt();
+        if (nbt == null || !nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
+        DefaultedList<ItemStack> list = DefaultedList.of();
+        Inventories.readNbt(nbt,list);
+        return AttributeHelpers.compactItems(list);
+    };
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;
