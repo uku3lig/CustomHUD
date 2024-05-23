@@ -580,13 +580,14 @@ public class VariableParser {
             return element;
         }
 
-        if (part.startsWith("itemcount:")) {
+        if (part.startsWith("itemcount:") || part.startsWith("itemcount_icon:")) {
+            boolean icon = part.charAt(9) == '_';
             part = part.substring(part.indexOf(':')+1);
 
             try {
                 Item item = Registries.ITEM.get(new Identifier(part));
                 if (item != Items.AIR)
-                    return Flags.wrap(new ItemCountElement(item), flags);
+                    return Flags.wrap(icon ? new ItemCountIconElement(item, flags) : new ItemCountElement(item, flags), flags);
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ITEM_ID, part);
                 return null;
             }

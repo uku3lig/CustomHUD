@@ -3,9 +3,9 @@ package com.minenash.customhud.HudElements;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.IdElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
-import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.HudElements.text.TextElement;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.data.NumberFlags;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -67,45 +67,34 @@ public abstract class FuncElements<T> implements HudElement {
         @Override public Text getText() { return FuncElements.sanitize(supplier, function, Text.literal("-")); }
     }
 
-    public static class Num<T> extends FuncElements<T> {
+    public static class Num<T> extends FuncElements<T> implements NumElement {
         public record NumEntry<T>(Function<T,Number> function, int precision, StatFormatter formatter) {}
         public static <T> NumEntry<T> of(int p, Function<T,Number> func) { return new NumEntry<>(func, p, null); }
         public static <T> NumEntry<T> of(int p, StatFormatter f, Function<T,Number> func) { return new NumEntry<>(func, p, f); }
         public static <T> NumEntry<T> of(StatFormatter f, Function<T,Number> func) { return new NumEntry<>(func, 0, f); }
 
         private final Function<T,Number> function;
-        private final int precision;
-        private final int zerofill;
-        private final double scale;
-        private final StatFormatter formatter;
-        private final int base;
+        private final NumberFlags flags;
 
         public Num(Supplier<T> supplier, Function<T,Number> func, Flags flags) {
             super(supplier);
-            function = func;
-            precision = flags.precision == -1 ? 0 : flags.precision;
-            zerofill = flags.zerofill;
-            scale = flags.scale;
-            formatter = null;
-            base = flags.base;
+            this.function = func;
+            this.flags = NumberFlags.of(flags);
         }
         public Num(Supplier<T> supplier, NumEntry<T> entry, Flags flags) {
             super(supplier);
-            function = entry.function;
-            precision = flags.precision == -1 ? entry.precision : flags.precision;
-            zerofill = flags.zerofill;
-            scale = flags.scale;
-            formatter = flags.formatted ? entry.formatter : null;
-            base = flags.base;
+            this.function = entry.function;
+            this.flags = NumberFlags.of(flags, entry.precision, entry.formatter);
         }
 
-
+        @Override public int getPrecision() { return flags.precision(); }
         @Override public Number getNumber() { return sanitize(supplier, function, Double.NaN); }
         @Override public boolean getBoolean() { return sanitize(supplier, function, Double.NaN).doubleValue() > 0; }
         @Override public String getString() {
-            double num = getNumber().doubleValue() * scale;
-            return NumElement.formatString(num, formatter, precision, zerofill, base);
+            try { return flags.formatString( getNumber().doubleValue() ); }
+            catch (Exception e) { return "-"; }
         }
+
     }
 
     public static class NumBool<T> extends Num<T> {

@@ -3,6 +3,7 @@ package com.minenash.customhud.HudElements.supplier;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.data.NumberFlags;
 import net.minecraft.stat.StatFormatter;
 
 import java.util.function.Supplier;
@@ -18,40 +19,27 @@ public class NumberSupplierElement implements HudElement, NumElement {
     }
 
     private final Supplier<Number> supplier;
-    private final int precision;
-    private final double scale;
-    private final int zerofill;
-    private StatFormatter formatter = null;
-    private final int base;
+    private final NumberFlags flags;
 
     public NumberSupplierElement(Entry entry, Flags flags) {
-        this(entry.supplier, flags);
-        this.formatter = flags.formatted ? entry.formatter : null;
+        this.supplier = entry.supplier;
+        this.flags = NumberFlags.of(flags, entry.precision, entry.formatter);
     }
 
     public NumberSupplierElement(Supplier<Number> supplier, Flags flags) {
         this.supplier = supplier;
-        this.precision = flags.precision == -1 ? 0 : flags.precision;
-        this.zerofill = flags.zerofill;
-        this.scale = flags.scale;
-        this.base = flags.base;
+        this.flags = NumberFlags.of(flags);
     }
 
     @Override
     public int getPrecision() {
-        return precision;
+        return flags.precision();
     }
 
     @Override
     public String getString() {
-        try {
-            double num = supplier.get().doubleValue() * scale;
-            return NumElement.formatString(num, formatter, precision, zerofill, base);
-
-        }
-        catch (Exception _e) {
-            return "-";
-        }
+        try { return flags.formatString( supplier.get().doubleValue() ); }
+        catch (Exception _e) { return "-"; }
     }
 
     @Override

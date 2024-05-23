@@ -8,24 +8,19 @@ import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.Macro;
+import com.minenash.customhud.data.NumberFlags;
 
 import java.util.Collections;
 import java.util.List;
 
-public class MacroElement implements HudElement, MultiElement {
+public class MacroElement implements HudElement, MultiElement, NumElement {
 
     private final String macroName;
-    private final int precision;
-    private final int zerofill;
-    private final double scale;
-    private final int base;
+    private final NumberFlags flags;
 
     public MacroElement(String macroName, Flags flags) {
         this.macroName = macroName;
-        this.precision = flags.precision == -1 ? 0 : flags.precision;
-        this.zerofill = flags.zerofill;
-        this.scale = flags.scale;
-        this.base = flags.base;
+        this.flags = NumberFlags.of(flags);
     }
 
     @Override
@@ -45,7 +40,7 @@ public class MacroElement implements HudElement, MultiElement {
             return builder.toString();
         }
 
-        return Double.toString( macro.op().getValue() );
+        return flags.formatString( macro.op().getValue() );
     }
 
     @Override
@@ -74,11 +69,16 @@ public class MacroElement implements HudElement, MultiElement {
         if (macro.elements() != null)
             return macro.elements();
 
-        return Collections.singletonList( new StringElement( NumElement.formatString(macro.op().getValue() * scale, null, precision, zerofill, base) ) );
+        return Collections.singletonList( new StringElement(flags.formatString( macro.op().getValue() )) );
     }
 
     @Override
     public boolean ignoreNewlineIfEmpty() {
         return true;
+    }
+
+    @Override
+    public int getPrecision() {
+        return ProfileManager.getActive().macros.get(macroName).elements() != null ? 0 : flags.precision();
     }
 }

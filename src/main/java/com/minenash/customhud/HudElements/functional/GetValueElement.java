@@ -5,28 +5,23 @@ import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.data.NumberFlags;
 import net.minecraft.stat.StatFormatter;
 
-public class GetValueElement implements HudElement {
+public class GetValueElement implements HudElement, NumElement {
 
     private final String valueName;
-    private final int precision;
-    private final int zerofill;
-    private final double scale;
-    private final int base;
+    private final NumberFlags flags;
 
     public GetValueElement(String valueName, Flags flags) {
         this.valueName = valueName;
-        this.precision = flags.precision == -1 ? 0 : flags.precision;
-        this.zerofill = flags.zerofill;
-        this.scale = flags.scale;
-        this.base = flags.base;
+        this.flags = NumberFlags.of(flags);
     }
 
 
     @Override
     public String getString() {
-        return NumElement.formatString( getNumber().doubleValue() * scale, null, precision, zerofill, base );
+        return flags.formatString( getNumber().doubleValue() );
     }
 
     @Override
@@ -37,5 +32,10 @@ public class GetValueElement implements HudElement {
     @Override
     public boolean getBoolean() {
         return getNumber().doubleValue() > 0;
+    }
+
+    @Override
+    public int getPrecision() {
+        return flags.precision();
     }
 }

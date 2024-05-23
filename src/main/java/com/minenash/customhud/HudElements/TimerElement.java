@@ -5,15 +5,12 @@ import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.data.NumberFlags;
 import net.minecraft.stat.StatFormatter;
 
-public class TimerElement implements HudElement {
+public class TimerElement implements HudElement, NumElement {
 
-    private final int precision;
-    private final int zerofill;
-    private final double scale;
-    private final int base;
-
+    private final NumberFlags flags;
     private final Operation interval;
     private final Operation end;
 
@@ -21,11 +18,7 @@ public class TimerElement implements HudElement {
     private int value = 0;
 
     public TimerElement(Operation end, Operation interval, Flags flags) {
-        precision = flags.precision == -1 ? 0 : flags.precision;
-        zerofill = flags.zerofill;
-        scale = flags.scale;
-        base = flags.base;
-
+        this.flags = NumberFlags.of(flags);
         this.interval = interval;
         this.end = end;
     }
@@ -43,7 +36,7 @@ public class TimerElement implements HudElement {
 
     @Override
     public String getString() {
-        return NumElement.formatString(get()*scale, null, precision, zerofill, base);
+        return flags.formatString(get());
     }
 
     @Override
@@ -54,5 +47,10 @@ public class TimerElement implements HudElement {
     @Override
     public boolean getBoolean() {
         return get() > 0;
+    }
+
+    @Override
+    public int getPrecision() {
+        return flags.precision();
     }
 }
