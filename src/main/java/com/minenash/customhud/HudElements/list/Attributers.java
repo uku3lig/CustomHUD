@@ -512,7 +512,8 @@ public class Attributers {
             case "size", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
             case "index", "i": return new NumberSupplierElement( () -> ListManager.getIndex(finalProviderID), flags);
             case "raw": return new StringSupplierElement( () -> ListManager.getValue(finalProviderID).toString() );
-            case "break": return new FunctionalElement.BreakList( finalProviderID );
+            case "exit": return new FunctionalElement.ExitList( finalProviderID );
+            case "continue": return new FunctionalElement.ContinueList( finalProviderID );
         };
 
         Attributer attributer = ATTRIBUTER_MAP.get(entry.provider());
