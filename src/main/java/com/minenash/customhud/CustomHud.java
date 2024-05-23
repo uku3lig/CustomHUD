@@ -72,7 +72,8 @@ public class CustomHud implements ModInitializer {
 	public static void delayedInitialize() {
 		MODMENU_INSTALLED = FabricLoader.getInstance().isModLoaded("modmenu");
 
-		readProfiles();
+
+//		readProfiles();
 		ConfigManager.load();
 		updateCrosshairObjectShare();
 

@@ -79,8 +79,8 @@ public class ConfigManager {
                             case "profile3.txt" -> "Profile 3.txt";
                             default -> fileName;
                         };
-                        Files.move(path, CustomHud.PROFILE_FOLDER.resolve(outName));
-                        throw new IOException();
+                        try { Files.move(path, CustomHud.PROFILE_FOLDER.resolve(outName)); }
+                        catch (IOException e) { CustomHud.LOGGER.catching(e); }
                     }
                 }
         } catch (IOException e) {
@@ -99,6 +99,7 @@ public class ConfigManager {
     }
 
     public static void readV3(JsonObject json) {
+        CustomHud.readProfiles();
         JsonElement lastVersion = json.get("latestKnownVersion");
         if (lastVersion != null)
             UpdateChecker.latestKnownVersion = lastVersion.getAsString().split("\\.");
