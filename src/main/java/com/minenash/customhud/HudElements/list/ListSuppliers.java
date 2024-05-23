@@ -235,13 +235,13 @@ public class ListSuppliers {
 
 
     // Don't change to method references
-    public static final Function<Mod,List<?>> MOD_AUTHORS = (mod) -> mod.getAuthors();
-    public static final Function<Mod,List<?>> MOD_CONTRIBUTORS = (mod) -> mod.getContributors();
-    public static final Function<Mod,List<?>> MOD_CREDITS = (mod) -> mod.getCredits();
-    public static final Function<Mod,List<?>> MOD_BADGES = (mod) -> Arrays.asList(mod.getBadges().toArray());
-    public static final Function<Mod,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(mod.getLicense().toArray());
-    public static final Function<Mod,List<?>> MOD_PARENTS = (mod) -> {
-        Mod parent = ModMenu.MODS.get(mod.getParent());
+    public static final Function<?,List<?>> MOD_AUTHORS = (mod) -> ((Mod)mod).getAuthors();
+    public static final Function<?,List<?>> MOD_CONTRIBUTORS = (mod) -> ((Mod)mod).getContributors();
+    public static final Function<?,List<?>> MOD_CREDITS = (mod) -> ((Mod)mod).getCredits();
+    public static final Function<?,List<?>> MOD_BADGES = (mod) -> Arrays.asList(((Mod)mod).getBadges().toArray());
+    public static final Function<?,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(((Mod)mod).getLicense().toArray());
+    public static final Function<?,List<?>> MOD_PARENTS = (mod) -> {
+        Mod parent = ModMenu.MODS.get(((Mod)mod).getParent());
         return parent == null ? Collections.emptyList() : Collections.singletonList(parent);
     };
     public static final Function<?,List<?>> MOD_CHILDREN = (mod) -> ModMenu.PARENT_MAP.get(((Mod)mod));

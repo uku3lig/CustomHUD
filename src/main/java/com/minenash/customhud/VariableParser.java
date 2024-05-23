@@ -1632,9 +1632,14 @@ public class VariableParser {
             return attrElement(part, src -> Registries.STATUS_EFFECT.get(Identifier.tryParse(src)), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
                     EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, profile, debugLine, enabled, original);
 
-        if (part.startsWith("mod:"))
+        if (part.startsWith("mod:")) {
+            if (!CustomHud.MODMENU_INSTALLED) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.REQUIRES_MODMENU, "");
+                return new IgnoreErrorElement();
+            }
             return attrElement(part, ModMenu.MODS::get, false, (mod) -> () -> mod,
-                    MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_METHOD, profile, debugLine, enabled, original );
+                    MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_METHOD, profile, debugLine, enabled, original);
+        }
 
         if (part.startsWith("resource_pack:"))
             return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), false, (pack) -> () -> pack,

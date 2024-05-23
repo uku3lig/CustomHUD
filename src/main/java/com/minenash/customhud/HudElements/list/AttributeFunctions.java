@@ -352,26 +352,26 @@ public class AttributeFunctions {
 
 
     // MODS
-    public static final Function<Mod,String> MOD_NAME = (mod) -> mod.getName();
-    public static final Function<Mod,String> MOD_ID = (mod) -> mod.getId();
-    public static final Function<Mod,String> MOD_SUMMARY = (mod) -> mod.getSummary();
-    public static final Function<Mod,String> MOD_DESCRIPTION = (mod) -> mod.getTranslatedDescription();
-    public static final Function<Mod,String> MOD_VERSION = (mod) -> mod.getVersion();
-    public static final Function<Mod,String> MOD_PREFIXED_VERSION = (mod) -> mod.getPrefixedVersion();
-    public static final Function<Mod,String> MOD_HASH = (mod) -> {
-        try { return mod.getSha512Hash(); }
+    public static final Function<?,String> MOD_NAME = (mod) -> ((Mod)mod).getName();
+    public static final Function<?,String> MOD_ID = (mod) -> ((Mod)mod).getId();
+    public static final Function<?,String> MOD_SUMMARY = (mod) -> ((Mod)mod).getSummary();
+    public static final Function<?,String> MOD_DESCRIPTION = (mod) -> ((Mod)mod).getTranslatedDescription();
+    public static final Function<?,String> MOD_VERSION = (mod) -> ((Mod)mod).getVersion();
+    public static final Function<?,String> MOD_PREFIXED_VERSION = (mod) -> ((Mod)mod).getPrefixedVersion();
+    public static final Function<?,String> MOD_HASH = (mod) -> {
+        try { return ((Mod)mod).getSha512Hash(); }
         catch (IOException e) { return null; }
     };
-    public static final Function<Mod,Boolean> MOD_IS_LIBRARY = (mod) -> mod.getBadges().contains(Mod.Badge.LIBRARY);
-    public static final Function<Mod,Boolean> MOD_IS_CLIENT = (mod) -> mod.getBadges().contains(Mod.Badge.CLIENT);
-    public static final Function<Mod,Boolean> MOD_IS_DEPRECATED = (mod) -> mod.getBadges().contains(Mod.Badge.DEPRECATED);
-    public static final Function<Mod,Boolean> MOD_IS_PATCHWORK = (mod) -> mod.getBadges().contains(Mod.Badge.PATCHWORK_FORGE);
-    public static final Function<Mod,Boolean> MOD_IS_FROM_MODPACK = (mod) -> mod.getBadges().contains(Mod.Badge.MODPACK);
-    public static final Function<Mod,Boolean> MOD_IS_MINECRAFT = (mod) -> mod.getBadges().contains(Mod.Badge.MINECRAFT);
+    public static final Function<?,Boolean> MOD_IS_LIBRARY = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.LIBRARY);
+    public static final Function<?,Boolean> MOD_IS_CLIENT = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.CLIENT);
+    public static final Function<?,Boolean> MOD_IS_DEPRECATED = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.DEPRECATED);
+    public static final Function<?,Boolean> MOD_IS_PATCHWORK = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.PATCHWORK_FORGE);
+    public static final Function<?,Boolean> MOD_IS_FROM_MODPACK = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.MODPACK);
+    public static final Function<?,Boolean> MOD_IS_MINECRAFT = (mod) -> ((Mod)mod).getBadges().contains(Mod.Badge.MINECRAFT);
 
-    public static final Function<Mod.Badge,String> BADGE_NAME = (badge) -> badge.getText().getString();
-    public static final Function<Mod.Badge,Number> BADGE_OUTLINE_COLOR = (badge) -> badge.getOutlineColor();
-    public static final Function<Mod.Badge,Number> BADGE_FILL_COLOR = (badge) -> badge.getFillColor();
+    public static final Function<?,String> BADGE_NAME = (badge) -> ((Mod.Badge)badge).getText().getString();
+    public static final Function<?,Number> BADGE_OUTLINE_COLOR = (badge) -> ((Mod.Badge)badge).getOutlineColor();
+    public static final Function<?,Number> BADGE_FILL_COLOR = (badge) -> ((Mod.Badge)badge).getFillColor();
 
 
     // PACKS
