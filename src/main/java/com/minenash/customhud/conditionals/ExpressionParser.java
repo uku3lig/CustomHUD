@@ -22,7 +22,7 @@ public class ExpressionParser {
 
     public enum TokenType { START_PREN, END_PREN, FULL_PREN, FUNCTION, AND, OR, MATH, COMPARISON, NUMBER, STRING, BOOLEAN, VARIABLE, NEGATED_VARIABLE, IF, ELSE, TERNARY }
     public enum Comparison { LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUALS, EQUALS, NOT_EQUALS, HAS, IS_IN, NOT_HAS, NOT_IS_IN }
-    public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT }
+    public enum MathOperator { ADD, SUBTRACT, MULTIPLY, DIVIDE, MOD, EXPONENT, IF_NULL }
     public record TernaryTokens(List<Token> conditional, List<Token> left, List<Token> right) {}
 
     record Token(TokenType type, Object value) {
@@ -63,6 +63,7 @@ public class ExpressionParser {
             char c = chars[i];
             if (c == '(') tokens.add(new Token(TokenType.START_PREN, null));
             else if (c == ')') tokens.add(new Token(TokenType.END_PREN, null));
+            else if (c == '?' && i+1 != chars.length && chars[i+1] == '?') {tokens.add(new Token(TokenType.MATH, MathOperator.IF_NULL)); i++;}
             else if (c == '?') tokens.add(new Token(TokenType.IF, null));
             else if (c == ';') tokens.add(new Token(TokenType.ELSE, null));
             else if (c == '∧' || c == '⋀') tokens.add(new Token(TokenType.AND, null));
@@ -427,29 +428,35 @@ public class ExpressionParser {
         if (tokens.size() == 1)
             return getPrimitiveOperation(tokens.get(0));
 
-        Pair<List<List<Token>>, List<MathOperator>> addPairs = split(tokens, List.of(MathOperator.ADD, MathOperator.SUBTRACT));
-        List<Operation> ops = new ArrayList<>();
+        Pair<List<List<Token>>, List<MathOperator>> ifNullPairs = split(tokens, List.of(MathOperator.IF_NULL));
+        List<Operation> ops0 = new ArrayList<>();
 
-        for (var partTokens : addPairs.getLeft()) {
-            Pair<List<List<Token>>, List<MathOperator>> multiplyPairs = split(partTokens, List.of(MathOperator.MULTIPLY, MathOperator.DIVIDE, MathOperator.MOD));
-            List<Operation> ops2 = new ArrayList<>();
+        for (var partTokens0 : ifNullPairs.getLeft()) {
+            Pair<List<List<Token>>, List<MathOperator>> addPairs = split(partTokens0, List.of(MathOperator.ADD, MathOperator.SUBTRACT));
+            List<Operation> ops1 = new ArrayList<>();
 
-            for (var partPartToken : multiplyPairs.getLeft()) {
-                Pair<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
-                List<HudElement> elements = new ArrayList<>();
-                for (var partPartPartToken : exponentPairs.getLeft()) {
-                    if (partPartPartToken.size() > 1)
-                        throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation between values");
-                    elements.add( getValueElement(partPartPartToken.get(0)) );
+            for (var partTokens : addPairs.getLeft()) {
+                Pair<List<List<Token>>, List<MathOperator>> multiplyPairs = split(partTokens, List.of(MathOperator.MULTIPLY, MathOperator.DIVIDE, MathOperator.MOD));
+                List<Operation> ops2 = new ArrayList<>();
+
+                for (var partPartToken : multiplyPairs.getLeft()) {
+                    Pair<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
+                    List<HudElement> elements = new ArrayList<>();
+                    for (var partPartPartToken : exponentPairs.getLeft()) {
+                        if (partPartPartToken.size() > 1)
+                            throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation between values");
+                        elements.add( getValueElement(partPartPartToken.get(0)) );
+                    }
+                    if (elements.size() == 1)
+                        ops2.add(new Operation.Element(elements.get(0)));
+                    else
+                        ops2.add(new Operation.MathOperation(elements, exponentPairs.getRight()));
                 }
-                if (elements.size() == 1)
-                    ops2.add(new Operation.Element(elements.get(0)));
-                else
-                    ops2.add(new Operation.MathOperation(elements, exponentPairs.getRight()));
+                ops1.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getRight()));
             }
-            ops.add(ops2.size() == 1 ? ops2.get(0) : new Operation.MathOperationsOp(ops2, multiplyPairs.getRight()));
+            ops0.add( ops1.size() == 1 ? ops1.get(0) : new Operation.MathOperationsOp(ops1, addPairs.getRight()) );
         }
-        return ops.size() == 1 ? ops.get(0) : new Operation.MathOperationsOp(ops, addPairs.getRight());
+        return ops0.size() == 1 ? ops0.get(0) : new Operation.MathOperationsOp(ops0, ifNullPairs.getRight());
 
     }
 

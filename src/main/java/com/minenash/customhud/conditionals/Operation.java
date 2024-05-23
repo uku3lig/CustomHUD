@@ -201,7 +201,7 @@ public interface Operation {
 
         @Override
         public double getValue() {
-            return MathOperation.apply(left.getValue(), right.getValue(), op);
+            return MathOperationsOp.apply(left.getValue(), right, op);
         }
 
         @Override
@@ -217,18 +217,19 @@ public interface Operation {
             if (elements.isEmpty()) return 0;
             double value = elements.get(0).getNumber().doubleValue();
             for (int i = 1; i < elements.size(); i++)
-                value = apply(value, elements.get(i).getNumber().doubleValue(), operations.get(i-1));
+                value = apply(value, elements.get(i), operations.get(i-1));
             return value;
         }
 
-        public static double apply(double value, double second, ExpressionParser.MathOperator op) {
+        public static double apply(double value, HudElement second, ExpressionParser.MathOperator op) {
             return switch (op) {
-                case ADD -> value + second;
-                case SUBTRACT -> value - second;
-                case MULTIPLY -> value * second;
-                case DIVIDE -> value / second;
-                case MOD -> value % second;
-                case EXPONENT -> Math.pow(value, second);
+                case ADD -> value + second.getNumber().doubleValue();
+                case SUBTRACT -> value - second.getNumber().doubleValue();
+                case MULTIPLY -> value * second.getNumber().doubleValue();
+                case DIVIDE -> value / second.getNumber().doubleValue();
+                case MOD -> value % second.getNumber().doubleValue();
+                case EXPONENT -> Math.pow(value, second.getNumber().doubleValue());
+                case IF_NULL -> !Double.isNaN( value ) ? value : second.getNumber().doubleValue();
             };
         }
 
@@ -246,8 +247,20 @@ public interface Operation {
         public double getValue() {
             double value = elements().isEmpty() ? 0 : elements.get(0).getValue();
             for (int i = 1; i < elements.size(); i++)
-                value = MathOperation.apply(value, elements.get(i).getValue(), operations.get(i-1));
+                value = apply(value, elements.get(i), operations.get(i-1));
             return value;
+        }
+
+        public static double apply(double value, Operation second, ExpressionParser.MathOperator op) {
+            return switch (op) {
+                case ADD -> value + second.getValue();
+                case SUBTRACT -> value - second.getValue();
+                case MULTIPLY -> value * second.getValue();
+                case DIVIDE -> value / second.getValue();
+                case MOD -> value % second.getValue();
+                case EXPONENT -> Math.pow(value, second.getValue());
+                case IF_NULL -> !Double.isNaN( value ) ? value : second.getValue();
+            };
         }
 
 
