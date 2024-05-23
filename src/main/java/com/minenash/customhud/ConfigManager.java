@@ -55,13 +55,13 @@ public class ConfigManager {
             readV1AndConvert(json);
             return;
         }
-
         int version = json.get("configVersion").getAsInt();
-        if (version != 2) {
-            //TODO: Do Toast
+        if (version == 2)
+            readV2(json);
+        else if (version == 3)
+            readV3(json);
+        else
             CustomHud.LOGGER.warn("[CustomHud] Unknown Config Version. Not loading it");
-        }
-        readV2(json);
     }
 
     public static void readV1AndConvert(JsonObject json) {
@@ -92,6 +92,13 @@ public class ConfigManager {
     }
 
     public static void readV2(JsonObject json) {
+        String activeProfileName = json.get("activeProfile").getAsString();
+        json.remove("activeProfile");
+        json.addProperty("activeProfileName", activeProfileName);
+        readV3(json);
+    }
+
+    public static void readV3(JsonObject json) {
         JsonElement lastVersion = json.get("latestKnownVersion");
         if (lastVersion != null)
             UpdateChecker.latestKnownVersion = lastVersion.getAsString().split("\\.");
@@ -110,7 +117,7 @@ public class ConfigManager {
             String name = obj.get("name").getAsString();
 
             Profile p = profiles.get(name);
-            if (p != null) {
+            if (p != null && !order.contains(p)) {
                 String keyTranslation = obj.get("key").getAsString();
                 p.keyBinding.setBoundKey(InputUtil.fromTranslationKey(keyTranslation));
                 p.cycle = obj.get("cycle").getAsBoolean();
@@ -119,7 +126,7 @@ public class ConfigManager {
         }
         ProfileManager.reorder(order, false);
 
-        String activeProfileName = json.get("activeProfile").getAsString();
+        String activeProfileName = json.get("activeProfileName").getAsString();
         if (activeProfileName == null)
             ProfileManager.setActive(null);
         else {
@@ -162,10 +169,10 @@ public class ConfigManager {
             }
         }
         JsonObject config = new JsonObject();
-        config.addProperty("configVersion", 2);
+        config.addProperty("configVersion", 3);
         config.addProperty("debugMode", CustomHud.DEBUG_MODE);
         config.addProperty("enabled", ProfileManager.enabled);
-        config.addProperty("activeProfile", ProfileManager.getActive() == null ? "" : ProfileManager.getActive().name);
+        config.addProperty("activeProfileName", ProfileManager.getActive() == null ? "" : ProfileManager.getActive().name);
         config.addProperty("latestKnownVersion", UpdateChecker.getLatestKnownVersionAsString());
 
         JsonArray profiles = new JsonArray();
