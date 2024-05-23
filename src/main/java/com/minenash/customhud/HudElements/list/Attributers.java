@@ -31,7 +31,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.ITEM_ATTR_MODIFIER_NAME;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
@@ -105,11 +104,19 @@ public class Attributers {
         default -> null;
     };
 
-    public static final Attributer BLOCK_STATE = (sbp, pid, sup, name, flags, context) -> switch (name) {
+    public static final Attributer BLOCK_PROPERTY = (sbp, pid, sup, name, flags, context) -> switch (name) {
         case "", "name" -> new Str(sup, BLOCK_STATE_NAME);
         case "type" -> new Special(sup, BLOCK_STATE_TYPE);
         case "full_type" -> new Str(sup,BLOCK_STATE_FULL_TYPE);
         case "value" -> new Str(sup, BLOCK_STATE_VALUE);
+        default -> null;
+    };
+
+    public static final Attributer RECEIVED_POWER = (sbp, pid, sup, name, flags, context) -> switch (name) {
+        case "direction", "dir" -> new Str(sup, REC_DIRECTION);
+        case "opposite_direction", "odir" -> new Str(sup, REC_DIRECTION);
+        case "", "power" -> new Num(sup, REC_POWER, flags);
+        case "strong_power", "strong" -> new Num(sup, REC_STRONG_POWER, flags);
         default -> null;
     };
 
@@ -164,7 +171,7 @@ public class Attributers {
                         var enchants = EnchantmentHelper.get((ItemStack)sup.get());
                         return Map.entry(enchant, enchants.getOrDefault(enchant, 0));
                     },
-                    ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_PROPERTY, context.profile(), context.line(), context.enabled(), name);
+                    ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, context.profile(), context.line(), context.enabled(), name);
         return switch (name) {
             case "", "item" -> new Special(sup, ITEM_NAME, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY);
             case "id" -> new SpecialId(sup, ITEM_ID, ITEM_RAW_ID, ITEM_IS_NOT_EMPTY, flags);
@@ -408,9 +415,10 @@ public class Attributers {
         ATTRIBUTER_MAP.put(STATUS_EFFECTS_NEUTRAL, EFFECT);
         ATTRIBUTER_MAP.put(ONLINE_PLAYERS, PLAYER);
         ATTRIBUTER_MAP.put(SUBTITLES, SUBTITLE);
-        ATTRIBUTER_MAP.put(TARGET_BLOCK_STATES, BLOCK_STATE);
+        ATTRIBUTER_MAP.put(TARGET_BLOCK_STATES, BLOCK_PROPERTY);
         ATTRIBUTER_MAP.put(TARGET_BLOCK_TAGS, TAG);
-        ATTRIBUTER_MAP.put(TARGET_FLUID_STATES, BLOCK_STATE);
+        ATTRIBUTER_MAP.put(TARGET_BLOCK_POWERS, RECEIVED_POWER);
+        ATTRIBUTER_MAP.put(TARGET_FLUID_STATES, BLOCK_PROPERTY);
         ATTRIBUTER_MAP.put(TARGET_FLUID_TAGS, TAG);
 //        ATTRIBUTER_MAP.put(TARGET_BLOCK_ITEMS, ITEM);
 //        ATTRIBUTER_MAP.put(TARGET_BLOCK_COMPACT_ITEMS, ITEM);
@@ -441,7 +449,8 @@ public class Attributers {
         DEFAULT_PREFIX.put(EFFECT, "e");
         DEFAULT_PREFIX.put(PLAYER, "p");
         DEFAULT_PREFIX.put(SUBTITLE, "s");
-        DEFAULT_PREFIX.put(BLOCK_STATE, "p");
+        DEFAULT_PREFIX.put(BLOCK_PROPERTY, "p");
+        DEFAULT_PREFIX.put(RECEIVED_POWER, "r");
         DEFAULT_PREFIX.put(TAG, "t");
         DEFAULT_PREFIX.put(ENCHANTMENT, "e");
         DEFAULT_PREFIX.put(ITEM_LORE_LINE, "lore");

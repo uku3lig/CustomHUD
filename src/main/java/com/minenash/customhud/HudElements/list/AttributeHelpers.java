@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.list;
 
-import com.google.common.collect.Lists;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.mixin.accessors.AttributeContainerAccessor;
 import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
@@ -17,21 +16,18 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
-import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
@@ -67,6 +63,8 @@ public class AttributeHelpers {
             return null;
         }
     };
+
+    public record ReceivedPower(Direction direction, int power, int strongPower) {}
 
 
     public static Entity getFullEntity(Entity entity) {

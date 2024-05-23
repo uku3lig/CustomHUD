@@ -61,6 +61,7 @@ import static com.minenash.customhud.HudElements.supplier.EntitySuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*;
 import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.*;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
+import static com.minenash.customhud.HudElements.supplier.IntegerSuppliers.TARGET_BLOCK_STRONG_POWERED_SOUTH;
 import static com.minenash.customhud.HudElements.supplier.SpecialIdSupplier.*;
 import static com.minenash.customhud.HudElements.supplier.SpecialSupplierElement.*;
 import static com.minenash.customhud.HudElements.supplier.StringSupplierElement.*;
@@ -259,7 +260,7 @@ public class VariableParser {
             return new StringElement(part);
 
         String original = part;
-        part = part.substring(1, part.length()-1);
+        part = part.substring(1, part.length()-1).trim();
 
         if (part.isBlank()) {
             Errors.addError(profile.name, debugLine, original, ErrorType.EMPTY_VARIABLE, "");
@@ -271,7 +272,7 @@ public class VariableParser {
                 Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_CONDITIONAL, "Conditional not closed / incomplete");
                 return null;
             }
-            part = part.substring(1, part.length() - 1);
+            part = part.substring(1, part.length() - 1).trim();
 
             CustomHud.logInDebugMode("COND:");
             List<String> ps = partitionConditional(part);
@@ -575,7 +576,7 @@ public class VariableParser {
                 cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, debugLine);
             }
             if (element == null)
-                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, method);
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, method);
             return element;
         }
 
@@ -978,6 +979,23 @@ public class VariableParser {
             case "target_villager_xp", "tve" -> { enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_XP; }
             case "target_villager_xp_needed", "tven" -> { enabled.targetEntity = enabled.targetVillager = true; yield VILLAGER_XP_NEEDED; }
             case "vehicle_entity_armor", "vehicle_armor", "vea" -> VEHICLE_ENTITY_ARMOR;
+
+            case "target_block_power", "target_power", "tbp" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED; }
+            case "target_block_power_north", "target_power_north", "tbpn" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_NORTH; }
+            case "target_block_power_south", "target_power_south", "tbps" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_SOUTH; }
+            case "target_block_power_east", "target_power_east", "tbpe" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_EAST; }
+            case "target_block_power_west", "target_power_west", "tbpw" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_WEST; }
+            case "target_block_power_up", "target_power_up", "tbpu" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_UP; }
+            case "target_block_power_down", "target_power_down", "tbpd" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERED_DOWN; }
+
+            case "target_block_strong_power", "target_strong_power", "tbsp" -> { enabled.targetBlock = true; enabled.world = true; yield TARGET_BLOCK_STRONG_POWERED; }
+            case "target_block_strong_power_north", "target_strong_power_north", "tbspn" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_NORTH; }
+            case "target_block_strong_power_south", "target_strong_power_south", "tbsps" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_SOUTH; }
+            case "target_block_strong_power_east", "target_strong_power_east", "tbspe" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_EAST; }
+            case "target_block_strong_power_west", "target_strong_power_west", "tbspw" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_WEST; }
+            case "target_block_strong_power_up", "target_strong_power_up", "tbspu" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_UP; }
+            case "target_block_strong_power_down", "target_strong_power_down", "tbspd" -> { enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STRONG_POWERED_DOWN; }
+
             case "in_chunk_x", "icx" -> IN_CHUNK_X;
             case "in_chunk_y", "icy" -> IN_CHUNK_Y;
             case "in_chunk_z", "icz" -> IN_CHUNK_Z;
@@ -1336,12 +1354,13 @@ public class VariableParser {
             case "neu_effects", "neutral_effects" -> STATUS_EFFECTS_NEUTRAL;
             case "players" -> ONLINE_PLAYERS;
             case "subtitles" -> {enabled.subtitles = true; yield SUBTITLES;}
-            case "target_block_props", "target_block_properties", "tbp" -> {enabled.targetBlock = true; yield TARGET_BLOCK_STATES;}
-            case "target_block_tags", "tbt" -> {enabled.targetBlock = true; yield TARGET_BLOCK_TAGS;}
+            case "target_block_props", "target_block_properties", "tbprops" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_STATES;}
+            case "target_block_tags", "target_tags", "tbt" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_TAGS;}
+            case "target_block_powers", "target_powers" , "tbpowers" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERS;}
 //            case "target_block_items", "tbitems" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_ITEMS;}
 //            case "target_block_items_compact", "tbic" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_COMPACT_ITEMS;}
-            case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
-            case "target_fluid_tags", "tft" -> {enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
+            case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
+            case "target_fluid_tags", "tft" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
             case "attributes" -> PLAYER_ATTRIBUTES;
             case "target_entity_attributes", "target_entity_attrs", "teas" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ATTRIBUTES;}
             case "hooked_entity_attributes", "hooked_entity_attrs", "heas" -> HOOKED_ENTITY_ATTRIBUTES;
@@ -1567,48 +1586,62 @@ public class VariableParser {
     public static HudElement getAttributeElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
         if (part.startsWith("item:"))
             return attrElement(part, SLOT_READER, false, (slot) -> () -> CLIENT.player.getStackReference(slot).get(),
-                    ITEM, ErrorType.UNKNOWN_SLOT, ErrorType.UNKNOWN_ITEM_PROPERTY, profile, debugLine, enabled, original);
+                    ITEM, ErrorType.UNKNOWN_SLOT, ErrorType.UNKNOWN_ITEM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("attribute:"))
             return attrElement(part, ENTITY_ATTR_READER, true, (attr) -> () -> getEntityAttr(CLIENT.player, attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("target_entity_attribute:") || part.startsWith("target_entity_attr:") || part.startsWith("tea:"))
             return attrElement(part, ENTITY_ATTR_READER, true, (attr) -> () -> getEntityAttr(ComplexData.targetEntity, attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("hooked_entity_attribute:") || part.startsWith("hooked_entity_attr:") || part.startsWith("hea:"))
             return attrElement(part, ENTITY_ATTR_READER, true,
                     (attr) -> () -> getEntityAttr(CLIENT.player.fishHook == null ? null : CLIENT.player.fishHook.getHookedEntity(), attr),
-                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_PROPERTY, profile, debugLine, enabled, original);
+                    ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, profile, debugLine, enabled, original);
+
+        if (part.startsWith("target_block_property:") || part.startsWith("target_property:") || part.startsWith("tbprop:")) {
+            HudElement e = attrElement(part, src -> src, false,
+                    (prop) -> () -> {
+                        for (var p : ComplexData.targetBlock.getEntries().entrySet())
+                            if (p.getKey().getName().equalsIgnoreCase(prop))
+                                return p;
+                        return null;
+                    },
+                    BLOCK_PROPERTY, null, ErrorType.UNKNOWN_ATTRIBUTE_METHOD, profile, debugLine, enabled, original);
+            if (e != null)
+                enabled.world = enabled.targetBlock = true;
+            return e;
+        }
 
         if (part.startsWith("team:"))
             return attrElement(part, src -> src, false, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
-                    TEAM, null, ErrorType.UNKNOWN_TEAM_PROPERTY, profile, debugLine, enabled, original);
+                    TEAM, null, ErrorType.UNKNOWN_TEAM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("objective:"))
             return attrElement(part, src -> src, false, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
-                    SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_PROPERTY, profile, debugLine, enabled, original);
+                    SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("bossbar:"))
             return attrElement(part, src -> src, true, (name) -> () -> AttributeHelpers.getBossBar(name),
-                    BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_PROPERTY, profile, debugLine, enabled, original);
+                    BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("effect:"))
             return attrElement(part, src -> Registries.STATUS_EFFECT.get(Identifier.tryParse(src)), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
-                    EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_PROPERTY, profile, debugLine, enabled, original);
+                    EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("mod:"))
             return attrElement(part, ModMenu.MODS::get, false, (mod) -> () -> mod,
-                    MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_PROPERTY, profile, debugLine, enabled, original );
+                    MOD, ErrorType.UNKNOWN_MOD, ErrorType.UNKNOWN_MOD_METHOD, profile, debugLine, enabled, original );
 
         if (part.startsWith("resource_pack:"))
             return attrElement(part, (src) -> CLIENT.getResourcePackManager().getProfile(src), false, (pack) -> () -> pack,
-                    PACK, ErrorType.UNKNOWN_RESOURCE_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
+                    PACK, ErrorType.UNKNOWN_RESOURCE_PACK, ErrorType.UNKNOWN_PACK_METHOD, profile, debugLine, enabled, original );
 
         if (part.startsWith("data_pack:") || part.startsWith("datapack:"))
             return attrElement(part, DATA_PACK_READER, false, (pack) -> () -> pack,
-                    PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_PROPERTY, profile, debugLine, enabled, original );
+                    PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_METHOD, profile, debugLine, enabled, original );
 
         return null;
     }

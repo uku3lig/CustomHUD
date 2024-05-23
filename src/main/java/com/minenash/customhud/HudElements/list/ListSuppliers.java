@@ -30,7 +30,8 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 
@@ -44,10 +45,12 @@ import static com.minenash.customhud.HudElements.list.AttributeHelpers.*;
 @SuppressWarnings("DataFlowIssue")
 public class ListSuppliers {
 
+    public static final Direction[] DIRS = new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN};
     public static final Comparator<PlayerListEntry> ENTRY_ORDERING =
             Comparator.comparingInt((PlayerListEntry entry) -> entry.getGameMode() == GameMode.SPECTATOR ? 1 : 0)
                     .thenComparing((entry) -> Nullables.mapOrElse(entry.getScoreboardTeam(), Team::getName, ""))
                     .thenComparing((entry) -> entry.getProfile().getName(), String::compareToIgnoreCase);
+
 
     public static final List<String> IGNORE_MODS = List.of("minecraft", "fabricloader", "java");
     public static final Comparator<?> MOD_ORDERING = Comparator.comparing(mod -> ((Mod)mod).getTranslatedName().toLowerCase(Locale.ROOT));
@@ -67,6 +70,16 @@ public class ListSuppliers {
         TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
         TARGET_FLUID_STATES = () ->  ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetFluid.getEntries().entrySet().toArray()),
         TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : ComplexData.targetFluid.streamTags().toList(),
+
+        TARGET_BLOCK_POWERS = () -> {
+            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
+            List<ReceivedPower> powers = new ArrayList<>(6);
+            for (Direction d : DIRS) {
+                BlockPos pos = ComplexData.targetBlockPos.offset(d);
+                powers.add( new ReceivedPower(d, CLIENT.world.getEmittedRedstonePower(pos, d), CLIENT.world.getStrongRedstonePower(pos, d)) );
+            }
+            return powers;
+        },
 //        TARGET_BLOCK_ITEMS = () -> {
 //            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
 //            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);

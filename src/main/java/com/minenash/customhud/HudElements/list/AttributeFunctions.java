@@ -125,17 +125,17 @@ public class AttributeFunctions {
 
 
     // BLOCK STATES
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_NAME = (property) -> property.getKey().getName();
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_VALUE = (property) -> property.getValue().toString();
-    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_FULL_TYPE = (property) -> property.getKey().getType().getSimpleName();
+    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_NAME = (property) -> property == null ? null : property.getKey().getName();
+    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_VALUE = (property) -> property == null ? null : property.getValue().toString();
+    public static final Function<Map.Entry<Property<?>,Comparable<?>>,String> BLOCK_STATE_FULL_TYPE = (property) -> property == null ? null : property.getKey().getType().getSimpleName();
     public static final Entry<Map.Entry<Property<?>,Comparable<?>> > BLOCK_STATE_TYPE = new Entry<> (
-            (property) -> switch (blockstate$getPropertyType(property.getKey().getType())) {
+            (property) -> property == null ? null : switch (blockstate$getPropertyType(property.getKey().getType())) {
                 case 1 -> "Boolean";
                 case 2 -> "Number";
                 case 3 -> "Enum";
                 default -> "String"; },
-            (property) -> blockstate$getPropertyType(property.getKey().getType()),
-            (property) -> blockstate$getPropertyType(property.getKey().getType()) != 0);
+            (property) -> property == null ? null : blockstate$getPropertyType(property.getKey().getType()),
+            (property) -> property == null ? null : blockstate$getPropertyType(property.getKey().getType()) != 0);
 
 
     // BLOCK/ITEM TAGS
@@ -143,6 +143,11 @@ public class AttributeFunctions {
     public static final Function<TagKey<?>,String> TAG_NAME = (tag) -> tag.id().getNamespace().equals("minecraft") ?
             tag.id().getPath() : tag.id().toString();
 
+    // RECIEVED POWER
+    public static final Function<AttributeHelpers.ReceivedPower,String> REC_DIRECTION = (rec) -> rec.direction().getName();
+    public static final Function<AttributeHelpers.ReceivedPower,String> REC_OPOSITE_DIRECTION = (rec) -> rec.direction().getOpposite().getName();
+    public static final Function<AttributeHelpers.ReceivedPower,Number> REC_POWER = (rec) -> rec.power();
+    public static final Function<AttributeHelpers.ReceivedPower,Number> REC_STRONG_POWER = (rec) -> rec.strongPower();
 
     // ENCHANTMENTS
     public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_NAME = (enchant) -> I18n.translate(enchant.getKey().getTranslationKey());

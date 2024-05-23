@@ -7,7 +7,6 @@ import com.minenash.customhud.mixin.accessors.WorldRendererAccess;
 import com.mojang.blaze3d.platform.GLX;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.entity.SpawnGroup;
@@ -15,6 +14,7 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.village.VillagerData;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
@@ -31,6 +31,8 @@ import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.supplier.EntryNumberSuppliers.*;
+import static com.minenash.customhud.complex.ComplexData.targetBlock;
+import static com.minenash.customhud.complex.ComplexData.targetBlockPos;
 import static java.time.temporal.ChronoField.MICRO_OF_SECOND;
 
 public class IntegerSuppliers {
@@ -87,17 +89,33 @@ public class IntegerSuppliers {
     public static final Supplier<Number> BLOCK_X = () -> blockPos().getX();
     public static final Supplier<Number> BLOCK_Y = () -> blockPos().getY();
     public static final Supplier<Number> BLOCK_Z = () -> blockPos().getZ();
-    public static final Supplier<Number> TARGET_BLOCK_X = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getX();
-    public static final Supplier<Number> TARGET_BLOCK_Y = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getY();
-    public static final Supplier<Number> TARGET_BLOCK_Z = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getZ();
-    public static final Supplier<Number> TARGET_BLOCK_DISTANCE = () -> ComplexData.targetBlockPos == null ? null : ComplexData.targetBlockPos.getManhattanDistance(client.player.getBlockPos());
-    public static final Supplier<Number> TARGET_BLOCK_COLOR = () -> ComplexData.targetBlock == null || ComplexData.targetBlock.isAir() ? null : ComplexData.targetBlock.getMapColor(client.world, ComplexData.targetBlockPos).color;
-    public static final Supplier<Number> TARGET_BLOCK_LUMINANCE = () -> ComplexData.targetBlock == null || ComplexData.targetBlock.isAir() ? null : ComplexData.world.getLuminance(ComplexData.targetBlockPos);
+    public static final Supplier<Number> TARGET_BLOCK_X = () -> targetBlockPos == null ? null : targetBlockPos.getX();
+    public static final Supplier<Number> TARGET_BLOCK_Y = () -> targetBlockPos == null ? null : targetBlockPos.getY();
+    public static final Supplier<Number> TARGET_BLOCK_Z = () -> targetBlockPos == null ? null : targetBlockPos.getZ();
+    public static final Supplier<Number> TARGET_BLOCK_DISTANCE = () -> targetBlockPos == null ? null : targetBlockPos.getManhattanDistance(client.player.getBlockPos());
+    public static final Supplier<Number> TARGET_BLOCK_COLOR = () -> targetBlock == null || targetBlock.isAir() ? null : targetBlock.getMapColor(client.world, targetBlockPos).color;
+    public static final Supplier<Number> TARGET_BLOCK_LUMINANCE = () -> targetBlock == null || targetBlock.isAir() ? null : ComplexData.world.getLuminance(targetBlockPos);
     public static final Supplier<Number> TARGET_FLUID_X = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getX();
     public static final Supplier<Number> TARGET_FLUID_Y = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getY();
     public static final Supplier<Number> TARGET_FLUID_Z = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getZ();
     public static final Supplier<Number> TARGET_FLUID_DISTANCE = () -> ComplexData.targetFluidPos == null ? null : ComplexData.targetFluidPos.getManhattanDistance(client.player.getBlockPos());
     public static final Supplier<Number> TARGET_FLUID_COLOR = () -> ComplexData.targetFluid == null || ComplexData.targetFluid.isEmpty()? null : ComplexData.targetFluid.getBlockState().getMapColor(client.world, ComplexData.targetFluidPos).color;
+
+    public static final Supplier<Number> TARGET_BLOCK_POWERED = () -> targetBlockPos == null ? null : client.world.getReceivedRedstonePower(targetBlockPos);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_NORTH = () -> targetBlockPos == null ? null : client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.NORTH), Direction.NORTH);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_SOUTH = () -> targetBlockPos == null ? null : client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.SOUTH), Direction.SOUTH);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_EAST = () -> targetBlockPos == null ? null :  client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.EAST), Direction.EAST);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_WEST = () -> targetBlockPos == null ? null :  client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.WEST), Direction.WEST);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_UP = () -> targetBlockPos == null ? null :    client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.UP), Direction.UP);
+    public static final Supplier<Number> TARGET_BLOCK_POWERED_DOWN = () -> targetBlockPos == null ? null :  client.world.getEmittedRedstonePower(targetBlockPos.offset(Direction.DOWN), Direction.DOWN);
+
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED = () -> targetBlockPos == null ? null : client.world.getReceivedStrongRedstonePower(targetBlockPos);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_NORTH = () -> targetBlockPos == null ? null : client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.NORTH), Direction.NORTH);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_SOUTH = () -> targetBlockPos == null ? null : client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.SOUTH), Direction.SOUTH);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_EAST = () -> targetBlockPos == null ? null :  client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.EAST), Direction.EAST);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_WEST = () -> targetBlockPos == null ? null :  client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.WEST), Direction.WEST);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_UP = () -> targetBlockPos == null ? null :    client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.UP), Direction.UP);
+    public static final Supplier<Number> TARGET_BLOCK_STRONG_POWERED_DOWN = () -> targetBlockPos == null ? null :  client.world.getStrongRedstonePower(targetBlockPos.offset(Direction.DOWN), Direction.DOWN);
 
     public static final Supplier<Number> IN_CHUNK_X = () -> blockPos().getX() & 15;
     public static final Supplier<Number> IN_CHUNK_Y = () -> blockPos().getY() & 15;
