@@ -150,26 +150,22 @@ public class AttributeFunctions {
     public static final Function<AttributeHelpers.ReceivedPower,Number> REC_STRONG_POWER = (rec) -> rec.strongPower();
 
     // ENCHANTMENTS
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_NAME = (enchant) -> I18n.translate(enchant.getKey().getTranslationKey());
-    public static final Function<Map.Entry<Enchantment,Integer>,Identifier> ENCHANT_ID = (enchant) -> Registries.ENCHANTMENT.getId(enchant.getKey());
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant.getKey().getRarity().toString().toLowerCase();
-    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant.getValue();
-    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant.getKey().getMaxLevel();
-    public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_FULL = new Entry<> (
-            (enchant) -> {
-                String enchantName = I18n.translate(enchant.getKey().getTranslationKey());
-                return enchant.getValue() == 0 ? "No " + enchantName : enchant.getKey().getMaxLevel() == 1 ? enchantName
-                    : enchantName + " " + I18n.translate("enchantment.level." + enchant.getValue());},
-            (enchant) -> enchant.getValue(),
-            (enchant) -> enchant.getValue() > 0);
+    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_NAME = (enchant) -> enchant == null ? null : I18n.translate(enchant.getKey().getTranslationKey());
+    public static final Function<Map.Entry<Enchantment,Integer>,Identifier> ENCHANT_ID = (enchant) -> enchant == null ? null : Registries.ENCHANTMENT.getId(enchant.getKey());
+    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant == null ? null : enchant.getKey().getRarity().toString().toLowerCase();
+    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant == null ? null : enchant.getValue();
+    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant == null ? null : enchant.getKey().getMaxLevel();
+    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL = (enchant) -> enchant == null ? null :
+            enchant.getKey().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().getTranslationKey())
+                    : I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
-            (enchant) -> enchant.getValue() == 0 ? "0" : I18n.translate("enchantment.level." + enchant.getValue()),
-            (enchant) -> enchant.getValue(),
-            (enchant) -> enchant.getValue() > 0);
+            (enchant) -> enchant == null ? null : I18n.translate("enchantment.level." + enchant.getValue()),
+            (enchant) -> enchant == null ? null : enchant.getValue(),
+            (enchant) -> enchant != null);
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_MAX_LEVEL = new Entry<> (
-            (enchant) -> I18n.translate("enchantment.level." + enchant.getKey().getMaxLevel()),
-            (enchant) -> enchant.getKey().getMaxLevel(),
-            (enchant) -> enchant.getValue() > 0);
+            (enchant) -> enchant == null ? null : I18n.translate("enchantment.level." + enchant.getKey().getMaxLevel()),
+            (enchant) -> enchant == null ? null : enchant.getKey().getMaxLevel(),
+            (enchant) -> enchant != null);
 
 
     // ITEMS
