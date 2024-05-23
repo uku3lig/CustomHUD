@@ -180,15 +180,18 @@ public class CustomHudRenderer {
                 piece.x += left;
             }
 
-            if (maxLineRenderPieces != null) {
-                int x1 = section.getSetWidthBgX(right, maxLineWidth);
-                for (MaxLineRenderPiece piece : maxLineRenderPieces)
-                    addLineBg(context, bgBuilder, x1 - 2, piece.y1, x1+maxLineWidth+2, piece.y2, piece.color);
-                addLineBg(context, bgBuilder, x1 - 2, staticWidthY - 2, x1 + maxLineWidth+2, y - 2, theme.bgColor);
-            }
-            else if (!dynamicWidth) {
-                int x1 = section.getSetWidthBgX(right + 3, maxLineWidth) - 2;
-                addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + section.width, y - 2, theme.bgColor);
+            if (maxLineWidth != 0) {
+                if (maxLineRenderPieces != null) {
+                    int x1 = section.getSetWidthBgX(right, maxLineWidth);
+                    for (MaxLineRenderPiece piece : maxLineRenderPieces) {
+                        if (piece.y1 != piece.y2)
+                            addLineBg(context, bgBuilder, x1 - 2, piece.y1, x1 + maxLineWidth + 2, piece.y2, piece.color);
+                    }
+                    addLineBg(context, bgBuilder, x1 - 2, staticWidthY - 2, x1 + maxLineWidth + 2, y - 2, theme.bgColor);
+                } else if (!dynamicWidth) {
+                    int x1 = section.getSetWidthBgX(right + 3, maxLineWidth) - 2;
+                    addLineBg(context, bgBuilder, x1, staticWidthY - 2, x1 + section.width, y - 2, theme.bgColor);
+                }
             }
 
         }
