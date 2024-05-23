@@ -185,6 +185,23 @@ public class AttributeHelpers {
         return compact;
     }
 
+    public static List<ItemStack> getItemItems(ItemStack stack, boolean returnStack) {
+        NbtCompound nbt = stack.getNbt();
+        if (stack.isEmpty() || nbt == null || !nbt.contains("BlockEntityTag")) return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+        nbt = nbt.getCompound("BlockEntityTag");
+        if (!nbt.contains("Items", NbtElement.LIST_TYPE)) return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+        NbtList list = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
+        List<ItemStack> items = new ArrayList<>(list.size());
+
+        for(int i = 0; i < list.size(); ++i) {
+            List<ItemStack> inner = getItemItems(ItemStack.fromNbt(list.getCompound(i)), true);
+            for (ItemStack is : inner)
+                is.setCount(is.getCount() * stack.getCount());
+            items.addAll(inner);
+        }
+        return items;
+    }
+
     public static Scoreboard scoreboard() {
         return CLIENT.getServer() != null ? CLIENT.getServer().getScoreboard() : CLIENT.world.getScoreboard();
     }

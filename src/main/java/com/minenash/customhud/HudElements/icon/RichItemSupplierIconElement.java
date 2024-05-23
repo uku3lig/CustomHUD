@@ -56,8 +56,10 @@ public class RichItemSupplierIconElement extends IconElement {
         return ItemStack.EMPTY;
     }
     private ItemStack getStack(RenderPiece piece) {
-        if (piece.value != null)
-            return piece.value instanceof ItemConvertible ic ? ic.asItem().getDefaultStack() : (ItemStack) piece.value;
+        if (piece.value instanceof ItemConvertible ic)
+            return ic.asItem().getDefaultStack();
+        if (piece.value instanceof ItemStack stack)
+            return stack;
         Object result = supplier.get();
         if (result instanceof ItemStack stack)
             return stack;

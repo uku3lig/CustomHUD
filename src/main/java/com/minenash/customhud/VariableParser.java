@@ -1368,6 +1368,7 @@ public class VariableParser {
             case "target_villager_offers", "tvo" -> {enabled.targetEntity = true; enabled.targetVillager = true; yield TARGET_VILLAGER_OFFERS;}
             case "teams" -> TEAMS;
             case "items" -> ITEMS;
+            case "items_unpacked" -> ITEMS_UNPACKED;
             case "inventory_items", "inv_items" -> INV_ITEMS;
             case "armor_items" -> ARMOR_ITEMS;
             case "equipped_items" -> EQUIPPED_ITEMS;

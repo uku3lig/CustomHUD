@@ -42,10 +42,13 @@ import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
+import static com.minenash.customhud.HudElements.list.AttributeHelpers.getItemItems;
 
 @SuppressWarnings("ALL")
 public class AttributeFunctions {
@@ -409,17 +412,12 @@ public class AttributeFunctions {
         int amountOfFirst = 0;
         int amountOfSecond = 0;
 
-        PlayerInventory inv = CLIENT.player.getInventory();
-        ItemStack offhand = inv.offHand.get(0);
-        if (ItemStack.canCombine(first, offhand))
-            amountOfFirst += offhand.getCount();
-        else if (ItemStack.canCombine(second, offhand))
-            amountOfSecond += offhand.getCount();
+        List<ItemStack> items = new ArrayList<>(37);
+        items.add(CLIENT.player.getInventory().player.getOffHandStack());
+        for (ItemStack stack : CLIENT.player.getInventory().main)
+            items.addAll(getItemItems(stack, true));
 
-        if (amountOfFirst >= first.getCount() && amountOfSecond >= second.getCount())
-            return true;
-
-        for (ItemStack stack : inv.main) {
+        for (ItemStack stack : items) {
             if (ItemStack.canCombine(first, stack))
                 amountOfFirst += stack.getCount();
             else if (ItemStack.canCombine(second, stack))

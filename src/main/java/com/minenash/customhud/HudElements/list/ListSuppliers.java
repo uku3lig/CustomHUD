@@ -130,6 +130,17 @@ public class ListSuppliers {
             items.add(inv.offHand.get(0));
             return items;
         },
+        ITEMS_UNPACKED = () -> {
+            List<ItemStack> items = new ArrayList<>(36);
+            for (ItemStack stack : CLIENT.player.getInventory().main) {
+                List<ItemStack> innerItems = getItemItems(stack, true);
+                if (innerItems.isEmpty())
+                    items.add(stack);
+                else
+                    items.addAll(innerItems);
+            }
+            return AttributeHelpers.compactItems( items );
+        },
 
         SCOREBOARD_OBJECTIVES = () -> Arrays.asList(scoreboard().getObjectives().toArray()),
         PLAYER_SCOREBOARD_SCORES = () -> Arrays.asList(scoreboard().getScores(CLIENT.getGameProfile().getName()).scores.entrySet().toArray()),
@@ -178,19 +189,7 @@ public class ListSuppliers {
     public static final Function<ItemStack,List<?>> ITEM_HIDDEN = (stack) -> getHideFlagStrings(stack, false);
     public static final Function<ItemStack,List<?>> ITEM_SHOWN = (stack) -> getHideFlagStrings(stack, true);
     public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
-    public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> {
-        NbtCompound nbt = stack.getNbt();
-        if (nbt == null || !nbt.contains("BlockEntityTag")) return Collections.EMPTY_LIST;
-        nbt = nbt.getCompound("BlockEntityTag");
-        if (!nbt.contains("Items", NbtElement.LIST_TYPE)) return Collections.EMPTY_LIST;
-        NbtList list = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
-        List<ItemStack> items = new ArrayList<>(list.size());
-
-        for(int i = 0; i < list.size(); ++i)
-            items.add(ItemStack.fromNbt( list.getCompound(i) ));
-
-        return compactItems(items);
-    };
+    public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> compactItems( getItemItems(stack, false) );
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;
