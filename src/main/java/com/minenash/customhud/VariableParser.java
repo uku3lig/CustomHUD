@@ -91,9 +91,16 @@ public class VariableParser {
                 elements.add(element);
         }
 
-        if (line && profile.convertLineBreak)
+        if (line && profile.convertLineBreak && !(profile.ignoreBlankLines && basicallyEmpty(elements)) )
             elements.add(new FunctionalElement.NewLine());
         return elements;
+    }
+
+    private static boolean basicallyEmpty(List<HudElement> elements) {
+        for (HudElement e : elements)
+            if ( !(e instanceof FunctionalElement.NewLine) )
+                return false;
+        return true;
     }
 
     private static List<String> partition(String str) {

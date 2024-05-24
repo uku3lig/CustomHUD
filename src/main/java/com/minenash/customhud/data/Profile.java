@@ -30,7 +30,8 @@ public class Profile {
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
-    private static final Pattern CONVERT_LINE_BREAK_PATTERN = Pattern.compile("== ?convertlinebreak: ?(true|false) ?==");
+    private static final Pattern CONVERT_LINE_BREAKS_PATTERN = Pattern.compile("== ?convertlinebreaks: ?(true|false) ?==");
+    private static final Pattern IGNORE_BLANK_LINES_PATTERN = Pattern.compile("== ?ignoreblanklines: ?(true|false) ?==");
     private static final Pattern GLOBAL_THEME_PATTERN = Pattern.compile("== ?(.+) ?==");
     private static final Pattern LOCAL_THEME_PATTERN = Pattern.compile("= ?(.+) ?=");
 
@@ -45,6 +46,7 @@ public class Profile {
     public HudTheme baseTheme = HudTheme.defaults();
     public float targetDistance = 20;
     public boolean convertLineBreak = true;
+    public boolean ignoreBlankLines = false;
     public Crosshairs crosshair = Crosshairs.NORMAL;
     public EnumSet<DisableElement> disabled = EnumSet.noneOf(DisableElement.class);
     public Map<String,Toggle> toggles = new LinkedHashMap<>();
@@ -145,9 +147,14 @@ public class Profile {
                     continue;
                 }
 
-                matcher = CONVERT_LINE_BREAK_PATTERN.matcher(lineLC);
+                matcher = CONVERT_LINE_BREAKS_PATTERN.matcher(lineLC);
                 if (matcher.matches()) {
                     profile.convertLineBreak = Boolean.parseBoolean(matcher.group(1));
+                    continue;
+                }
+                matcher = IGNORE_BLANK_LINES_PATTERN.matcher(lineLC);
+                if (matcher.matches()) {
+                    profile.ignoreBlankLines = Boolean.parseBoolean(matcher.group(1));
                     continue;
                 }
 
