@@ -37,6 +37,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -367,6 +368,14 @@ public class ComplexData {
 
         public boolean slots = false;
         public boolean targetVillager = false;
+
+        public void merge(Enabled enabled) {
+            for (Field field : this.getClass().getFields()) {
+                if (field.getType() != Boolean.TYPE) continue;
+                try { field.setBoolean(this, field.getBoolean(this) || field.getBoolean(enabled)); }
+                catch (Exception ignored) {}
+            }
+        }
     }
 
 

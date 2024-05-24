@@ -3,6 +3,7 @@ package com.minenash.customhud.registry;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.list.Attributers;
 import com.minenash.customhud.HudElements.list.ListProvider;
+import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.data.Flags;
 
 import java.util.*;
@@ -13,6 +14,7 @@ public class CustomHudRegistry {
     private static final Map<String, BiFunction<Flags,ParseContext,HudElement>> elementRegistry = new HashMap<>();
     private static final Map<String, BiFunction<String,ParseContext,HudElement>> parseRegistry = new LinkedHashMap<>();
     private static final Map<String, ListProvider> listRegistry = new HashMap<>();
+    private static final Map<String, ComplexData.Enabled> listRegistryEnabled = new HashMap<>();
     private static final List<Runnable> complexData = new ArrayList<>();
 
     public static void registerElement(String name, BiFunction<Flags,ParseContext,HudElement> element) {
@@ -27,6 +29,11 @@ public class CustomHudRegistry {
         Attributers.ATTRIBUTER_MAP.put(listProvider, attributer);
         Attributers.DEFAULT_PREFIX.put(attributer, prefix);
         listRegistry.put(name, listProvider);
+    }
+
+    public static void registerList(String name, String prefix, ListProvider listProvider, Attributers.Attributer attributer, ComplexData.Enabled enabled) {
+        registerList(name, prefix, listProvider, attributer);
+        listRegistryEnabled.put(name, enabled);
     }
 
     public static void unregisterElement(String name) {
@@ -52,7 +59,10 @@ public class CustomHudRegistry {
         var function = elementRegistry.get(parts[0]);
         return function == null ? null : function.apply(Flags.parse(context.profile().name, context.line(), parts), context);
     }
-    public static ListProvider getList(String name) {
+    public static ListProvider getList(String name, ComplexData.Enabled enabled) {
+        ComplexData.Enabled listEnable = listRegistryEnabled.get(name);
+        if (listEnable != null)
+            enabled.merge(listEnable);
         return listRegistry.get(name);
     }
 

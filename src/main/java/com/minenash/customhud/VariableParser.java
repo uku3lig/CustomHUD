@@ -1398,7 +1398,7 @@ public class VariableParser {
         };
 
         if (provider == null)
-            provider = CustomHudRegistry.getList(variable);
+            provider = CustomHudRegistry.getList(variable, enabled);
 
         if (provider == null)
             return null;

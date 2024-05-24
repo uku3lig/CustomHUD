@@ -6,7 +6,7 @@ import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen.Mode;
 import com.minenash.customhud.gui.TogglesScreen;
-import com.minenash.customhud.gui.editor.EditorWindow;
+//import com.minenash.customhud.gui.editor.EditorWindow;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;

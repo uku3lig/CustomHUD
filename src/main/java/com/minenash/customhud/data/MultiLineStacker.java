@@ -33,33 +33,43 @@ public class MultiLineStacker {
 
     public void elseIf(String cond, Profile profile, int line, String source, ComplexData.Enabled enabled) {
         if (stack.isEmpty())
-            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else if");
+            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "elseif");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
             mlb.setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true));
         else {
+            boolean success = false;
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
                     mlb.addAll( finish(i+1, profile, line, false) );
+                    ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true));
+                    success = true;
                     break;
                 }
             }
-            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(ExpressionParser.parseExpression(cond, source, profile, line, enabled, listProviders, true));
+            if (!success) {
+                Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "elseif");
+            }
         }
     }
 
     public void else1(Profile profile, int line, String source) {
         if (stack.isEmpty())
-            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "=else=");
+            Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else");
         else if (stack.peek() instanceof ConditionalElement.MultiLineBuilder mlb)
             mlb.setConditional(new Operation.Literal(1));
         else {
+            boolean success = false;
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ConditionalElement.MultiLineBuilder mlb) {
                     mlb.addAll( finish(i+1, profile, line, false) );
+                    ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(new Operation.Literal(1));
+                    success = true;
                     break;
                 }
             }
-            ( (ConditionalElement.MultiLineBuilder)stack.peek() ).setConditional(new Operation.Literal(1));
+            if (!success) {
+                Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "else");
+            }
         }
 
     }
@@ -146,13 +156,18 @@ public class MultiLineStacker {
         else if (stack.peek() instanceof ListElement.MultiLineBuilder mlb)
             mlb.separatorMode();
         else {
+            boolean success = false;
             for (int i = stack.size()-1; i >= 0; i--) {
                 if (stack.get(i) instanceof ListElement.MultiLineBuilder mlb) {
                     mlb.addAll( finish(i+1, profile, line, false) );
+                    ( (ListElement.MultiLineBuilder)stack.peek() ).separatorMode();
+                    success = true;
                     break;
                 }
             }
-            ( (ListElement.MultiLineBuilder)stack.peek() ).separatorMode();
+            if (!success) {
+                Errors.addError(profile.name, line, source, ErrorType.CONDITIONAL_NOT_STARTED, "separator");
+            }
         }
     }
 
