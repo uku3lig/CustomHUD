@@ -27,10 +27,12 @@ public class ConfigManager {
         }
         catch (Exception e) {
             CustomHud.LOGGER.info("[CustomHud] Can't write to config dir");
+            CustomHud.readProfiles();
             return;
         }
         if(!Files.exists(CONFIG)) {
             CustomHud.LOGGER.info("[CustomHud] Couldn't find the config File, creating one");
+            CustomHud.readProfiles();
             save();
             return;
         }
@@ -39,9 +41,11 @@ public class ConfigManager {
         }
         catch (JsonSyntaxException | NullPointerException e) {
             CustomHud.LOGGER.warn("[CustomHud] Malformed Json, Fixing");
+            CustomHud.readProfiles();
             save();
         }
         catch (IOException e) {
+            CustomHud.readProfiles();
             CustomHud.LOGGER.error("[CustomHud] Couldn't read the config");
         }
     }

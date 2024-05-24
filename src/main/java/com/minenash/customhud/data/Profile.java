@@ -71,7 +71,7 @@ public class Profile {
         catch (Exception e) {
             Errors.addError(profileName, 0, "", ErrorType.PROFILE_ERROR, "");
             CustomHud.LOGGER.catching(e);
-            return null;
+            return new Profile();
         }
 
         if (!Errors.getErrors(profileName).isEmpty()) {
