@@ -20,7 +20,7 @@ public class ConfigManager {
 
     public static final Path CONFIG = CustomHud.CONFIG_FOLDER.resolve("config.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
+    private static boolean readProfiles = false;
     public static void load() {
         try {
             Files.createDirectories(CustomHud.PROFILE_FOLDER);
@@ -36,16 +36,19 @@ public class ConfigManager {
             save();
             return;
         }
+        readProfiles = false;
         try {
             read( GSON.fromJson(Files.newBufferedReader(CONFIG), JsonObject.class) );
         }
         catch (JsonSyntaxException | NullPointerException e) {
             CustomHud.LOGGER.warn("[CustomHud] Malformed Json, Fixing");
-            CustomHud.readProfiles();
+            if (!readProfiles)
+                CustomHud.readProfiles();
             save();
         }
         catch (IOException e) {
-            CustomHud.readProfiles();
+            if (!readProfiles)
+                CustomHud.readProfiles();
             CustomHud.LOGGER.error("[CustomHud] Couldn't read the config");
         }
     }
@@ -91,6 +94,7 @@ public class ConfigManager {
             CustomHud.LOGGER.catching(e);
         }
         CustomHud.readProfiles();
+        readProfiles = true;
         ProfileManager.fallback();
         save();
     }
@@ -104,6 +108,7 @@ public class ConfigManager {
 
     public static void readV3(JsonObject json) {
         CustomHud.readProfiles();
+        readProfiles = true;
         JsonElement lastVersion = json.get("latestKnownVersion");
         if (lastVersion != null)
             UpdateChecker.latestKnownVersion = lastVersion.getAsString().split("\\.");
