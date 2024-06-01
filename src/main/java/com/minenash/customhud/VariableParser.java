@@ -460,7 +460,7 @@ public class VariableParser {
             Operation height = matcher.group(hg) == null || matcher.group(hg).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(hg), original, profile, debugLine, enabled, listProviders, false);
 
             Flags flags = Flags.parse(profile.name, debugLine, mainParts);
-            if (!matcher.group(2).isEmpty() && u == null && v == null && w == null && h == null && width == null && height == null) {
+            if (matcher.group(2) != null && !matcher.group(2).isEmpty() && u == null && v == null && w == null && h == null && width == null && height == null) {
                 SimpleTextureIconElement element = new SimpleTextureIconElement(id, flags);
                 if (element.isIconAvailable())
                     return Flags.wrap(element, flags);
