@@ -187,10 +187,18 @@ public class AttributeHelpers {
 
     public static List<ItemStack> getItemItems(ItemStack stack, boolean returnStack) {
         NbtCompound nbt = stack.getNbt();
-        if (stack.isEmpty() || nbt == null || !nbt.contains("BlockEntityTag")) return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+        if (stack.isEmpty() || nbt == null)
+            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+        if (nbt.contains("Items", NbtElement.LIST_TYPE))
+            return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE) );
+        if (!nbt.contains("BlockEntityTag"))
+            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
         nbt = nbt.getCompound("BlockEntityTag");
-        if (!nbt.contains("Items", NbtElement.LIST_TYPE)) return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
-        NbtList list = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
+        if (!nbt.contains("Items", NbtElement.LIST_TYPE))
+            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+        return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE) );
+    }
+    private static List<ItemStack> getItemItemsInternal(ItemStack stack, NbtList list) {
         List<ItemStack> items = new ArrayList<>(list.size());
 
         for(int i = 0; i < list.size(); ++i) {

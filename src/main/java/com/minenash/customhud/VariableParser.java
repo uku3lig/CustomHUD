@@ -1236,6 +1236,7 @@ public class VariableParser {
 
     private static SpecialSupplierElement.Entry getSpecialSupplierElements(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "difficulty" -> DIFFICULTY;
             case "max_fps" -> MAX_FPS;
             case "profile_keybind" -> PROFILE_KEYBIND;
             case "hour24", "hours25" -> { enabled.time = true; yield TIME_HOUR_24; }
@@ -1367,7 +1368,7 @@ public class VariableParser {
             case "target_block_powers", "target_powers" , "tbpowers" -> {enabled.world = enabled.targetBlock = true; yield TARGET_BLOCK_POWERS;}
 //            case "target_block_items", "tbitems" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_ITEMS;}
 //            case "target_block_items_compact", "tbic" -> {enabled.targetBlock = enabled.world = true; yield TARGET_BLOCK_COMPACT_ITEMS;}
-            case "target_fluid_props", "target_fluid_properties", "tfp" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
+            case "target_fluid_props", "target_fluid_properties", "tfprops" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_STATES;}
             case "target_fluid_tags", "tft" -> {enabled.world = enabled.targetFluid = true; yield TARGET_FLUID_TAGS;}
             case "attributes" -> PLAYER_ATTRIBUTES;
             case "target_entity_attributes", "target_entity_attrs", "teas" -> {enabled.targetEntity = true; yield TARGET_ENTITY_ATTRIBUTES;}

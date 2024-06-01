@@ -123,7 +123,10 @@
       <li> Example:  <code>{effects, &quot;{index} - {icon} {name}\n&quot;}</code></li>
     </ul></details></li>
     <li>Each list will have a set of child variables that only work within the list<ul>
-      <li>Available to all lists: <code>{i}</code> / <code>{index}</code> , <code>{raw}</code> , <code>{count}</code></li>
+      <li>Available to all lists: <ul>
+        <li><code>{i}</code> / <code>{index}</code> , <code>{raw}</code> , <code>{size}</code></li>
+        <li><code>{exit}</code> (exits the list prematurely), <code>{continue}</code> (skips to the next iteration)</li>
+      </ul></li>
       <li>The <code>e:</code> and likewise can be changed with the <code>-pre:&lt;prefix&gt;</code> list flag.<ul>
         <li>Ex: <code>{effects -pre:eff, &quot;{eff:name}&quot;}</code></li>
       </ul></li>
@@ -157,12 +160,25 @@
     <li><b>Functions (all trig uses degrees)</b><ul>
       <li>Ex: <code>{set:test, sin(30+60)}</code></li>
       <li>Functions added:<ul>
-        <li><code>sin</code> , <code>cos</code> , <code>tan</code> , <code>csc</code> , <code>sec</code> , <code>cot</code></li>
-        <li><code>asin</code> , <code>acos</code> , <code>atan</code> , <code>acsc</code> , <code>asec</code> , <code>acot</code></li>
         <li><code>round</code> , <code>ceil</code> , <code>floor</code></li>
         <li><code>sqrt</code> , <code>abs</code></li>
+        <li><code>sin</code> , <code>cos</code> , <code>tan</code> , <code>csc</code> , <code>sec</code> , <code>cot</code></li>
+        <li><code>asin</code> , <code>acos</code> , <code>atan</code> , <code>acsc</code> , <code>asec</code> , <code>acot</code></li>
       </ul></li>
     </ul></li>
+    <li><details><summary><b>If no value (<code>??</code>) Operator</b></summary><ul>
+      <li>Sometimes a variable doesn't have a usable number value. For example, <code>{target_block_x}</code> when not
+        looking at a block. It can't use 0 or -1 as those are valid coordinates. So it instead gives the value of NaN
+        (Not a Number).
+      </li>
+      <li>When you do math with NaN value, the result will always be NaN</li>
+      <li>The <code>??</code> allows you to give a "default" value</li>
+      <li>Example: <ul>
+        <li><code>Sharpness: {$ item:main:enchant:sharpness:lvl + 10}</code></li>
+        <li>If the item doesn't have sharpness it'll show as "Sharpness: -", but what if we wanted to treat not having the enchantment as having it at level 0</li>
+        <li><code>Sharpness: {$ (item:main:enchant:sharpness:lvl ?? 0) + 10}</code></li>
+      </ul></li>
+    </ul></details></li>
     <li><details><summary> <b>Math symbol aliases for operators.</b> For the lols, not really useful </summary><ul>
       <li>And: <code>&Wedge;</code> , <code>&wedge;</code></li>
       <li>Or: <code>&xvee;</code> , <code>&vee;</code></li>
@@ -291,13 +307,15 @@
     <li>Sets the scale of the CustomHud hud to as if it was a specific gui scale.<br>This avoids weirdness that can happen when using <code>==Scale: &lt;scale&gt;==</code></li>
     <li><code>==NiceScale: 2==</code> will render as if the GUI Scale in Minecraft&#39;s settings was set to 2.</li>
     <li><code>==NiceScale: +1==</code> with your GUI Scale set to 3, the profile will render as if it was set to 4.</li>
-  </ul>
-  </li>
+  </ul></li>
   <li><code>==HudScale: &lt;(+/-) GUI Scale&gt;==</code><ul>
     <li>Same as NiceScale, but for minecraft&#39;s vanilla hud (hotbar, scoreboard, bossbar, etc)</li>
-  </ul>
-  </li>
-  <li><details><summary><code>==ConvertLineBreak: &lt;true|false&gt;==</code></summary><ul>
+  </ul></li>
+  <li><code>==IgnoreBlankLines: &lt;true|false&gt;==</code> <ul>
+    <li>Default: false</li>
+    <li>Blank lines in the profile file are ignored. If true and you want to add blank lines, use <cod>\n</cod></li>
+  </ul></li>
+  <li><details><summary><code>==ConvertLineBreaks: &lt;true|false&gt;==</code></summary><ul>
     <li>If true it treats line breaks in the profile file as NewLines in the hud</li>
     <li>If false, only <code>\n</code> in the profiles will add NewLines to the hud </li>
     <li>This means that you can also change theming part way through a line. </li>
@@ -367,8 +385,8 @@
 
 <details class="list">
   <summary><div>
-    <code>target_block_properties</code> / <code>target_block_props</code> / <code>tbp</code><br>
-    <code>target_fluid_properties</code> / <code>target_fluid_props</code> / <code>tfp</code>
+    <code>target_block_properties</code> / <code>target_block_props</code> / <code>tbprops</code><br>
+    <code>target_fluid_properties</code> / <code>target_fluid_props</code> / <code>tfprops</code>
   </div></summary>
   <div class="child_vars">
     &emsp;Child Vars:<ul>
@@ -389,13 +407,27 @@
   </div>
 </details>
 
+  <details class="list">
+    <summary><div>
+      <code>target_block_powers</code> / <code>tbpowers</code>
+    </div></summary>
+    <div class="child_vars">
+      &emsp;Child Vars:<ul>
+      <li><code>{r:dir}</code> / <code>{r:direction}</code></li>
+      <li><code>{r:odir}</code> / <code>{r:opposite_direction}</code></li>
+      <li><code>{r:power}</code></li>
+      <li><code>{r:strong}</code> / <code>{r:strong_power}</code></li>
+    </ul>
+    </div>
+  </details>
+
 <details class="list" id="villager_offers">
   <summary><div> <code>target_villager_offers</code> , <code>tvo</code> </div></summary>
   <div class="child_vars">
     &emsp;Child Vars:<ul>
     <li><code>{o:uses}</code>,<code>{o:max_uses}</code></li>
     <li><code>{o:special_price}</code>,<code>{o:demand_bonus}</code>,<code>{o:price_multiplier}</code></li>
-    <li><p><code>{o:disabled}</code>,<code>{o:can_afford}</code></p>
+    <li><p><code>{o:disabled}</code>,<code>{o:can_afford}</code> (will also look into shulker boxes)</p>
     </li>
     <li><p><code>{o:first:&lt;method&gt;}</code></p>
     </li>
@@ -440,6 +472,7 @@
     <div style="display: flex">
     <div style="margin-right: 8px">
       <code>items</code><br>
+      <code>items_unpacked</code><br>
       <code>all_items</code><br>
       <code>quipped_items</code><br>
       <code>armor_items</code><br>
@@ -448,6 +481,7 @@
     </div>
     <div>
       - Hotbar + Inventory. Stacks are combined<br>
+      - Hotbar + Inventory. Includes items from Shulker Boxes / similar<br>
       - Hotbar + Inventory + Armor + Offhand<br>
       - Armor + Mainhand + Offhand<br>
       - Armor<br>
@@ -466,6 +500,7 @@
     <li><code>{i:dur_color}</code> , <code>{i:durability_color}</code> (See new color feature)</li>
     <li><code>{i:unbreakable}</code> , <code>{i:repair_cost}</code> , <code>{i:hide_flags}</code></li>
     <li><code>{i:rarity}</code> (The name of rarity, can also be used with the new color feature)</li>
+    <li><code>{i:armor_slot}</code> (which armor slot the item can go in)</li>
     <li><code>{i:icon}</code> </li>
     <li>List Var <code>i:enchants</code> (See <code>i:enchants</code> section above)</li>
     <li>List Var <code>i:lore</code> with child var <code>{lore:line}</code></li>
@@ -474,7 +509,9 @@
     <li>List Var <code>i:can_destroy</code> and <code>i:can_place_on</code><ul>
       <li>Children <code>{c:name}</code> , <code>{c:id}</code></li>
     </ul></li>
-    <li>List Var <code>tags</code> with children <code>{t:name}</code> and <code>{t:id}</code></li>
+    <li>List Var <code>i:tags</code> with children <code>{t:name}</code> and <code>{t:id}</code></li>
+    <li>List Var <code>i:items</code> (items stored in stuff like Shulker Boxes). Same child vars.</li>
+    <li>List Var <code>i:items_compact</code> (items stored in stuff like Shulker Boxes, compacted). Same child vars.</li>
     <li><code>i:enchant:&lt;id&gt;:&lt;method&gt;</code><ul>
       <li>Ex: <code>i:enchant:sharpness:full</code></li>
       <li>Methods:<ul>
@@ -725,9 +762,13 @@
   <li><code>{toggle:&lt;name&gt;}</code> Ex: <code>{toggle:test}</code><ul>
     <li>Set the keybind for the toggle in the new config screen.</li>
   </ul></li>
+  <li><code>{gliding}</code> Flying using an elytra</li>
   <li><code>{slime_chunk:&lt;seed&gt;}</code><ul>
     <li>You should still use <code>{slime_chunk}</code> in singleplayer</li>
   </ul></li>
+  <li><code>{difficulty} - Peaceful/easy/normal/hard</code></li>
+  <li><code>Selected hotbar slot: {hotbar_slot}</code> (1-9) and {hotbar_index}</code> (0-8)</li>
+  <li><code>Shows the amount of a specific item you have as a icon: {itemcount_icon:&lt;item_id&gt;}</code></li>
   <li>Target Block and Target Fluid:<ul>
     <li><code>{target_block_color}</code> / <code>{target_color}</code> / <code>{tbc}</code> (Map Color)</li>
     <li><code>{target_fluid_color}</code> / <code>{tfc}</code></li>
@@ -756,6 +797,22 @@
     <li><code>{tve}</code> / <code>{target_villager_xp}</code> , <code>{tven}</code> / <code>{target_villager_xp_needed}</code></li>
     <li><code>{tveb}</code> / <code>{target_villager_xp_bar}</code></li>
     <li>Don't forget about the List Var <a href="#villager_offers"><code>target_villager_offers</code> , <code>tvo</code> </a>!</li>
+  </ul></details></li>
+  <li><details><summary>How much redstone power a block is receiving</summary><ul>
+    <li>Total:<code>{target_block_power}</code>, <code>{target_power}</code>, <code>{tbp}</code></li>
+    <li>Total Strong:<code>{target_block_strong_power}</code>, <code>{target_strong_power}</code>, <code>{tbsp}</code></li>
+    <li><code>{target_block_power_north}</code>, <code>{target_power_north}</code>, <code>{tbpn}</code></li>
+    <li><code>{target_block_power_south}</code>, <code>{target_power_south}</code>, <code>{tbps}</code></li>
+    <li><code>{target_block_power_east}</code>, <code>{target_power_east}</code>, <code>{tbpe}</code></li>
+    <li><code>{target_block_power_west}</code>, <code>{target_power_west}</code>, <code>{tbpw}</code></li>
+    <li><code>{target_block_power_up}</code>, <code>{target_power_up}</code>, <code>{tbpu}</code></li>
+    <li><code>{target_block_power_down}</code>, <code>{target_power_down}</code>, <code>{tbpd}</code></li>
+    <li><code>{target_block_strong_power_north}</code>, <code>{target_strong_power_north}</code>, <code>{tbspn}</code></li>
+    <li><code>{target_block_strong_power_south}</code>, <code>{target_strong_power_south}</code>, <code>{tbsps}</code></li>
+    <li><code>{target_block_strong_power_east}</code>, <code>{target_strong_power_east}</code>, <code>{tbspe}</code></li>
+    <li><code>{target_block_strong_power_west}</code>, <code>{target_strong_power_west}</code>, <code>{tbspw}</code></li>
+    <li><code>{target_block_strong_power_up}</code>, <code>{target_strong_power_up}</code>, <code>{tbspu}</code></li>
+    <li><code>{target_block_strong_power_down}</code>, <code>{target_strong_power_down}</code>, <code>{tbspd}</code></li>
   </ul></details></li>
   <li>Added Hooked Entity yaw/pitch<ul>
     <li><code>{hedy}</code> / <code>{hooked_entity_direction_yaw}</code></li>
@@ -798,6 +855,7 @@
     </ul></details></li>
   </ul></li>
   <li><details><summary>More methods for <code>{item:&lt;slot&gt;:&lt;method&gt;}</code></summary><ul>
+    <li><code>armor_slot</code> (which armor slot the item can go in)</li>
     <li><code>unbreakable</code> , <code>repair_cost</code> , <code>hide_flags</code></li>
     <li>List <code>attributes</code> / <code>attrs</code> (See Item Attribute Modifiers child vars)</li>
     <li>List <code>info_shown</code> and <code>info_hidden</code> with child <code>{ii:info}</code></li>
@@ -805,9 +863,10 @@
       <li>Children <code>{c:name}</code> , <code>{c:id}</code></li>
     </ul></li>
     <li>List <code>tags</code> with children <code>{t:name}</code> and <code>{t:id}</code></li>
-    <li><code>effect:&lt;id&gt;:&lt;method&gt;</code><ul>
+    <li>List Var <code>items</code> (items stored in stuff like Shulker Boxes). Same child vars as <code>items</code>.</li>
+    <li>List Var <code>items_compact</code> (items stored in stuff like Shulker Boxes, compacted). Same child vars as <code>items</code>.</li>
+    <li><code>enchant:&lt;id&gt;:&lt;method&gt;</code><ul>
       <li>Ex: <code>item:main:enchant:sharpness:full</code><ul>
-        <li>If the item doesn&#39;t have sharpness, it&#39;s level is 0</li>
         <li>Methods:<ul>
           <li><code>name</code> , <code>id</code></li>
           <li><code>level</code> / <code>lvl</code> (like IV)</li>
@@ -818,6 +877,11 @@
           <li><code>rarity</code></li>
         </ul></li>
       </ul></li>
+    </ul></li>
+  </ul></details></li>
+  <li><details><summary>Get a block's property: <code>{target_block_property:&lt;property&gt;:&lt;method&gt;}</code> / <code>{tbprop:&lt;property&gt;:&lt;method&gt;}</code></summary><ul>
+    <li>Methods:<ul>
+      <li><code>{p:name}</code> , <code>{p:value}</code> , <code>{p:type}</code> , <code>{p:full_type}</code></li>
     </ul></li>
   </ul></details></li>
   <li>Attribute Variables<ul>
@@ -958,6 +1022,7 @@
     </ul></li>
     <li><code>{getmacro:&lt;name&gt;}</code></li>
   </ul></li>
+  <li><code>{window_focused}</code> : If the minecraft window is focused or in the background</li>
   <li>F3 Parity:<ul>
     <li>
       <details><summary>Client/Server Chunk Variables</summary><ul>
@@ -998,6 +1063,7 @@
 
 <h3 id="variable-changes"> Variable Changes </h3>
 <ul>
+  <li> <code>{itemcount:&lt;item_id&gt;}</code> now works with number variable flags</li>
   <li> <code>{tps}</code> and <code>{ms_ticks}</code> / <code>{ticks_ms}</code> are now estimated when on servers!!! </li>
   <li> <code>{ms_ticks}</code> no longer bottoms out at 50ms in singleplayer </li>
   <li> Improvements to <code>{space:#}</code> <ul>
@@ -1050,6 +1116,7 @@
     <ul><li>Pass flags into elements that take flags, and wrap string variables in <code>Flags.wrap(&lt;ELEMENT&gt;, flags)</code></li></ul></li>
   <li> <code>CustomHudRegistry.registerParser("id", (str, context) -> &lt;ELEMENT&gt;)</code> </li>
   <li> <code>CustomHudRegistry.registerList("name", "default prefix", () -> &lt;LIST&gt;, &lt;ATTRIBUTER&gt;)</code> </li>
+  <li> <code>CustomHudRegistry.registerList("name", "default prefix", () -> &lt;LIST&gt;, &lt;ATTRIBUTER&gt;, &lt;ENABLED&gt;)</code> </li>
   <li> Also <code>unregister()</code> and <code>has()</code> for all 3 kinds of registries </li>
 </ul>
 
@@ -1064,6 +1131,7 @@
   <li> Fixes to icons and rich item icons </li>
   <li> No longer crashes when using BooleanSupplierElement before minecraft's options are loaded </li>
   <li> Fixed text positioning when line spacing is 0 </li>
+  <li> <code>{ var_name}</code> (whitespace before the name) now works</li>
 </ul>
 </div>
 

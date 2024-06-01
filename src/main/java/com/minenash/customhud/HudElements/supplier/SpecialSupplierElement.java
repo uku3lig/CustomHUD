@@ -27,13 +27,17 @@ public class SpecialSupplierElement implements HudElement {
         return dir == Direction.EAST || dir == Direction.SOUTH;
     }
 
+    public static final Entry DIFFICULTY = of( () -> client.world.getDifficulty().getName(),
+                                               () -> client.world.getDifficulty().getId(),
+                                               () -> client.world.getDifficulty().getId() != 0);
+
     public static final Entry MAX_FPS = of( () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE ? null : client.options.getMaxFps().getValue().toString(),
-            () ->  client.options.getMaxFps().getValue(),
-            () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE);
+                                            () ->  client.options.getMaxFps().getValue(),
+                                            () -> client.options.getMaxFps().getValue() == GameOptions.MAX_FRAMERATE);
 
     public static final Entry PROFILE_KEYBIND = of( () -> getActive() == null ? "" : getActive().keyBinding.getBoundKeyLocalizedText().getString(),
-            () -> getActive() == null ? 0 : getActive().keyBinding.boundKey.getCode(),
-            () -> getActive() != null && !getActive().keyBinding.isUnbound());
+                                                    () -> getActive() == null ? 0 : getActive().keyBinding.boundKey.getCode(),
+                                                    () -> getActive() != null && !getActive().keyBinding.isUnbound());
 
     public static final Entry TIME_HOUR_24 = of( () -> String.format("%02d", ComplexData.timeOfDay / 1000),
                                                  () -> ComplexData.timeOfDay / 1000,

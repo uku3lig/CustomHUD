@@ -6,7 +6,6 @@ import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.complex.SubtitleTracker;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -16,12 +15,7 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackManager;
@@ -189,7 +183,8 @@ public class ListSuppliers {
     public static final Function<ItemStack,List<?>> ITEM_HIDDEN = (stack) -> getHideFlagStrings(stack, false);
     public static final Function<ItemStack,List<?>> ITEM_SHOWN = (stack) -> getHideFlagStrings(stack, true);
     public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
-    public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> compactItems( getItemItems(stack, false) );
+    public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> getItemItems(stack, false);
+    public static final Function<ItemStack,List<?>> ITEM_ITEMS_COMPACT = (stack) -> compactItems( getItemItems(stack, false) );
 
     public static final Function<BossBar,List<?>> BOSSBAR_PLAYERS = (bar) -> {
         if (CLIENT.getServer() == null || !(bar instanceof CommandBossBar cboss)) return Collections.EMPTY_LIST;

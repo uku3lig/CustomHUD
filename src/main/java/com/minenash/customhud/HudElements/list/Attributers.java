@@ -200,6 +200,7 @@ public class Attributers {
             case "info_hidden" -> new CreateListElement(sbp, sup, ITEM_HIDDEN, ITEM_INFO_INFO);
             case "tags" -> new CreateListElement(sbp, sup, ITEM_TAGS, TAG);
             case "items" -> new CreateListElement(sbp, sup, ITEM_ITEMS, ITEM2);
+            case "items_compact" -> new CreateListElement(sbp, sup, ITEM_ITEMS_COMPACT, ITEM2);
             default -> null;
         };
     };
@@ -522,9 +523,7 @@ public class Attributers {
             CustomHud.LOGGER.error("[CustomHud] [FIX ME]: Attributer not in Map!");
             return null;
         }
-        String[] flagParts = part.split(" ");
-        String prefix = VariableParser.getPrefix(entry.provider(), flagParts, profile.name, line, part);
-        part = flagParts[0];
+        String prefix = flags.listPrefix.isEmpty() ? defaultPrefix(entry.provider()) : flags.listPrefix;
 
         int dotIndex = part.lastIndexOf('.');
         if (dotIndex != -1)
@@ -533,7 +532,7 @@ public class Attributers {
         ParseContext context = new ParseContext(profile, line, null, null);
         HudElement element = attributer.get(prefix, finalProviderID, () -> ListManager.getValue(finalProviderID), part, flags, context);
         if (element instanceof CreateListElement cle) {
-            String attr = dotIndex == -1 ? "" : flagParts[0].substring(dotIndex + 1);
+            String attr = dotIndex == -1 ? "" : part.substring(dotIndex + 1);
             cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, line);
         }
         return element;
