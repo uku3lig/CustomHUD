@@ -75,7 +75,7 @@ public class VariableParser {
 
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
-    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.: -]*))?.*");
+    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.: /-]*))?.*");
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
 
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProviderSet listProviders) {
@@ -1670,6 +1670,7 @@ public class VariableParser {
 
         String src = matcher.group(1) == null ? "" : matcher.group(1);
         String method = matcher.group(2) == null ? "" : matcher.group(2);
+        String oMethod = method;
         int dotIndex = method.lastIndexOf('.');
         if (dotIndex != -1 && dotIndex > method.lastIndexOf(":"))
             method = method.substring(0, dotIndex);
@@ -1690,7 +1691,7 @@ public class VariableParser {
             return new IgnoreErrorElement();
         }
 
-        String[] flagParts = method.split(" ");
+        String[] flagParts = oMethod.split(" ");
         Flags flags = Flags.parse(profile.name, debugLine, flagParts);
         ParseContext context = new ParseContext(profile, debugLine, enabled, null);
         HudElement element = attributer.get(flags.listPrefix, null, supplier.apply(value), flagParts[0], flags, context);

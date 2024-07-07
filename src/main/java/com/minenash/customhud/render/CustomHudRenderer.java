@@ -165,6 +165,8 @@ public class CustomHudRenderer {
                         for (int j = ei+1; j < elements.size(); j++) {
                             if (elements.get(j) instanceof FunctionalElement.AdvanceList pl && pl.providerID.equals(cl.providerID))
                                 break;
+                            if (elements.get(j) instanceof FunctionalElement.PopList pl && pl.providerID.equals(cl.providerID))
+                                break;
                             ei++;
                         }
                     }
