@@ -77,7 +77,7 @@ public class SlotItemIconElement extends IconElement {
             }
 
             if (showCooldown) {
-                float f = client.player == null ? 0.0F : client.player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getTickDelta());
+                float f = client.player == null ? 0.0F : client.player.getItemCooldownManager().getCooldownProgress(stack.getItem(), client.getRenderTickCounter().getTickDelta(false));
                 if (f > 0.0F) {
                     int k = MathHelper.floor(16.0F * (1.0F - f));
                     int l = k + MathHelper.ceil(16.0F * f);

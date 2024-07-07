@@ -163,7 +163,7 @@ public class VariableParser {
             if (element != null)
                 return element;
 
-            Identifier statId = Registries.CUSTOM_STAT.get(new Identifier(stat));
+            Identifier statId = Registries.CUSTOM_STAT.get(Identifier.of(stat));
             if (Stats.CUSTOM.hasStat(statId)) {
                 enabled.updateStats = true;
                 return new CustomStatElement(Stats.CUSTOM.getOrCreateStat(statId), flags);
@@ -188,7 +188,7 @@ public class VariableParser {
 //            for (int i = 0; i <= matcher.groupCount(); i++)
 //                System.out.println(i + ": " + matcher.group(i));
 
-            Identifier id = new Identifier(matcher.group(1) + ".png");
+            Identifier id = Identifier.of(matcher.group(1) + ".png");
             int u = matcher.group(2) == null ? 0 : Integer.parseInt(matcher.group(2));
             int v = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
             int w = matcher.group(4) == null ? -1 : Integer.parseInt(matcher.group(4));
@@ -205,7 +205,7 @@ public class VariableParser {
             part = part.substring(part.indexOf(':')+1);
 
             try {
-                Item item = Registries.ITEM.get(new Identifier(part));
+                Item item = Registries.ITEM.get(Identifier.of(part));
                 if (item == Items.AIR)
                     Errors.addError(profile, debugLine, original, ErrorType.UNKNOWN_ITEM_ID, part);
                 else
@@ -285,7 +285,7 @@ public class VariableParser {
         if (!stat.startsWith(prefix))
             return null;
 
-        Optional<?> entry = registry.getOrEmpty( new Identifier(stat.substring(prefix.length())) );
+        Optional<?> entry = registry.getOrEmpty( Identifier.of(stat.substring(prefix.length())) );
         if (entry.isPresent()) {
             enabled.updateStats = true;
             return new TypedStatElement(type, entry.get(), flags);

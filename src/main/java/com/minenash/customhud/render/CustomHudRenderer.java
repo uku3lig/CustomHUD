@@ -25,7 +25,7 @@ public class CustomHudRenderer {
 
     public static Identifier font;
 
-    public static void render(DrawContext context, float _tickDelta) {
+    public static void render(DrawContext context, RenderTickCounter tick) {
 
         Profile profile = CustomHud.getActiveProfile();
         if (profile == null || client.getDebugHud().shouldShowDebugHud())
@@ -37,8 +37,7 @@ public class CustomHudRenderer {
 
         context.getMatrices().push();
         context.getMatrices().scale(profile.baseTheme.scale, profile.baseTheme.scale, 1);
-        BufferBuilder bgBuilder = Tessellator.getInstance().getBuffer();
-        bgBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder bgBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (Section section : profile.sections) {
             HudTheme theme = profile.baseTheme;
@@ -126,7 +125,9 @@ public class CustomHudRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        BufferRenderer.drawWithGlobalProgram(bgBuilder.end());
+        BuiltBuffer bb = bgBuilder.endNullable();
+        if (bb != null)
+            BufferRenderer.drawWithGlobalProgram(bb);
         RenderSystem.disableBlend();
 
         for (RenderPiece piece : pieces) {
@@ -172,10 +173,10 @@ public class CustomHudRenderer {
         float g = (float)(color >> 16 & 255) / 255.0F;
         float h = (float)(color >> 8 & 255) / 255.0F;
         float j = (float)(color & 255) / 255.0F;
-        builder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(g, h, j, f).next();
-        builder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(g, h, j, f).next();
-        builder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(g, h, j, f).next();
-        builder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(g, h, j, f).next();
+        builder.vertex(matrix, (float)x1, (float)y2, 0.0F).color(g, h, j, f);
+        builder.vertex(matrix, (float)x2, (float)y2, 0.0F).color(g, h, j, f);
+        builder.vertex(matrix, (float)x2, (float)y1, 0.0F).color(g, h, j, f);
+        builder.vertex(matrix, (float)x1, (float)y1, 0.0F).color(g, h, j, f);
     }
 
 

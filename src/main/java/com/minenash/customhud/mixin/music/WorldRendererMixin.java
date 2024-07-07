@@ -1,8 +1,10 @@
 package com.minenash.customhud.mixin.music;
 
 import com.minenash.customhud.MusicAndRecordTracker;
+import net.minecraft.block.jukebox.JukeboxSong;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Final;
@@ -19,9 +21,9 @@ public class WorldRendererMixin {
 
     @Shadow @Final private Map<BlockPos, SoundInstance> playingSongs;
 
-    @Inject(method = "playSong", at = @At("TAIL"))
-    private void getRecord(SoundEvent song, BlockPos songPosition, CallbackInfo ci) {
-        MusicAndRecordTracker.setRecord(song, playingSongs.get(songPosition));
+    @Inject(method = "playJukeboxSong", at = @At("TAIL"))
+    private void getRecord(RegistryEntry<JukeboxSong> song, BlockPos jukeboxPos, CallbackInfo ci) {
+        MusicAndRecordTracker.setRecord(song, playingSongs.get(jukeboxPos), jukeboxPos);
     }
 
 }
