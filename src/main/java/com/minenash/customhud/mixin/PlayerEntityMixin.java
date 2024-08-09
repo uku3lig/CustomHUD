@@ -18,6 +18,7 @@ public class PlayerEntityMixin {
         if (((Object)this) == MinecraftClient.getInstance().player && ComplexData.targetEntityHitPos != null) {
             ComplexData.lastHitEntity = target;
             ComplexData.lastHitEntityDist = ComplexData.targetEntityHitPos.distanceTo(MinecraftClient.getInstance().getCameraEntity().getPos());
+            ComplexData.lastHitEntityTime = System.currentTimeMillis();
         }
     }
 

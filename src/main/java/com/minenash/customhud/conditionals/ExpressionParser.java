@@ -251,6 +251,7 @@ public class ExpressionParser {
     private static final Function<Double,Double> ASEC = (in) -> round (RD * Math.acos(1 / in) );
     private static final Function<Double,Double> ACOT = (in) -> round (RD * Math.atan(1 / in) );
     private static final Function<Double,Double> ROUND = (in) -> (double) Math.round(in);
+    private static final Function<Double,Double> LOG_2 = (in) -> Math.log(in) / Math.log(2);
     private static double round(double in) { return Math.round(in * 100000) / 100000D; }
 
     private static Pair<Token,Integer> getFunctionStart(char[] chars, int i) {
@@ -284,10 +285,14 @@ public class ExpressionParser {
             case "round" -> ROUND;
             case "ceil" -> Math::ceil;
             case "floor" -> Math::floor;
-            case "ln" -> Math::log;
-            case "log" -> Math::log10;
+            case "ln", "log_e" -> Math::log;
+            case "ln1p", "log_e1p" -> Math::log1p;
+            case "log2" -> LOG_2;
+            case "log", "log10" -> Math::log10;
             case "sqrt" -> Math::sqrt;
             case "abs" -> Math::abs;
+
+
             default -> null;
         };
         return func == null ? null : new Pair<>(new Token(TokenType.START_PREN, func), funcStr.length()+1);

@@ -407,6 +407,15 @@ public class Attributers {
         default -> null;
     };
 
+    public static final Attributer CHAT_MESSAGE = (sbp, pid, sup, name, flags, context) -> switch (name) {
+        case "type" -> new Str(sup, CHAT_MESSAGE_TYPE);
+        case "text" -> new Tex(sup, CHAT_MESSAGE_TEXT);
+//        case "player" ->
+//        case "time" ->
+        case "time_ago" -> new Num(sup, CHAT_MESSAGE_TIME_AGO, flags);
+        default -> null;
+    };
+
 
     public static final Map<ListProvider, Attributer> ATTRIBUTER_MAP = new HashMap<>();
     public static final Map<Attributer, String> DEFAULT_PREFIX = new HashMap<>();
@@ -449,6 +458,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(DISABLED_DATA_PACKS, PACK);
         ATTRIBUTER_MAP.put(RECORDS, RECORD);
         ATTRIBUTER_MAP.put(TARGET_VILLAGER_OFFERS, OFFER);
+        ATTRIBUTER_MAP.put(CHAT_MESSAGES, CHAT_MESSAGE);
 
         DEFAULT_PREFIX.put(EFFECT, "e");
         DEFAULT_PREFIX.put(PLAYER, "p");
@@ -483,6 +493,7 @@ public class Attributers {
         DEFAULT_PREFIX.put(RECORD, "r");
         DEFAULT_PREFIX.put(OFFER, "o");
         DEFAULT_PREFIX.put(ITEM_CONVERTABLE_TAG_ENTRY, "t");
+        DEFAULT_PREFIX.put(CHAT_MESSAGE, "cm");
     }
 
     public static HudElement get(ListProviderSet set, String name, Flags flags, Profile profile, int line) {

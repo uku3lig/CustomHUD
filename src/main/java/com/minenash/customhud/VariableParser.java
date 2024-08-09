@@ -357,7 +357,9 @@ public class VariableParser {
         }
 
         if (part.startsWith("bar"))
-            return barElement(part, profile, debugLine, enabled, original, listProviders);
+            return barElement(true, part, profile, debugLine, enabled, original, listProviders);
+        if (part.startsWith("nb_bar"))
+            return barElement(false, part.substring(3), profile, debugLine, enabled, original, listProviders);
 
         if (part.startsWith("space:")) {
             String widthStr = part.substring(6).trim();
@@ -378,7 +380,7 @@ public class VariableParser {
                 return new SetValueElement(valueName, new Operation.Literal(0));
             }
             Operation op = ExpressionParser.parseExpression(part.substring(commaIndex+1).trim(), part, profile, debugLine, enabled, listProviders, false);
-            return new SetValueElement(part.substring(4,commaIndex), op);
+            return new SetValueElement(part.substring(4,commaIndex).toLowerCase(), op);
         }
 
         if (part.startsWith("setmacro:") || part.startsWith("setm:")) {
@@ -516,7 +518,7 @@ public class VariableParser {
         }
 
         if (part.startsWith("get:")) {
-            String valueName = part.substring(4);
+            String valueName = part.substring(4).toLowerCase();
             return new GetValueElement(valueName, flags);
         }
 
@@ -744,7 +746,7 @@ public class VariableParser {
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
             case "target_villager_xp_bar", "tveb": {
                 enabled.targetEntity = enabled.targetVillager = true;
-                return new ProgressBarIcon( new Operation.Element(new NumberSupplierElement(VILLAGER_XP, new Flags())),
+                return new ProgressBarIcon( true, new Operation.Element(new NumberSupplierElement(VILLAGER_XP, new Flags())),
                                             new Operation.Element(new NumberSupplierElement(VILLAGER_XP_NEEDED, new Flags())),
                                             ProgressBarIcon.VILLAGER_GREEN, flags);
             }
@@ -1141,6 +1143,7 @@ public class VariableParser {
             case "target_entity_z", "tez" -> {enabled.targetEntity = true; yield TARGET_ENTITY_Z;}
             case "target_entity_distance", "ted" -> {enabled.targetEntity = true; yield TARGET_ENTITY_DISTANCE;}
             case "last_hit_distance", "lhd" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_DISTANCE;}
+            case "last_hit_time_ago", "lhta" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_AGO;}
             case "hooked_entity_x", "hex" -> HOOKED_ENTITY_X;
             case "hooked_entity_y", "hey" -> HOOKED_ENTITY_Y;
             case "hooked_entity_z", "hez" -> HOOKED_ENTITY_Z;
@@ -1254,6 +1257,7 @@ public class VariableParser {
             case "facing_towards_pn_sign" -> FACING_TOWARDS_PN_SIGN;
             case "gamemode" -> GAMEMODE;
             case "active_renderer" -> ACTIVE_RENDERER;
+            case "perspective" -> CAMERA_PERSPECTIVE;
             default -> null;
         };
     }
@@ -1394,6 +1398,7 @@ public class VariableParser {
             case "data_packs", "datapacks" -> DATA_PACKS;
             case "disabled_data_packs", "disabled_datapacks" -> DISABLED_DATA_PACKS;
             case "records" -> {enabled.music = true; yield RECORDS;}
+            case "chat_messages" -> CHAT_MESSAGES;
 
             default -> null;
         };
@@ -1473,7 +1478,7 @@ public class VariableParser {
         return new ListProviderSet.Entry(provider, randomUUID(), prefix);
     }
 
-    public static HudElement barElement(String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
+    public static HudElement barElement(boolean background, String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
         if (part.indexOf(',') == -1) {
             Errors.addError(profile.name, debugLine, original, ErrorType.MALFORMED_BAR, null);
             return null;
@@ -1506,7 +1511,7 @@ public class VariableParser {
         if (collinIndex != -1)
             style = ProgressBarIcon.getStyle(parts.get(0).substring(collinIndex+1));
 
-        return new ProgressBarIcon(op1, op2, style, flags);
+        return new ProgressBarIcon(background, op1, op2, style, flags);
 
     }
 

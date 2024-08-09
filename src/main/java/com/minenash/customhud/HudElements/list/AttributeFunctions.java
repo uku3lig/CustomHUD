@@ -10,6 +10,8 @@ import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
@@ -19,7 +21,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -85,7 +86,8 @@ public class AttributeFunctions {
 
     // PLAYERS (From PlayerList)
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_NAME = (player) -> player.getProfile().getName();
-    public static final Function<PlayerListEntry,Text> PLAYER_ENTRY_DISPLAY_NAME = (player) -> player.getDisplayName();
+    public static final Function<PlayerListEntry,Text> PLAYER_ENTRY_DISPLAY_NAME = (player) -> player.getDisplayName() != null
+            ? player.getDisplayName().copy() : Team.decorateName(player.getScoreboardTeam(), Text.literal(player.getProfile().getName()));
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_UUID = (player) -> player.getProfile().getId().toString();
     public static final Function<PlayerListEntry,String> PLAYER_ENTRY_TEAM = (player) -> player.getScoreboardTeam().getName(); //TODO: CHANGE TEAM VAR
     public static final Function<PlayerListEntry,Number> PLAYER_ENTRY_LATENCY = (player) -> player.getLatency();
@@ -434,7 +436,15 @@ public class AttributeFunctions {
     public static final Function<ItemConvertible,Identifier> TAG_ENTRY_ID = (convertible) -> Registries.ITEM.getId(convertible.asItem());
 
 
-
+    //CHAT MESSAGES
+    public static final Function<ChatHudLine,Text> CHAT_MESSAGE_TEXT = (line) -> line.content();
+    public static final NumEntry<ChatHudLine> CHAT_MESSAGE_TIME_AGO = Num.of(HMS, (line) -> line == null ? null : CLIENT.inGameHud.getTicks() - line.creationTick());
+    public static final Function<ChatHudLine,String> CHAT_MESSAGE_TYPE = (line) -> {
+        if (line == null) return null;
+        if (line.indicator() == null) return "Normal";
+        if (line.indicator() == MessageIndicator.singlePlayer()) return "Singpleplayer";
+        return line.indicator().loggedName();
+    };
 
     // HELPER METHODS
 

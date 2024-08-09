@@ -100,6 +100,16 @@ public class SpecialSupplierElement implements HudElement {
                                                     () -> INSTANCE.hasRenderer() ? INSTANCE.getRenderer().getClass().getSimpleName().length() : 7,
                                                     () -> INSTANCE.hasRenderer());
 
+    public static final Entry CAMERA_PERSPECTIVE = of (
+            () -> switch (client.options.getPerspective()) {
+                case FIRST_PERSON -> "First Person";
+                case THIRD_PERSON_BACK -> "Third Person (Back)";
+                case THIRD_PERSON_FRONT -> "Third Person (Front)";
+            },
+            () -> client.options.getPerspective().ordinal(),
+            () -> client.options.getPerspective().ordinal() != 0
+    );
+
 
     public record Entry(Supplier<String> stringSupplier, Supplier<Number> numberSupplier, Supplier<Boolean> booleanSupplier) {}
     public static Entry of(Supplier<String> stringSupplier, Supplier<Number> numberSupplier, Supplier<Boolean> booleanSupplier) {

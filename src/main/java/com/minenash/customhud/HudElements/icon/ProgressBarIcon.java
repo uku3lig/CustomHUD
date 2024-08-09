@@ -15,12 +15,14 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ProgressBarIcon extends IconElement {
 
+    private final boolean background;
     private final Operation numerator;
     private final Operation denominator;
     private final BarStyle style;
 
-    public ProgressBarIcon(Operation numerator, Operation denominator, BarStyle style, Flags flags) {
+    public ProgressBarIcon(boolean background, Operation numerator, Operation denominator, BarStyle style, Flags flags) {
         super(flags, style instanceof VillagerTextureStyle ? 102 : 182);
+        this.background = background;
         this.numerator = numerator;
         this.denominator = denominator;
         this.style = style == null ? DEFAULT : style;
@@ -37,7 +39,7 @@ public class ProgressBarIcon extends IconElement {
         matrices.scale(scale, scale, 0);
         rotate(matrices, 182, 5);
 
-        style.render(context, (float) MathHelper.clamp(numerator.getValue() / denominator.getValue(), 0, 1));
+        style.render(context, (float) MathHelper.clamp(numerator.getValue() / denominator.getValue(), 0, 1), background);
 
         matrices.pop();
     }
@@ -111,16 +113,22 @@ public class ProgressBarIcon extends IconElement {
     public static BarStyle VILLAGER_GREEN = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_current"));
     public static BarStyle VILLAGER_WHITE = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_result"));
     public interface BarStyle {
-        void render(DrawContext context, float progress);
+        void render(DrawContext context, float progress, boolean background);
     }
 
 
     public static class BossBarStyle implements BarStyle {
         private final BossBar bossBar;
         public BossBarStyle(Color color, Style style) {this.bossBar = new BossbarIcon.BasicBar(color, style);}
-        public void render(DrawContext context, float progress) {
+        public void render(DrawContext context, float progress, boolean background) {
             bossBar.setPercent(progress);
-            CLIENT.inGameHud.getBossBarHud().renderBossBar(context, 0, 0, bossBar);
+            var bbh = CLIENT.inGameHud.getBossBarHud();
+            if (background)
+                bbh.renderBossBar(context, 0, 0, bossBar, 182, bbh.BACKGROUND_TEXTURES, bbh.NOTCHED_BACKGROUND_TEXTURES);
+            int i = MathHelper.lerpPositive(bossBar.getPercent(), 0, 182);
+            if (i > 0) {
+                bbh.renderBossBar(context, 0, 0, bossBar, i, bbh.PROGRESS_TEXTURES, bbh.NOTCHED_PROGRESS_TEXTURES);
+            }
         }
     }
 
@@ -128,8 +136,9 @@ public class ProgressBarIcon extends IconElement {
         private final Identifier fg;
         private final Identifier bg;
         public TextureStyle(Identifier fg, Identifier bg) {this.fg = fg; this.bg = bg;}
-        public void render(DrawContext context, float progress) {
-            context.drawGuiTexture(bg, 0, 0, 182, 5);
+        public void render(DrawContext context, float progress, boolean background) {
+            if (background)
+                context.drawGuiTexture(bg, 0, 0, 182, 5);
             if (progress > 0)
                 context.drawGuiTexture(fg, 182, 5, 0, 0, 0, 0, (int)(progress*182), 5);
 
@@ -140,8 +149,9 @@ public class ProgressBarIcon extends IconElement {
     public static class VillagerTextureStyle implements BarStyle {
         private final Identifier fg;
         public VillagerTextureStyle(Identifier fg) {this.fg = fg;}
-        public void render(DrawContext context, float progress) {
-            context.drawGuiTexture(EXPERIENCE_BAR_BACKGROUND_TEXTURE, 0, 0, 102, 5);
+        public void render(DrawContext context, float progress, boolean background) {
+            if (background)
+                context.drawGuiTexture(EXPERIENCE_BAR_BACKGROUND_TEXTURE, 0, 0, 102, 5);
             if (progress > 0)
                 context.drawGuiTexture(fg, 102, 5, 0, 0, 0, 0, (int)(progress*102), 5);
         }

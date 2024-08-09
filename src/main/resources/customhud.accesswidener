@@ -50,3 +50,9 @@ accessible class net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator <init> ()V
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator get (J)J
 accessible field net/minecraft/client/util/InputUtil$Key type Lnet/minecraft/client/util/InputUtil$Type;
+accessible method net/minecraft/client/gui/hud/BossBarHud renderBossBar (Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/entity/boss/BossBar;I[Lnet/minecraft/util/Identifier;[Lnet/minecraft/util/Identifier;)V
+accessible field net/minecraft/client/gui/hud/BossBarHud BACKGROUND_TEXTURES [Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/hud/BossBarHud PROGRESS_TEXTURES [Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/hud/BossBarHud NOTCHED_BACKGROUND_TEXTURES [Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/hud/BossBarHud NOTCHED_PROGRESS_TEXTURES [Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;

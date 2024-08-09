@@ -168,7 +168,9 @@ public class ListSuppliers {
             List<ResourcePackProfile> profiles = Lists.newArrayList(manager.getProfiles());
             profiles.removeAll(manager.getEnabledProfiles());
             return profiles;
-        }
+        },
+
+        CHAT_MESSAGES = () -> CLIENT.inGameHud.getChatHud().messages
     ;
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();

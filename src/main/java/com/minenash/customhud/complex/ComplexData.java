@@ -58,6 +58,7 @@ public class ComplexData {
     public static Vec3d targetEntityHitPos = null;
     public static Entity lastHitEntity = null;
     public static double lastHitEntityDist = Double.NaN;
+    public static long lastHitEntityTime = -1;
     public static String[] sounds = null;
     public static String[] clientChunkCache = null;
     public static int timeOfDay = -1;

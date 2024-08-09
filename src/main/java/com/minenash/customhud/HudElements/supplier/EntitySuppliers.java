@@ -45,6 +45,14 @@ public class EntitySuppliers {
     public static final Supplier<Text> LAST_HIT_ENTITY_NAME = () -> name(ComplexData.lastHitEntity);
     public static final Supplier<String> LAST_HIT_ENTITY_UUID = () -> uuid(ComplexData.lastHitEntity);
     public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_DISTANCE = of( () -> ComplexData.lastHitEntityDist, 1);
+    public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_AGO = of( () -> (System.currentTimeMillis() - ComplexData.lastHitEntityTime) / 1000D, 0, secs -> {
+        int seconds = secs % 60;
+        int minutes = (secs / 60) % 60;
+        int hours = (secs / 60 / 60);
+        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
+    });
+
+
 
     public static final Supplier<String> VEHICLE_ENTITY = () -> type(veh());
     public static final Supplier<Identifier> VEHICLE_ENTITY_ID = () -> id(veh());
