@@ -596,6 +596,8 @@ public class VariableParser {
             part = part.substring(part.indexOf(':')+1);
 
             try {
+                if (!icon && part.startsWith("#"))
+                    return new ItemTagCountElement(new Identifier(part.substring(1)), flags);
                 Item item = Registries.ITEM.get(new Identifier(part));
                 if (item != Items.AIR)
                     return Flags.wrap(icon ? new ItemCountIconElement(item, flags) : new ItemCountElement(item, flags), flags);
