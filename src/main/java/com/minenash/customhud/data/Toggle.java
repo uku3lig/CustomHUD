@@ -11,8 +11,8 @@ public class Toggle {
     public final String name;
     public final boolean direct;
     public final List<Integer> lines;
-    public final KeyBinding modifier;
-    public final KeyBinding key;
+    public KeyBinding modifier;
+    public KeyBinding key;
 
     public boolean inProfile;
     public boolean value;

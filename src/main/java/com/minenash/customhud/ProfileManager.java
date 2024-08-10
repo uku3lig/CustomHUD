@@ -64,6 +64,14 @@ public class ProfileManager {
                         entry.getValue().inProfile = false;
                         profile.toggles.put(entry.getKey(), t);
                     }
+
+                    Toggle tt = profile.toggles.get(entry.getKey());
+                    if (tt != null) {
+                        Toggle oldT = entry.getValue();
+                        tt.value = oldT.getValue();
+                        tt.key = oldT.key;
+                        tt.modifier = oldT.modifier;
+                    }
                 }
 
                 profiles.set(i, profile);

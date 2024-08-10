@@ -18,7 +18,6 @@ import com.minenash.customhud.errors.Errors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.UUID;
 
 public class MultiLineStacker {
 
@@ -102,7 +101,6 @@ public class MultiLineStacker {
     }
 
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
-
         List<String> parts = VariableParser.partitionConditional(list);
         list = parts.get(0);
 
@@ -126,10 +124,16 @@ public class MultiLineStacker {
         }
 
         if (provider == null && !listProviders.isEmpty()) {
-            HudElement e = Attributers.get(listProviders, list, new Flags(), profile, line);
+            String[] nameParts = list.split(" ");
+            String first = nameParts[0];
+            Flags flags = Flags.parse(profile.name, line, nameParts);
+            HudElement e = Attributers.getFromPrefix(listProviders, first, flags, profile, line);
+            if (e == null)
+                e = Attributers.get(listProviders, first, flags, profile, line);
             if (e instanceof FunctionalElement.CreateListElement cle) {
                 provider = cle.entry;
             }
+
         }
 
         listProviders.push(provider);

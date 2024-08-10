@@ -177,12 +177,14 @@ public class CustomHudRenderer {
                 }
             }
 
+            int lastY = Integer.MIN_VALUE;
             for (;initialPiecesOffset < pieces.size(); initialPiecesOffset++) {
                 RenderPiece piece = pieces.get(initialPiecesOffset);
                 int left = section.getStartX(right, piece.lineWith, maxLineWidth);
 
-                if (dynamicWidth && piece.x == 0) {
+                if (dynamicWidth && piece.x == 0 && piece.y != lastY) {
                     addLineBg(context, bgBuilder, left-2, piece.y - 2, left + piece.lineWith + 2, piece.y + 9 + theme.lineSpacing - 2, piece.bgColor);
+                    lastY = piece.y;
                 }
 
                 piece.x += left;

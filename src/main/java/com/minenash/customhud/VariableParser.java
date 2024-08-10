@@ -77,6 +77,8 @@ public class VariableParser {
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
     private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.: /-]*))?.*");
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
+    private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
+
 
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProviderSet listProviders) {
 //        System.out.println("[Line " + debugLine+ "] '" + id + "'");
@@ -503,12 +505,12 @@ public class VariableParser {
             return el;
 
 
-        String[] flagParts = part.split(" ");
+        Matcher matcher = IS_LIST_PATTERN.matcher(part);
+        String[] flagParts = (matcher.matches() ? matcher.group(1) : part).split(" ");
         part = flagParts[0];
-        Flags flags = part.endsWith(",") ? new Flags() : Flags.parse(profile.name, debugLine, flagParts);
-
+        Flags flags = Flags.parse(profile.name, debugLine, flagParts);
         if (!listProviders.isEmpty()) {
-            HudElement element = Attributers.getFromPrefix(listProviders, part.endsWith(",") ? part.substring(0, part.length()-1) : part, flags, profile, debugLine );
+            HudElement element = Attributers.getFromPrefix(listProviders, part, flags, profile, debugLine );
             if (element instanceof FunctionalElement.CreateListElement cle) {
                 String p = original.substring(1, original.length() - 1);
                 return listElement(cle.entry, p, p.indexOf(','), profile, debugLine, enabled, original, listProviders);
@@ -1290,7 +1292,7 @@ public class VariableParser {
         if (dotIndex != -1)
             providerName = providerName.substring(0, dotIndex);
 
-        ListProviderSet.Entry provider = getListProvider(providerName, profile, debugLine, enabled, original, listProviders);
+        ListProviderSet.Entry provider = getListProvider(parts.get(0), profile, debugLine, enabled, original, listProviders);
 
         if (provider == null)
             return null;

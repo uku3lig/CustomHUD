@@ -509,7 +509,7 @@ public class Attributers {
         for (int i = set.entries.size() - 1; i >= 0; i--) {
             ListProviderSet.Entry entry = set.entries.get(i);
             if (entry != null && part.startsWith(entry.prefix() + ":"))
-                return get0(entry, part, flags, profile, line);
+                return get0(entry, part.substring(part.indexOf(':')+1), flags, profile, line);
         }
         return null;
     }
@@ -519,7 +519,6 @@ public class Attributers {
             return null;
 
         UUID finalProviderID = entry.id();
-        part = part.substring(part.indexOf(':')+1);
 
         switch (part) {
             case "size", "c": return new NumberSupplierElement( () -> ListManager.getCount(finalProviderID), flags);
@@ -534,7 +533,7 @@ public class Attributers {
             CustomHud.LOGGER.error("[CustomHud] [FIX ME]: Attributer not in Map!");
             return null;
         }
-        String prefix = flags.listPrefix.isEmpty() ? defaultPrefix(entry.provider()) : flags.listPrefix;
+        String prefix = flags.listPrefix;
 
         int dotIndex = part.lastIndexOf('.');
         if (dotIndex != -1)
