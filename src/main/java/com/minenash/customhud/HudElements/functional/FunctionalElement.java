@@ -2,9 +2,7 @@ package com.minenash.customhud.HudElements.functional;
 
 import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
-import com.minenash.customhud.HudElements.list.Attributers;
-import com.minenash.customhud.HudElements.list.ListProvider;
-import com.minenash.customhud.HudElements.list.ListProviderSet;
+import com.minenash.customhud.HudElements.list.*;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
 import com.minenash.customhud.data.HudTheme;
@@ -45,6 +43,7 @@ public class FunctionalElement implements HudElement {
     }
 
     public static class NewLine extends FunctionalElement {}
+    public static class LineBreak extends NewLine {}
     public static class IgnoreNewLineIfSurroundedByNewLine extends FunctionalElement {}
 
     public interface XList extends ExecuteElement {}
@@ -71,6 +70,9 @@ public class FunctionalElement implements HudElement {
     public static class ContinueList extends FunctionalElement {
         public final UUID providerID;
         public ContinueList(UUID providerID) { this.providerID = providerID; }
+    }
+    public static boolean isList(HudElement element) {
+        return element instanceof XList || element instanceof ListElement || element instanceof FilteredListElement;
     }
 
     public static class CreateListElement extends FunctionalElement {

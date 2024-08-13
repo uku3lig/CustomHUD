@@ -70,7 +70,7 @@ public class CustomHudRenderer {
             int lineCount = 0;
             List<HudElement> elements = new ArrayList<>();
             for (HudElement e : section.elements)
-                lineCount += addElement(elements, e, profile.convertLineBreak);
+                lineCount += addElement(elements, e, true);
             outer:
             for (int j = 0; j < elements.size()-1; j++) {
                 if (elements.get(j) instanceof FunctionalElement.IgnoreNewLineIfSurroundedByNewLine

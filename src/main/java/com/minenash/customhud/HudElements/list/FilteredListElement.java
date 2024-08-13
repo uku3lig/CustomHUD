@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class FilteredListElement implements HudElement, MultiElement {
+public class FilteredListElement extends FunctionalElement implements HudElement, MultiElement {
 
     private final HudElement popList, advanceList;
 
@@ -77,19 +77,19 @@ public class FilteredListElement implements HudElement, MultiElement {
         return !multiline;
     }
 
-    @Override
-    public String getString() {
-        return getNumber().toString();
-    }
-
-    @Override
-    public Number getNumber() {
-        return provider.get().size();
-    }
-
-    @Override
-    public boolean getBoolean() {
-        return provider.get().isEmpty();
-    }
+//    @Override
+//    public String getString() {
+//        return getNumber().toString();
+//    }
+//
+//    @Override
+//    public Number getNumber() {
+//        return provider.get().size();
+//    }
+//
+//    @Override
+//    public boolean getBoolean() {
+//        return provider.get().isEmpty();
+//    }
 
 }

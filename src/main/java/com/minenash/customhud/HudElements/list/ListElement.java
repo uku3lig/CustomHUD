@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class ListElement implements HudElement, MultiElement {
+public class ListElement extends FunctionalElement implements HudElement, MultiElement {
 
     private final HudElement popList, advanceList;
 
@@ -67,20 +67,20 @@ public class ListElement implements HudElement, MultiElement {
         return !multiline;
     }
 
-    @Override
-    public String getString() {
-        return getNumber().toString();
-    }
-
-    @Override
-    public Number getNumber() {
-        return provider.get().size();
-    }
-
-    @Override
-    public boolean getBoolean() {
-        return !provider.get().isEmpty();
-    }
+//    @Override
+//    public String getString() {
+//        return getNumber().toString();
+//    }
+//
+//    @Override
+//    public Number getNumber() {
+//        return provider.get().size();
+//    }
+//
+//    @Override
+//    public boolean getBoolean() {
+//        return !provider.get().isEmpty();
+//    }
 
     public static class MultiLineBuilder {
         private static final ListProvider EMPTY = () -> Collections.EMPTY_LIST;

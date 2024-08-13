@@ -1,14 +1,22 @@
 package com.minenash.customhud.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.CustomHud;
+import com.minenash.customhud.data.DebugCharts;
+import com.minenash.customhud.data.Profile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.world.ClientWorld;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +33,12 @@ public abstract class MinecraftClientMixin {
     @Shadow private double gpuUtilizationPercentage;
 
     @Shadow @Final private Window window;
+
+    @Shadow @Nullable public Screen currentScreen;
+
+    @Shadow @Final public InGameHud inGameHud;
+
+    @Shadow @Nullable public ClientWorld world;
 
     @Redirect(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;wasPressed()Z"))
     public boolean readClick(KeyBinding instance) {
@@ -74,4 +88,17 @@ public abstract class MinecraftClientMixin {
         CustomHud.resourceTriggeredReload();
     }
 
+    @WrapOperation(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowRenderingChart()Z"))
+    public boolean shouldShowProfiler(DebugHud instance, Operation<Boolean> original) {
+        Profile p = ProfileManager.getActive();
+        return original.call(instance) ||
+                (!options.hudHidden && !inGameHud.getDebugHud().shouldShowDebugHud() && world != null
+                        && p != null && (p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
+    }
+
+    @WrapOperation(method = "drawProfilerResults", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/client/util/Window;getFramebufferWidth()I"))
+    public int moveProfilerToLeft(Window instance, Operation<Integer> original) {
+        Profile p = ProfileManager.getActive();
+        return p != null && p.leftChart == DebugCharts.PROFILER ? 360 : original.call(instance);
+    }
 }

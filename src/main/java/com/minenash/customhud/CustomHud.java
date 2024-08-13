@@ -10,6 +10,7 @@ import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
 import com.minenash.customhud.render.CustomHudRenderer;
+import com.minenash.customhud.render.CustomHudRenderer3;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -50,6 +51,9 @@ public class CustomHud implements ModInitializer {
 	public static final KeyBinding kb_cycleProfiles = registerKeyBinding("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
 	public static final KeyBinding kb_showErrors = registerKeyBinding("show_errors", GLFW.GLFW_KEY_B);
 
+	public static final KeyBinding SWITCH_RENDERER = registerKeyBinding("switch_renderer", GLFW.GLFW_KEY_KP_5);
+	public static boolean useNewRenderer = true;
+
 	private static KeyBinding registerKeyBinding(String binding, int defaultKey) {
 		return KeyBindingHelper.registerKeyBinding(new KeyBinding("key.custom_hud." + binding, InputUtil.Type.KEYSYM, defaultKey, "category.custom_hud"));
 	}
@@ -58,7 +62,13 @@ public class CustomHud implements ModInitializer {
 	public void onInitialize() {
 		UpdateChecker.check();
 
-		HudRenderCallback.EVENT.register(CustomHudRenderer::render);
+		HudRenderCallback.EVENT.register((context, tickDelta) -> {
+			if (useNewRenderer)
+				CustomHudRenderer3.render(context, tickDelta);
+			else
+				CustomHudRenderer.render(context, tickDelta);
+		});
+
 
 		ClientTickEvents.END_CLIENT_TICK.register(CustomHud::onTick);
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -123,6 +133,9 @@ public class CustomHud implements ModInitializer {
 
 
 		//TODO: Redo KeyBinds!
+		while (SWITCH_RENDERER.wasPressed()) {
+			useNewRenderer = !useNewRenderer;
+		}
 		while (kb_enable.wasPressed()) {
 			ProfileManager.enabled = !ProfileManager.enabled;
 			saveDelay = 100;

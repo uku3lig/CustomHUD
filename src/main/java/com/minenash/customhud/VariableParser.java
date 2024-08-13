@@ -93,8 +93,8 @@ public class VariableParser {
                 elements.add(element);
         }
 
-        if (line && profile.convertLineBreak && !(profile.ignoreBlankLines && basicallyEmpty(elements)) )
-            elements.add(new FunctionalElement.NewLine());
+        if (line)
+            elements.add(new FunctionalElement.LineBreak());
         return elements;
     }
 
@@ -909,6 +909,10 @@ public class VariableParser {
 
     private static Supplier<Boolean> getBooleanSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
+            case "new_renderer" -> NEW_RENDERER;
+
+
+
             case "profile_in_cycle"-> PROFILE_IN_CYCLE;
             case "vsync" -> VSYNC;
             case "sp", "singleplayer" -> SINGLEPLAYER;

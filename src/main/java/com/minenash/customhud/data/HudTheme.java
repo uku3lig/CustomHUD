@@ -11,6 +11,7 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class HudTheme {
     public enum ScaleMethod {DIRECT, GUI, RELATIVE_GUI}
+    public record Padding(int top, int bottom, int left, int right) {}
 
     public int bgColor = 0x44000000;
     public CHFormatting fgColor = new CHFormatting().color(0xffffffff,0xffffffff);
@@ -22,6 +23,14 @@ public class HudTheme {
     private ScaleMethod scaleMethod = ScaleMethod.DIRECT;
     public Integer hudScale = null;
     public boolean hudScaleRelative = false;
+    public Padding padding = new Padding(2, 1, 2, 2);
+
+    private boolean lineSpaced = false;
+    private boolean padded = false;
+
+    public boolean convertLineBreaks = true;
+    public boolean ignoreBlankLines = false;
+    public boolean ignoreLeadingSpace = false;
 
     private HudTheme(){}
 
@@ -34,9 +43,21 @@ public class HudTheme {
         newTheme.bgColor = bgColor;
         newTheme.fgColor = fgColor;
         newTheme.lineSpacing = lineSpacing;
-        newTheme.scale = scale;
         newTheme.font = font;
         newTheme.textShadow = textShadow;
+        newTheme.scale = scale;
+        newTheme.scaleMethod = scaleMethod;
+        newTheme.hudScale = hudScale;
+        newTheme.hudScaleRelative = hudScaleRelative;
+        newTheme.padding = padding;
+
+        newTheme.lineSpaced = lineSpaced;
+        newTheme.padded = padded;
+
+        newTheme.convertLineBreaks = convertLineBreaks;
+        newTheme.ignoreBlankLines = ignoreBlankLines;
+        newTheme.ignoreLeadingSpace = ignoreLeadingSpace;
+
         return newTheme;
     }
 
@@ -51,6 +72,11 @@ public class HudTheme {
     private static final Pattern TEXT_SHADOW_FLAG_PATTERN = Pattern.compile("textshadow: ?(true|false)");
     private static final Pattern ROTATION_FLAG_PATTERN = Pattern.compile("rotate: ?(-?\\d+), ?(-?\\d+), ?(-?\\d+)");
     private static final Pattern TRANSLATE_FLAG_PATTERN = Pattern.compile("translate: ?(-?\\d+), ?(-?\\d+), ?(-?\\d+)");
+    private static final Pattern PADDING_FLAG_PATTERN = Pattern.compile("padding: ?(-?\\d+)?(, ?(-?\\d+)?)?(, ?(-?\\d+)?)?(, ?(-?\\d+)?)?");
+
+    private static final Pattern CONVERT_LINE_BREAKS_PATTERN = Pattern.compile("convertlinebreaks?: ?(true|false)");
+    private static final Pattern IGNORE_BLANK_LINES_PATTERN = Pattern.compile("ignoreblanklines?: ?(true|false)");
+    private static final Pattern IGNORE_LEADING_SPACES = Pattern.compile("ignoreleadingspaces?: ?(true|false)");
 
     public boolean parse(boolean global, String line, String profileName, int lineNum) {
         line = line.toLowerCase();
@@ -73,8 +99,14 @@ public class HudTheme {
                 bgColor = 0x44000000 + color;
         }
 
-        else if (( matcher = SPACING_FLAG_PATTERN.matcher(line) ).matches())
+        else if (( matcher = SPACING_FLAG_PATTERN.matcher(line) ).matches()) {
+            if (padded) {
+                Errors.addError(profileName, lineNum, line, ErrorType.LINE_SPACING_AND_PADDING, "");
+                return true; //Not Really, but I add the error here
+            }
             lineSpacing = Integer.parseInt(matcher.group(1));
+            lineSpaced = true;
+        }
 
         else if (global && (  matcher = SCALE_FLAG_PATTERN.matcher(line) ).matches()) {
             scale = Float.parseFloat(matcher.group(1));
@@ -100,10 +132,51 @@ public class HudTheme {
         else if (( matcher = TEXT_SHADOW_FLAG_PATTERN.matcher(line) ).matches())
             textShadow = Boolean.parseBoolean(matcher.group(1));
 
+        else if (( matcher = PADDING_FLAG_PATTERN.matcher(line) ).matches()) {
+            if (lineSpaced) {
+                Errors.addError(profileName, lineNum, line, ErrorType.LINE_SPACING_AND_PADDING, "");
+                return true; //Not Really, but I add the error here
+            }
+            padded = true;
+
+            if (!matcher.group(4).isEmpty()) { //Top, Bottom, Left, Right
+                padding = new Padding(
+                        empty(matcher,1) ? padding.top : Integer.parseInt(matcher.group(1)),
+                        empty(matcher,3) ? padding.bottom : Integer.parseInt(matcher.group(3)),
+                        empty(matcher,5) ? padding.left : Integer.parseInt(matcher.group(5)),
+                        empty(matcher,7) ? padding.right : Integer.parseInt(matcher.group(7))
+                );
+            }
+            else if (!matcher.group(2).isEmpty()) { //Vertical, Horizontal
+                padding = new Padding(
+                        empty(matcher, 1) ? padding.top : Integer.parseInt(matcher.group(1)),
+                        empty(matcher, 1) ? padding.bottom : Integer.parseInt(matcher.group(1)),
+                        empty(matcher, 3) ? padding.left : Integer.parseInt(matcher.group(3)),
+                        empty(matcher, 3) ? padding.right : Integer.parseInt(matcher.group(3))
+                );
+            }
+            else if (!matcher.group(1).isEmpty()) { // All
+                int p = Integer.parseInt(matcher.group(1));
+                padding = new Padding(p, p, p, p);
+            }
+        }
+
+        else if (( matcher = CONVERT_LINE_BREAKS_PATTERN.matcher(line) ).matches() )
+            convertLineBreaks = Boolean.parseBoolean(matcher.group(1));
+
+        else if (( matcher = IGNORE_BLANK_LINES_PATTERN.matcher(line) ).matches() )
+            ignoreBlankLines = Boolean.parseBoolean(matcher.group(1));
+
+        else if (( matcher = IGNORE_LEADING_SPACES.matcher(line) ).matches() )
+            ignoreLeadingSpace = Boolean.parseBoolean(matcher.group(1));
+
         else
             return false;
 
         return true;
+    }
+    private static boolean empty(Matcher matcher, int group) {
+        return matcher.group(group) == null || matcher.group(group).isEmpty();
     }
 
     public float getScale() {

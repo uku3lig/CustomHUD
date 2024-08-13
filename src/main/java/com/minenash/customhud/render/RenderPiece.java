@@ -10,7 +10,7 @@ public class RenderPiece {
     public final int color;
     public final int bgColor;
     public final boolean shadow;
-    public final int y;
+    public int y;
     public int x;
     public int lineWith;
     public boolean shiftTextUp;
@@ -25,6 +25,12 @@ public class RenderPiece {
         this.bgColor = bgColor;
         this.shadow = shadow;
         this.shiftTextUp = shiftTextUp;
+    }
+
+    public RenderPiece adjust(int x, int y) {
+        this.x += x;
+        this.y += y;
+        return this;
     }
 
 }

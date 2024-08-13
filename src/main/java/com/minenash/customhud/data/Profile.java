@@ -29,9 +29,8 @@ public class Profile {
     public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+)?)? ?(?:, ?([-+]?\\d+)?)? ?(?:, ?(true|false)?)? ?(?:, ?(-?\\d+|fit|max)?)? ?(?:, ?(left|right|center)?)? ?==");
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
+    private static final Pattern DEBUG_CHART_PATTERN = Pattern.compile("== ?(left|right)chart: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
-    private static final Pattern CONVERT_LINE_BREAKS_PATTERN = Pattern.compile("== ?convertlinebreaks: ?(true|false) ?==");
-    private static final Pattern IGNORE_BLANK_LINES_PATTERN = Pattern.compile("== ?ignoreblanklines: ?(true|false) ?==");
     private static final Pattern GLOBAL_THEME_PATTERN = Pattern.compile("== ?(.+) ?==");
     private static final Pattern LOCAL_THEME_PATTERN = Pattern.compile("= ?(.+) ?=");
 
@@ -45,9 +44,10 @@ public class Profile {
 
     public HudTheme baseTheme = HudTheme.defaults();
     public float targetDistance = 20;
-    public boolean convertLineBreak = true;
-    public boolean ignoreBlankLines = false;
     public Crosshairs crosshair = Crosshairs.NORMAL;
+    public DebugCharts leftChart = DebugCharts.NONE;
+    public DebugCharts rightChart = DebugCharts.NONE;
+    public boolean charts = false;
     public EnumSet<DisableElement> disabled = EnumSet.noneOf(DisableElement.class);
     public Map<String,Toggle> toggles = new LinkedHashMap<>();
     public Map<String, Double> values = new LinkedHashMap<>();
@@ -140,6 +140,22 @@ public class Profile {
                     continue;
                 }
 
+                matcher = DEBUG_CHART_PATTERN.matcher(lineLC);
+                if (matcher.matches()) {
+                    DebugCharts chart = DebugCharts.parse(matcher.group(2), profile.enabled);
+                    if (chart != null) {
+                        if (matcher.group(1).equals("left"))
+                            profile.leftChart = chart;
+                        else
+                            profile.rightChart = chart;
+                        profile.charts = true;
+                    }
+                    else {
+                        Errors.addError(profileName, i, line, ErrorType.UNKNOWN_CHART, matcher.group(1));
+                    }
+                    continue;
+                }
+
                 matcher = DISABLE_PATTERN.matcher(lineLC);
                 if (matcher.matches()) {
                     if (!DisableElement.add(profile.disabled, matcher.group(1)))
@@ -147,20 +163,11 @@ public class Profile {
                     continue;
                 }
 
-                matcher = CONVERT_LINE_BREAKS_PATTERN.matcher(lineLC);
-                if (matcher.matches()) {
-                    profile.convertLineBreak = Boolean.parseBoolean(matcher.group(1));
-                    continue;
-                }
-                matcher = IGNORE_BLANK_LINES_PATTERN.matcher(lineLC);
-                if (matcher.matches()) {
-                    profile.ignoreBlankLines = Boolean.parseBoolean(matcher.group(1));
-                    continue;
-                }
-
                 matcher = GLOBAL_THEME_PATTERN.matcher(lineLC);
-                if (matcher.matches() && profile.baseTheme.parse(true, matcher.group(1), profileName, i))
+                if (matcher.matches() && profile.baseTheme.parse(true, matcher.group(1), profileName, i)) {
+                    localTheme = profile.baseTheme.copy();
                     continue;
+                }
 
             }
             Matcher matcher = SECTION_DECORATION_PATTERN.matcher(lineLC);
@@ -256,10 +263,21 @@ public class Profile {
 
         profile.sections.removeIf(s -> s.elements.isEmpty());
 
-        if (!profile.convertLineBreak) {
-            for (var s : profile.sections)
+        for (var s : profile.sections) {
+            for (int i = s.elements.size()-1; i >= 0; i--) {
+                if (s.elements.get(i) instanceof FunctionalElement.LineBreak)
+                    s.elements.remove(i);
+                else
+                    break;
+            }
+            if ( !(s.elements.get(s.elements.size()-1) instanceof FunctionalElement.NewLine))
                 s.elements.add(new FunctionalElement.NewLine());
         }
+
+//        if (!profile.convertLineBreak) {
+//            for (var s : profile.sections)
+//                s.elements.add(new FunctionalElement.NewLine());
+//        }
 
         return profile;
     }

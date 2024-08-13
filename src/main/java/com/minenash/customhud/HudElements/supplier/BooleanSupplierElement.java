@@ -1,5 +1,6 @@
 package com.minenash.customhud.HudElements.supplier;
 
+import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
@@ -25,6 +26,10 @@ public class BooleanSupplierElement implements HudElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static boolean isInDim(Identifier id) { return client.world.getRegistryKey().getValue().equals(id); }
     protected static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
+
+
+    public static final Supplier<Boolean> NEW_RENDERER = () -> CustomHud.useNewRenderer;
+
 
     public static final Supplier<Boolean> PROFILE_IN_CYCLE = () -> ProfileManager.getActive() != null && ProfileManager.getActive().cycle;
 

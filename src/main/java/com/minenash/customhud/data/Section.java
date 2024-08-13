@@ -22,6 +22,10 @@ public abstract class Section {
 
     public Section(Align align) { this.sAlign = this.textAlign = align; }
 
+    public int hPaddingOffset(HudTheme theme) {
+        return textAlign == Align.LEFT ? theme.padding.left() : textAlign == Align.RIGHT ? -theme.padding.right() : (theme.padding.left() - theme.padding.right())/2;
+    }
+
     public int getStartX(int right, int lineWidth, int maxLineWidth) {
         maxLineWidth = width >= 0 ? width : maxLineWidth;
         float base = switch (textAlign) {

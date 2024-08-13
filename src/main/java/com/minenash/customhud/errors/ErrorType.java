@@ -24,8 +24,10 @@ public enum ErrorType {
     UNKNOWN_THEME_FLAG ("Theming", "references/theming", "Unknown Theme Option or Value"),
     UNKNOWN_COLOR ("Theming", "references/theming", "Unknown Color: §e"),
     UNKNOWN_CROSSHAIR ("Theming", "references/theming", "Unknown Crosshair: §e"),
+    UNKNOWN_CHART ("Theming", "references/theming", "Unknown Debug Chart: §e"),
     UNKNOWN_HUD_ELEMENT ("CHANGE ME", "CHANGE ME", "Unknown Vanilla Hud Element: §e"),
     ILLEGAL_GLOBAL_THEME_FLAG("Theming", "references/theming", "This theme option is global-only"),
+    LINE_SPACING_AND_PADDING ("Theming", "references/theming", "LineSpacing can't be used with Padding, adjust padding instead"),
 
     INVALID_TIME_FORMAT ("Time Formatting", "references/real_time", "Invalid Time Format: "),
     UNKNOWN_STATISTIC ("Statistics", "references/stats", "Unknown Statistic: §e"),

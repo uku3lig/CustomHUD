@@ -12,6 +12,7 @@ import java.util.List;
 
 public class RomanNumeralElement implements HudElement, MultiElement {
 
+    private static final Identifier ROMAN_NUMERAL_FONT = new Identifier("custom_hud", "roman");
     private final HudElement base;
     private final boolean precision;
 
@@ -38,7 +39,7 @@ public class RomanNumeralElement implements HudElement, MultiElement {
     @Override
     public List<HudElement> expand() {
         HudTheme copy = CustomHudRenderer.theme.copy();
-        copy.font = Identifier.of("custom_hud", "roman");
+        copy.font = ROMAN_NUMERAL_FONT;
 
         return List.of(
                 new FunctionalElement.ChangeTheme(copy),
