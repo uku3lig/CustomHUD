@@ -20,7 +20,7 @@ public record NumberFlags(int precision, double scale, int zerofill, StatFormatt
         if (base != 10)
             return formatNonDecimalString(num);
         if (precision == 0 && zerofill == 0)
-            return Integer.toString((int)num);
+            return Long.toString((long)num);
 
         String zf = zerofill == 0 ? "" : "0" + zerofill;
         return String.format("%" + zf + "."+precision+"f", num);

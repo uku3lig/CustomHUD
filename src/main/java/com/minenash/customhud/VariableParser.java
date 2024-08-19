@@ -1117,6 +1117,7 @@ public class VariableParser {
 
             case "hour12", "hour", "hours12", "hours" -> { enabled.time = true; yield TIME_HOUR_12; }
 
+            case "unix_time" -> UNIX_TIME;
             case "real_year" -> REAL_YEAR;
             case "real_month" -> REAL_MONTH;
             case "real_day" -> REAL_DAY;

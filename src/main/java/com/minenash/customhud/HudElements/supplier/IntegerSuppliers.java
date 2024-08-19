@@ -239,6 +239,7 @@ public class IntegerSuppliers {
         return hour == 0 ? 12 : hour;
     };
 
+    public static final Supplier<Number> UNIX_TIME = System::currentTimeMillis;
     public static final Supplier<Number> REAL_YEAR = () -> LocalDate.now().getYear();
     public static final Supplier<Number> REAL_MONTH = () -> LocalDate.now().getMonthValue();
     public static final Supplier<Number> REAL_DAY = () -> LocalDate.now().getDayOfMonth();
