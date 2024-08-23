@@ -5,6 +5,7 @@ import com.minenash.customhud.HudElements.FuncElements.Num.NumEntry;
 import com.minenash.customhud.HudElements.FuncElements.Special.Entry;
 import com.minenash.customhud.HudElements.FuncElements.SpecialText.TextEntry;
 import com.minenash.customhud.HudElements.list.AttributeHelpers.ItemAttribute;
+import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
 import com.minenash.customhud.ducks.ResourcePackProfileMetadataDuck;
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
@@ -38,6 +39,7 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
@@ -445,6 +447,14 @@ public class AttributeFunctions {
         if (line.indicator() == MessageIndicator.singlePlayer()) return "Singpleplayer";
         return line.indicator().loggedName();
     };
+
+
+    // PIE PROFILERS
+    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_NAME = (timing) -> timing.name();
+    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_PATH = (timing) -> timing.path().replace('\u001e', '.');
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_PARENT = (timing) -> timing.parent();
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_TOTAL = (timing) -> timing.total();
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_COLOR = (timing) -> timing.color();
 
     // HELPER METHODS
 

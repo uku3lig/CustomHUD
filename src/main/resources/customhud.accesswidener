@@ -62,3 +62,4 @@ accessible field net/minecraft/client/gui/hud/DebugHud pingChart Lnet/minecraft/
 accessible field net/minecraft/client/gui/hud/DebugHud packetSizeChart Lnet/minecraft/client/gui/hud/debug/PacketSizeChart;
 accessible field net/minecraft/client/render/item/BuiltinModelItemRenderer skullModels Ljava/util/Map;
 accessible field net/minecraft/client/render/item/ItemRenderer builtinModelItemRenderer Lnet/minecraft/client/render/item/BuiltinModelItemRenderer;
+accessible field net/minecraft/client/MinecraftClient tickProfilerResult Lnet/minecraft/util/profiler/ProfileResult;

@@ -1,5 +1,6 @@
 package com.minenash.customhud.complex;
 
+import com.minenash.customhud.HudElements.list.AttributeHelpers;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.mixin.accessors.DebugHudAccessor;
 import com.minenash.customhud.registry.CustomHudRegistry;
@@ -29,6 +30,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.PerformanceLog;
+import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.village.TradeOfferList;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -100,6 +102,10 @@ public class ComplexData {
     public static UUID villagerUUID = null;
     public static int fakeVillagerInteract = 0;
     public static long villagerLastRequested = Long.MAX_VALUE;
+
+    public record ProfilerTimingWithPath(String path, String name, double parent, double total, int color, List<ProfilerTimingWithPath> entries) {}
+    public static List<ProfilerTimingWithPath> rootEntries = Collections.EMPTY_LIST;
+    public static Map<String,ProfilerTimingWithPath> allEntries = Collections.EMPTY_MAP;
 
     @SuppressWarnings("ConstantConditions")
     public static void update(Profile profile) {
@@ -275,9 +281,37 @@ public class ComplexData {
 
         }
 
+        if (profile.enabled.profilerTimings) {
+            if (CLIENT.tickProfilerResult == null) {
+                rootEntries = Collections.EMPTY_LIST;
+                allEntries = Collections.EMPTY_MAP;
+            }
+            else {
+                rootEntries = new ArrayList<>();
+                allEntries = new HashMap<>();
+                List<ProfilerTiming> timings = CLIENT.tickProfilerResult.getTimings("root");
+                timings.remove(0);
+                for (var entry : timings)
+                    rootEntries.add( getEntries(entry, "root\u001e" + entry.name) );
+            }
+
+        }
+
         SubtitleTracker.INSTANCE.setEnable(profile.enabled.subtitles);
         CustomHudRegistry.runComplexData();
 
+    }
+
+    public static ProfilerTimingWithPath getEntries(ProfilerTiming timing, String path) {
+        List<ProfilerTimingWithPath> entries = new ArrayList<>();
+        List<ProfilerTiming> timings = CLIENT.tickProfilerResult.getTimings(path);
+        timings.remove(0);
+        for (var entry : timings)
+            entries.add(getEntries(entry, path + "\u001e" + entry.name));
+
+        ProfilerTimingWithPath entry = new ProfilerTimingWithPath(path, timing.name, timing.parentSectionUsagePercentage, timing.totalUsagePercentage, timing.getColor(), entries);
+        allEntries.put(path, entry);
+        return entry;
     }
 
     public static void processLog(PerformanceLog log, double multiplier, int samples, double[] metrics) {
@@ -366,6 +400,7 @@ public class ComplexData {
         public boolean tpsMetrics = false;
         public boolean pingMetrics = false;
         public boolean packetMetrics = false;
+        public boolean profilerTimings = false;
 
         public boolean slots = false;
         public boolean targetVillager = false;

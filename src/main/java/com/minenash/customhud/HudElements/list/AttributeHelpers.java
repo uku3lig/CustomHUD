@@ -29,9 +29,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.ProfilerTiming;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static net.minecraft.item.ItemStack.DISPLAY_KEY;
@@ -42,6 +44,13 @@ public class AttributeHelpers {
     public static final Function<String, EntityAttribute> ENTITY_ATTR_READER = (src) -> Registries.ATTRIBUTE.get(Identifier.tryParse(src));
     public static final Function<String, ResourcePackProfile> DATA_PACK_READER = (src) -> {
         return CLIENT.getServer() == null ? null : CLIENT.getServer().getDataPackManager().getProfile(src);
+    };
+    private static final Pattern TIMING_PERIOD_TO_SPECIAL = Pattern.compile("(?<!\\\\)\\.");
+    public static final Function<String, String> PROFILER_TIMING_READER = (src) -> {
+        src = TIMING_PERIOD_TO_SPECIAL.matcher(src).replaceAll("\u001e");
+        if (!src.startsWith("root\u001e"))
+            src = "root\u001e" + src;
+        return src;
     };
 
     public static final Function<String, Integer> SLOT_READER = (src) -> {

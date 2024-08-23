@@ -16,6 +16,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.profiler.ProfileResult;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,6 +40,8 @@ public abstract class MinecraftClientMixin {
     @Shadow @Final public InGameHud inGameHud;
 
     @Shadow @Nullable public ClientWorld world;
+
+    @Shadow public abstract DebugHud getDebugHud();
 
     @Redirect(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;wasPressed()Z"))
     public boolean readClick(KeyBinding instance) {
@@ -93,12 +96,23 @@ public abstract class MinecraftClientMixin {
         Profile p = ProfileManager.getActive();
         return original.call(instance) ||
                 (!options.hudHidden && !inGameHud.getDebugHud().shouldShowDebugHud() && world != null
-                        && p != null && (p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
+                        && p != null && (p.enabled.profilerTimings || p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER) );
     }
 
     @WrapOperation(method = "drawProfilerResults", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/client/util/Window;getFramebufferWidth()I"))
     public int moveProfilerToLeft(Window instance, Operation<Integer> original) {
         Profile p = ProfileManager.getActive();
         return p != null && p.leftChart == DebugCharts.PROFILER ? 360 : original.call(instance);
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;tickProfilerResult:Lnet/minecraft/util/profiler/ProfileResult;"))
+    private ProfileResult yourHandlerMethod(MinecraftClient instance, Operation<ProfileResult> original) {
+        Profile p = ProfileManager.getActive();
+        if (getDebugHud().shouldShowDebugHud() ||
+                (!options.hudHidden && !inGameHud.getDebugHud().shouldShowDebugHud() && world != null
+                && p != null && (p.leftChart == DebugCharts.PROFILER || p.rightChart == DebugCharts.PROFILER)) ) {
+            return original.call(instance);
+        }
+        return null;
     }
 }

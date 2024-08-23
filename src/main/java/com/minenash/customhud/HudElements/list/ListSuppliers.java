@@ -26,6 +26,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 
@@ -170,8 +171,12 @@ public class ListSuppliers {
             return profiles;
         },
 
-        CHAT_MESSAGES = () -> CLIENT.inGameHud.getChatHud().messages
+        CHAT_MESSAGES = () -> CLIENT.inGameHud.getChatHud().messages,
+
+    PROFILER_TIMINGS = () -> ComplexData.rootEntries
     ;
+
+    public static final Function<ComplexData.ProfilerTimingWithPath,List<?>> TIMINGS_SUB_ENTRIES = ComplexData.ProfilerTimingWithPath::entries;
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
     public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> Arrays.asList(team.getPlayerList().toArray());

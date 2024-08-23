@@ -287,6 +287,19 @@ public class Attributers {
         default -> null;
     };
 
+    public static Attributer PROFILER_TIMING2;
+    public static final Attributer PROFILER_TIMING = (sbp, pid, sup, name, flags, context) -> switch (name) {
+        case "name" -> new Str(sup, TIMING_NAME);
+        case "path" -> new Str(sup, TIMING_PATH);
+        case "", "per_of_parent", "percent_of_parent" -> new Num(sup, TIMING_PER_OF_PARENT, flags);
+        case "per_of_total", "percent_of_total" -> new Num(sup, TIMING_PER_OF_TOTAL, flags);
+        case "color" -> new Num(sup, TIMING_COLOR, flags);
+        case "entries" -> new CreateListElement(sbp, sup, TIMINGS_SUB_ENTRIES, PROFILER_TIMING2);
+        default -> null;
+    };
+    static {
+        PROFILER_TIMING2 = PROFILER_TIMING;}
+
     public static final Attributer MOD_AUTHOR = (sbp, pid, sup, name, flags, context) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
     public static final Attributer MOD_CONTRIBUTOR = (sbp, pid, sup, name, flags, context) -> name.isEmpty() || name.equals("contributor") ? new Str(sup, DIRECT) : null;
     public static final Attributer MOD_CREDIT = (sbp, pid, sup, name, flags, context) -> name.isEmpty() || name.equals("credit") ? new Str(sup, DIRECT) : null;
@@ -449,6 +462,7 @@ public class Attributers {
         ATTRIBUTER_MAP.put(PLAYER_SCOREBOARD_SCORES, SCOREBOARD_SCORE);
         ATTRIBUTER_MAP.put(BOSSBARS, BOSSBAR);
         ATTRIBUTER_MAP.put(ALL_BOSSBARS, BOSSBAR);
+        ATTRIBUTER_MAP.put(PROFILER_TIMINGS, PROFILER_TIMING);
         ATTRIBUTER_MAP.put(MODS, MOD);
         ATTRIBUTER_MAP.put(ALL_ROOT_MODS, MOD);
         ATTRIBUTER_MAP.put(ALL_MODS, MOD);
@@ -482,6 +496,8 @@ public class Attributers {
         DEFAULT_PREFIX.put(SCOREBOARD_OBJECTIVE, "o");
         DEFAULT_PREFIX.put(SCOREBOARD_SCORE, "ss");
         DEFAULT_PREFIX.put(BOSSBAR, "b");
+        DEFAULT_PREFIX.put(PROFILER_TIMING, "pt");
+        DEFAULT_PREFIX.put(PROFILER_TIMING2, "pt");
         DEFAULT_PREFIX.put(MOD_AUTHOR, "ma");
         DEFAULT_PREFIX.put(MOD_CONTRIBUTOR, "mc");
         DEFAULT_PREFIX.put(MOD_CREDIT, "mc");

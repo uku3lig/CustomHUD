@@ -80,6 +80,7 @@ public class VariableParser {
     private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
 
 
+
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProviderSet listProviders) {
 //        System.out.println("[Line " + debugLine+ "] '" + id + "'");
 
@@ -1400,6 +1401,7 @@ public class VariableParser {
             case "scores" -> PLAYER_SCOREBOARD_SCORES;
             case "bossbars" -> BOSSBARS;
             case "all_bossbars" -> ALL_BOSSBARS;
+            case "profiler_timings" -> {enabled.profilerTimings = true; yield PROFILER_TIMINGS;}
             case "mods" -> CustomHud.MODMENU_INSTALLED ? MODS : ListProvider.REGUIRES_MODMENU;
             case "all_root_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_ROOT_MODS : ListProvider.REGUIRES_MODMENU;
             case "all_mods" -> CustomHud.MODMENU_INSTALLED ? ALL_MODS : ListProvider.REGUIRES_MODMENU;
@@ -1672,6 +1674,11 @@ public class VariableParser {
         if (part.startsWith("data_pack:") || part.startsWith("datapack:"))
             return attrElement(part, DATA_PACK_READER, false, (pack) -> () -> pack,
                     PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_METHOD, profile, debugLine, enabled, original );
+
+        if (part.startsWith("profiler_timing:")) {
+            return attrElement(part, PROFILER_TIMING_READER, false, path -> () -> ComplexData.allEntries.get(path),
+                    PROFILER_TIMING, null, ErrorType.UNKNOWN_PROFILER_TIMING_PROPERTY, profile, debugLine, enabled, original);
+        }
 
         return null;
     }

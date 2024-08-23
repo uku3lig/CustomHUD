@@ -52,6 +52,7 @@ public enum ErrorType {
     UNKNOWN_SCORE_METHOD("CHANGE ME", "references/CHANGE ME", "Unknown Score Method: §e"),
     UNKNOWN_MOD_METHOD("CHANGE ME", "references/CHANGE ME", "Unknown Mod Method: §e"),
     UNKNOWN_PACK_METHOD("CHANGE ME", "references/CHANGE ME", "Unknown Pack Method: §e"),
+    UNKNOWN_PROFILER_TIMING_PROPERTY("CHANGE ME", "references/CHANGE ME", "Unknown Profiler Time Property: §e"),
     //TODO FIX ME
     UNKNOWN_ICON ("Icons", "references/icons", "Unknown item/texture: §e"),
 
