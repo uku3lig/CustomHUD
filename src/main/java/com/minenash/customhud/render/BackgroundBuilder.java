@@ -60,7 +60,8 @@ public class BackgroundBuilder {
                     piece.x = maxWidth/2 - piece.width/2;
         }
         else {
-            bgPieces.add( nonDynamicBgPiece );
+            if (nonDynamicBgPiece != null)
+                bgPieces.add( nonDynamicBgPiece );
             int width = isSet ? sectionWidth : maxWidth;
             for (var piece : bgPieces)
                 piece.width = width;
