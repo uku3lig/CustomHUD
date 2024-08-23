@@ -41,7 +41,7 @@ public class CHFormatting {
         this.color &= f.colorMask ^ INVERT;
         this.color |= f.color & f.colorMask;
         this.colorMask |= f.colorMask;
-        if ( (f.formatting & RESET) != 0)
+        if ( (f.formatting & RESET) != 0 && !theme.persistentFormatting)
             this.formatting = NONE;
         else
             this.formatting |= f.formatting;

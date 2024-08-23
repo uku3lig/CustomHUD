@@ -18,6 +18,7 @@ public class HudTheme {
     public int lineSpacing = 2;
     public Identifier font = null;
     public boolean textShadow = true;
+    public boolean persistentFormatting = false;
 
     private float scale = 1;
     private ScaleMethod scaleMethod = ScaleMethod.DIRECT;
@@ -57,6 +58,7 @@ public class HudTheme {
         newTheme.convertLineBreaks = convertLineBreaks;
         newTheme.ignoreBlankLines = ignoreBlankLines;
         newTheme.ignoreLeadingSpace = ignoreLeadingSpace;
+        newTheme.persistentFormatting = persistentFormatting;
 
         return newTheme;
     }
@@ -68,6 +70,7 @@ public class HudTheme {
     private static final Pattern HUDSCALE_FLAG_PATTERN = Pattern.compile("hudscale: ?(\\+)? ?(-?\\d+)");
     private static final Pattern COLOR_FLAG_PATTERN = Pattern.compile("(back|fore)groundcolou?r: ?(0x|#)?([0-9a-fA-F]+|none)");
     private static final Pattern COLOR_FLAG_PATTERN_STR = Pattern.compile("(back|fore)groundcolou?r: ?(.*)");
+    private static final Pattern PERSISTEMT_FORMATTING_FLAG_PATTERN = Pattern.compile("persistentformatting: ?(true|false)");
     private static final Pattern FONT_FLAG_PATTERN = Pattern.compile("font: ?(\\w*:?\\w+)");
     private static final Pattern TEXT_SHADOW_FLAG_PATTERN = Pattern.compile("textshadow: ?(true|false)");
     private static final Pattern ROTATION_FLAG_PATTERN = Pattern.compile("rotate: ?(-?\\d+), ?(-?\\d+), ?(-?\\d+)");
@@ -169,6 +172,9 @@ public class HudTheme {
 
         else if (( matcher = IGNORE_LEADING_SPACES.matcher(line) ).matches() )
             ignoreLeadingSpace = Boolean.parseBoolean(matcher.group(1));
+
+        else if (( matcher = PERSISTEMT_FORMATTING_FLAG_PATTERN.matcher(line) ).matches() )
+            persistentFormatting = Boolean.parseBoolean(matcher.group(1));
 
         else
             return false;
@@ -312,7 +318,7 @@ public class HudTheme {
             case "§m" -> CHFormatting.STRIKE;
             case "§n" -> CHFormatting.UNDERLINE;
             case "§o" -> CHFormatting.ITALIC;
-            case "§r" -> CHFormatting.RESET;
+            case "§r" -> CHFormatting.FULL_RESET;
             default -> null;
         };
         return formatting == null ? null : new CHFormatting().format(formatting);
