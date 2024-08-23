@@ -28,6 +28,7 @@ public enum ErrorType {
     UNKNOWN_HUD_ELEMENT ("CHANGE ME", "CHANGE ME", "Unknown Vanilla Hud Element: §e"),
     ILLEGAL_GLOBAL_THEME_FLAG("Theming", "references/theming", "This theme option is global-only"),
     LINE_SPACING_AND_PADDING ("Theming", "references/theming", "LineSpacing can't be used with Padding, adjust padding instead"),
+    ZERO_SCALE ("Theming", "references/theming", "Scale can not be 0"),
 
     INVALID_TIME_FORMAT ("Time Formatting", "references/real_time", "Invalid Time Format: "),
     UNKNOWN_STATISTIC ("Statistics", "references/stats", "Unknown Statistic: §e"),

@@ -49,13 +49,15 @@ public abstract class IconElement extends FunctionalElement {
         matrices.translate(-renderWidth/2, -renderHeight/2, 0);
     }
 
-    public void renderItemStack(DrawContext context, int x, int y, ItemStack stack) {
+    public void renderItemStack(DrawContext context, int x, int y, ItemStack stack, boolean fitInLine) {
         MatrixStack matrices = context.getMatrices();
         matrices.push();
         matrices.translate(x + shiftX, y + shiftY - 2, 0);
+        int size = fitInLine ? 11 : 16;
         if (!referenceCorner)
-            matrices.translate(0, -(11*scale-11)/2, 0);
-        matrices.scale(11/16F * scale, 11/16F * scale, 1);
+            matrices.translate(0, -(size*scale-11)/2, 0);
+        matrices.scale(size/16F * scale, size/16F * scale, 1);
+        rotate(matrices, 16, 16);
         rotate(matrices, 16, 16);
 
         context.drawItem(stack, 0, 0);

@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements.icon;
 
 import com.minenash.customhud.data.Flags;
+import com.minenash.customhud.render.CustomHudRenderer3;
 import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -44,7 +45,7 @@ public class RichItemSupplierIconElement extends IconElement {
 
     @Override
     public int getTextWidth() {
-        return getStack().isEmpty() ? 0 : width;
+        return getStack().isEmpty() ? 0 : CustomHudRenderer3.theme.fitItemIconsToLine ? width : (int)(16/11F * width);
     }
 
     private ItemStack getStack() {
@@ -77,9 +78,10 @@ public class RichItemSupplierIconElement extends IconElement {
 
         matrices.push();
         matrices.translate(piece.x + shiftX, piece.y + shiftY - 2, 0);
+        int size = piece.shiftTextUpOrFitItemIcon ? 11 : 16;
         if (!referenceCorner)
-            matrices.translate(0, -(11*scale-11)/2, 0);
-        matrices.scale(11/16F * scale, 11/16F * scale, 1);
+            matrices.translate(0, -(size*scale-11)/2, 0);
+        matrices.scale(size/16F * scale, size/16F * scale, 1);
         rotate(matrices, 16, 16);
 
         context.drawItem(stack, 0, 0);

@@ -32,6 +32,7 @@ public class HudTheme {
     public boolean convertLineBreaks = true;
     public boolean ignoreBlankLines = false;
     public boolean ignoreLeadingSpace = false;
+    public boolean fitItemIconsToLine = true;
 
     private HudTheme(){}
 
@@ -59,6 +60,7 @@ public class HudTheme {
         newTheme.ignoreBlankLines = ignoreBlankLines;
         newTheme.ignoreLeadingSpace = ignoreLeadingSpace;
         newTheme.persistentFormatting = persistentFormatting;
+        newTheme.fitItemIconsToLine = fitItemIconsToLine;
 
         return newTheme;
     }
@@ -76,6 +78,7 @@ public class HudTheme {
     private static final Pattern ROTATION_FLAG_PATTERN = Pattern.compile("rotate: ?(-?\\d+), ?(-?\\d+), ?(-?\\d+)");
     private static final Pattern TRANSLATE_FLAG_PATTERN = Pattern.compile("translate: ?(-?\\d+), ?(-?\\d+), ?(-?\\d+)");
     private static final Pattern PADDING_FLAG_PATTERN = Pattern.compile("padding: ?(-?\\d+)?(, ?(-?\\d+)?)?(, ?(-?\\d+)?)?(, ?(-?\\d+)?)?");
+    private static final Pattern ITEM_ICON_SIZE = Pattern.compile("itemiconsize?: ?(line|full)");
 
     private static final Pattern CONVERT_LINE_BREAKS_PATTERN = Pattern.compile("convertlinebreaks?: ?(true|false)");
     private static final Pattern IGNORE_BLANK_LINES_PATTERN = Pattern.compile("ignoreblanklines?: ?(true|false)");
@@ -112,16 +115,29 @@ public class HudTheme {
         }
 
         else if (global && (  matcher = SCALE_FLAG_PATTERN.matcher(line) ).matches()) {
-            scale = Float.parseFloat(matcher.group(1));
+            float scale = Float.parseFloat(matcher.group(1));
+            if (scale == 0) {
+                Errors.addError(profileName, lineNum, line, ErrorType.ZERO_SCALE, "");
+                return true; //Not Really, but I add the error here
+            }
+            this.scale = scale;
             scaleMethod = ScaleMethod.DIRECT;
         }
 
         else if (global && (  matcher = NICESCALE_FLAG_PATTERN.matcher(line) ).matches()) {
-            scale = Integer.parseInt(matcher.group(2));
-            if (matcher.group(1) != null || scale < 0)
+            float scale = Integer.parseInt(matcher.group(2));
+            if (matcher.group(1) != null || scale < 0) {
                 scaleMethod = ScaleMethod.RELATIVE_GUI;
-            else
+                this.scale = scale;
+            }
+            else if (scale == 0) {
+                Errors.addError(profileName, lineNum, line, ErrorType.ZERO_SCALE, "");
+                return true; //Not Really, but I add the error here
+            }
+            else {
                 scaleMethod = ScaleMethod.GUI;
+                this.scale = scale;
+            }
         }
 
         else if (global && (  matcher = HUDSCALE_FLAG_PATTERN.matcher(line) ).matches()) {
@@ -175,6 +191,9 @@ public class HudTheme {
 
         else if (( matcher = PERSISTEMT_FORMATTING_FLAG_PATTERN.matcher(line) ).matches() )
             persistentFormatting = Boolean.parseBoolean(matcher.group(1));
+
+        else if (( matcher = ITEM_ICON_SIZE.matcher(line) ).matches() )
+            fitItemIconsToLine = matcher.group(1).equals("line");
 
         else
             return false;

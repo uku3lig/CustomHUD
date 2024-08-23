@@ -214,16 +214,15 @@ public class CustomHudRenderer {
 
         for (RenderPiece piece : pieces) {
             font = piece.font;
-            int y = piece.shiftTextUp ? piece.y-1 : piece.y;
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
                 catch (Exception e){
                     CustomHud.LOGGER.catching(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
-                context.drawText(client.textRenderer, value, piece.x, y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, value, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
             else if (piece.element instanceof Text text)
-                context.drawText(client.textRenderer, text, piece.x, y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
 
         }
 

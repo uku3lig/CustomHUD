@@ -3,6 +3,7 @@ package com.minenash.customhud.render;
 import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
 import com.minenash.customhud.HudElements.icon.IconElement;
+import com.minenash.customhud.HudElements.icon.NewTextureIconElement;
 import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
@@ -143,7 +144,9 @@ public class CustomHudRenderer3 {
                             elements.addAll(i + 1, me.expand());
 
                     } else if (e instanceof IconElement ie) {
-                        wipPieces.add(new RenderPiece(ie, ListManager.getValue(ie.getProviderID()), null, xOffset + section.hPaddingOffset(theme), yOffset + theme.padding.top(), formatting.getColor(), theme.bgColor, false, false));
+                        if (e instanceof NewTextureIconElement ntie)
+                            ntie.calculate();
+                        wipPieces.add(new RenderPiece(ie, ListManager.getValue(ie.getProviderID()), null, xOffset + section.hPaddingOffset(theme), yOffset + theme.padding.top(), formatting.getColor(), theme.bgColor, false, theme.fitItemIconsToLine));
                         xOffset += ie.getTextWidth();
 
                     } else if (e instanceof FunctionalElement.ChangeFormatting cfe) {
@@ -221,16 +224,15 @@ public class CustomHudRenderer3 {
 
         for (RenderPiece piece : pieces) {
             font = piece.font;
-            int y = piece.shiftTextUp ? piece.y-1 : piece.y;
             if (piece.element instanceof IconElement ie )
                 try { ie.render(context, piece); }
                 catch (Exception e){
                     CustomHud.LOGGER.catching(e);
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
-                context.drawText(client.textRenderer, value, piece.x, y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, value, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
             else if (piece.element instanceof Text text)
-                context.drawText(client.textRenderer, text, piece.x, y, piece.color, piece.shadow);
+                context.drawText(client.textRenderer, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
 
         }
 

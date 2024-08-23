@@ -754,6 +754,7 @@ public class VariableParser {
                                             new Operation.Element(new NumberSupplierElement(VILLAGER_XP_NEEDED, new Flags())),
                                             ProgressBarIcon.VILLAGER_GREEN, flags);
             }
+            case "player_head": return new PlayerHeadIconElement(flags);
         }
 
         HudElement element = getSupplierElement(part, enabled, flags);

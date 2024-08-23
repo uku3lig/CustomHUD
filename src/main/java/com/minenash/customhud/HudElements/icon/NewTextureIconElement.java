@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 import java.io.IOException;
 import java.util.Optional;
 
-public class NewTextureIconElement extends IconElement implements ExecuteElement {
+public class NewTextureIconElement extends IconElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Identifier TEXTURE_NOT_FOUND = new Identifier("textures/item/barrier.png");
 
@@ -104,8 +104,7 @@ public class NewTextureIconElement extends IconElement implements ExecuteElement
     int calcWidth = 0;
     int calcHeight = 0;
 
-    @Override
-    public void run() {
+    public void calculate() {
         calcU = (int) u.getValue();
         calcV = (int) v.getValue();
         calcRegionWidth = regionWidth.getValue();

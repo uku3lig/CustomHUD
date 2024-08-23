@@ -80,7 +80,7 @@ public class Attributers {
             case "creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
             case "adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
             case "spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
-            case "head" -> new PlayerHeadIconElement(pid, flags); //TODO FIX
+            case "head" -> new ListPlayerHeadIconElement(pid, flags); //TODO FIX
         default -> null;
     };};
 

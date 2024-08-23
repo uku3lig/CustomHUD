@@ -13,9 +13,9 @@ public class RenderPiece {
     public int y;
     public int x;
     public int lineWith;
-    public boolean shiftTextUp;
+    public boolean shiftTextUpOrFitItemIcon;
 
-    public RenderPiece(Object element, Object value, Identifier font, int x, int y, int color, int bgColor, boolean shadow, boolean shiftTextUp) {
+    public RenderPiece(Object element, Object value, Identifier font, int x, int y, int color, int bgColor, boolean shadow, boolean shiftTextUpOrFitItemIcon) {
         this.element = element;
         this.value = value;
         this.font = font;
@@ -24,7 +24,7 @@ public class RenderPiece {
         this.color = color;
         this.bgColor = bgColor;
         this.shadow = shadow;
-        this.shiftTextUp = shiftTextUp;
+        this.shiftTextUpOrFitItemIcon = shiftTextUpOrFitItemIcon;
     }
 
     public RenderPiece adjust(int x, int y) {
