@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>CustomHud v4 Changelog (up to Beta 43)</title>
+<title>CustomHud v4 Changelog</title>
 <style>
   * {
     font-family: "Liberation Sans", sans-serif;
@@ -164,6 +164,7 @@
         <li><code>sqrt</code> , <code>abs</code></li>
         <li><code>sin</code> , <code>cos</code> , <code>tan</code> , <code>csc</code> , <code>sec</code> , <code>cot</code></li>
         <li><code>asin</code> , <code>acos</code> , <code>atan</code> , <code>acsc</code> , <code>asec</code> , <code>acot</code></li>
+        <li><code>log</code> / <code>log10</code> , <code>log2</code> , <code>log_e</code> / <code>ln</code> , <code>log_e1p</code> / <code>ln1p</code></li>
       </ul></li>
     </ul></li>
     <li><details><summary><b>If no value (<code>??</code>) Operator</b></summary><ul>
@@ -202,7 +203,7 @@
     <li><code>==Disable: &lt;VanillaHudElements&gt;==</code></li>
     <li>Elements:<ul>
       <li><code>health</code> , <code>hunger</code> , <code>armor</code> , <code>air</code>, (<code>status_bars</code> for all 4 + <code>horse_health</code>)</li>
-      <li><code>hotbar</code> , <code>xp</code>, (<code>lower</code> for both and everything in <code>status_bars</code>)</li>
+      <li><code>hotbar</code>, <code>item_tooltip</code> , <code>xp</code> , (<code>lower</code> for both and everything in <code>status_bars</code>)</li>
       <li><code>horse_health</code> , <code>horse_jump</code> (<code>horse</code> for both)</li>
       <li><code>chat</code> , <code>scoreboard</code> , <code>bossbar</code> , <code>subtitles</code> , <code>effects</code> / <code>status_effects</code></li>
       <li><code>titles</code> , <code>actionbar</code></li>
@@ -301,20 +302,60 @@
 </ul>
 
 <h3 id="new-themeing">New Theming</h3>
-&emsp;All of these are global-only.
+  <b style="font-size: 14px">&nbsp;&nbsp;Scaling (Global only)</b>
 <ul>
   <li><code>==NiceScale: &lt;(+/-) GUI Scale&gt;==</code><ul>
     <li>Sets the scale of the CustomHud hud to as if it was a specific gui scale.<br>This avoids weirdness that can happen when using <code>==Scale: &lt;scale&gt;==</code></li>
     <li><code>==NiceScale: 2==</code> will render as if the GUI Scale in Minecraft&#39;s settings was set to 2.</li>
     <li><code>==NiceScale: +1==</code> with your GUI Scale set to 3, the profile will render as if it was set to 4.</li>
   </ul></li>
+</ul><ul>
   <li><code>==HudScale: &lt;(+/-) GUI Scale&gt;==</code><ul>
     <li>Same as NiceScale, but for minecraft&#39;s vanilla hud (hotbar, scoreboard, bossbar, etc)</li>
   </ul></li>
+</ul>
+  <b style="font-size: 14px">&nbsp;&nbsp;Visual (Works Globally and Locally)</b>
+  <ul>
+    <li><code>==Padding: &lt;top&gt;, &lt;bottom&gt;, &lt;left&gt;, &lt;right&gt;==</code><ul>
+      <li>Default: 2,1,2,2</li>
+      <li>Can also be written as <code>==Padding: &lt;verticle&gt;, &lt;horizontal&gt;==</code> or <code>==Padding: &lt;all&gt;==</code></li>
+
+      <li>Sets how much padding is around the text. 0 all around will be just big enough to fit the text and its shadow</li>
+    </ul></li>
+  </ul><ul>
+    <li><code>==PersistentFormatting: &lt;true|false&gt;==</code><ul>
+      <li>Default: false</li>
+      <li>If true, color codes (like <code>&a</code> or <code>&{green}</code>) won't reset formatting (like bold)</li>
+    </ul></li>
+  </ul><ul>
+    <li><code>==ItemIconSize: &lt;line|full&gt;==</code><ul>
+      <li>Default: line</li>
+      <li>If line, item icons will be scaled to fit the line (like all other icons). If full, it'll render at full size</li>
+    </ul></li>
+  </ul>
+  <ul>
+    <li><code>==LeftGraph: &lt;graph&gt;==</code> and <code>==RightGraph: &lt;graph&gt;==</code><ul>
+      <li>Default: None</li>
+      <li>Graphs: Profiler, Fps, Tick, Ping, PacketSize, None</li>
+    </ul></li>
+  </ul>
+  <b style="font-size: 14px">&nbsp;&nbsp;Change how the profile is read (Works Globally and Locally)</b>
+<ul>
   <li><code>==IgnoreBlankLines: &lt;true|false&gt;==</code> <ul>
     <li>Default: false</li>
     <li>Blank lines in the profile file are ignored. If true and you want to add blank lines, use <cod>\n</cod></li>
   </ul></li>
+  </ul><ul>
+  <li><code>==IgnoreBlankLines: &lt;true|false&gt;==</code> <ul>
+    <li>Default: false</li>
+    <li>Blank lines in the profile file are ignored. If true and you want to add blank lines, use <cod>\n</cod></li>
+  </ul></li>
+</ul><ul>
+  <li><code>==IgnoreLeadingSpace: &lt;true|false&gt;==</code> <ul>
+    <li>Default: false</li>
+    <li>Removes leading spaces on lines. This is useful for nested if/fors</li>
+  </ul></li>
+</ul><ul>
   <li><details><summary><code>==ConvertLineBreaks: &lt;true|false&gt;==</code></summary><ul>
     <li>If true it treats line breaks in the profile file as NewLines in the hud</li>
     <li>If false, only <code>\n</code> in the profiles will add NewLines to the hud </li>
@@ -472,11 +513,11 @@
     <div style="display: flex">
     <div style="margin-right: 8px">
       <code>items</code><br>
-      <code>items_unpacked</code><br>
       <code>all_items</code><br>
       <code>quipped_items</code><br>
       <code>armor_items</code><br>
       <code>inv_items</code><br>
+      <code>inv_items_unpacked</code><br>
       <code>hotbar_items</code>
     </div>
     <div>
@@ -510,8 +551,8 @@
       <li>Children <code>{c:name}</code> , <code>{c:id}</code></li>
     </ul></li>
     <li>List Var <code>i:tags</code> with children <code>{t:name}</code> and <code>{t:id}</code></li>
-    <li>List Var <code>i:items</code> (items stored in stuff like Shulker Boxes). Same child vars.</li>
-    <li>List Var <code>i:items_compact</code> (items stored in stuff like Shulker Boxes, compacted). Same child vars.</li>
+    <li>List Var <code>i:items</code> (items stored in stuff like Shulker Boxes and bundles). Same child vars.</li>
+    <li>List Var <code>i:items_compact</code> (items stored in stuff like Shulker Boxes and bundles, compacted). Same child vars.</li>
     <li><code>i:enchant:&lt;id&gt;:&lt;method&gt;</code><ul>
       <li>Ex: <code>i:enchant:sharpness:full</code></li>
       <li>Methods:<ul>
@@ -676,10 +717,28 @@
   <div class="child_vars">
     &emsp;Child Vars:<ul>
     <li><code>{r:name}</code> , <code>{r:id}</code></li>
-    <li><code>{r:elapsed}</code> , <code>{elapsed_per}</code> / <code>{elapsed_percentage}</code></li>
+    <li><code>{r:elapsed}</code> , <code>{r:elapsed_per}</code> / <code>{r:elapsed_percentage}</code></li>
     <li><code>{r:length}</code> , <code>{r:remaining}</code></li>
     <li><code>{r:icon}</code></li>
   </ul>
+  </div>
+</details>
+
+<details class="list">
+  <summary><div> <code>profiler_timings</code></div> (numbers from the Profiler Chart)</summary>
+  <div class="child_vars">
+    &emsp;Child Vars:<ul>
+    <li><code>{pt:name}</code> , <code>{pt:path}</code> , <code>&{pt:color}</code></li>
+    <li><code>{pt:per_of_parent}</code> / <code>{pt:percent_of_parent}</code></li>
+    <li><code>{pt:per_of_total}</code> / <code>{pt:percent_of_total}</code></li>
+    <li><code>{pt:entries}</code> (sub-entries). Same child vars.</li>
+  </ul>
+    &emsp;Related:
+    <ul>
+      <li><code>{refresh_profiler_timings}</code> (also available as a keybind) <ul>
+        <li>Refreshes timings from the profiler. Don't run often, or it'll flicker</li>
+      </ul></li>
+    </ul>
   </div>
 </details>
 
@@ -740,6 +799,20 @@
 
 <details class="list">
   <summary><div>
+    <code>chat_messages</code>
+  </div></summary>
+  <div class="child_vars">
+    &emsp;Child Vars:<ul>
+    <li><code>{cm:type}</code> (Normal, SinglePlayer, System, Chat Error, Not Secure)</li>
+    <li><code>{cm:text}</code> (the actual message)</li>
+    <li><code>{cm:time_ago}</code> (how many ticks ago the message was recieved)</li>
+    <li><code>{p:icon}</code></li>
+  </ul>
+  </div>
+</details>
+
+<details class="list">
+  <summary><div>
     <code>loop[&lt;start&gt;,&lt;end&gt;,&lt;step&gt;]</code><br>
     <code>loop[&lt;start&gt;,&lt;end&gt;&gt;]</code> (step = 1)<br>
     <code>loop[&lt;end&gt;]</code> (start = 0, step = 1)
@@ -762,11 +835,14 @@
   <li><code>{toggle:&lt;name&gt;}</code> Ex: <code>{toggle:test}</code><ul>
     <li>Set the keybind for the toggle in the new config screen.</li>
   </ul></li>
+  <li><code>{toggle:&lt;name&gt;:last_pressed}</code> Milliseconds since it was last pressed</li>
   <li><code>{gliding}</code> Flying using an elytra</li>
+  <li><code>{perspective}</code> F5 Camera perspective (first, front, back)</li>
   <li><code>{slime_chunk:&lt;seed&gt;}</code><ul>
     <li>You should still use <code>{slime_chunk}</code> in singleplayer</li>
   </ul></li>
   <li><code>{difficulty} - Peaceful/easy/normal/hard</code></li>
+  <li><code>{player_head} - The player's face</code></li>
   <li><code>Selected hotbar slot: {hotbar_slot}</code> (1-9) and {hotbar_index}</code> (0-8)</li>
   <li><code>Shows the amount of a specific item you have as a icon: {itemcount_icon:&lt;item_id&gt;}</code></li>
   <li>Target Block and Target Fluid:<ul>
@@ -782,6 +858,7 @@
     <li><code>{last_hit_name}</code> / <code>{lhn}</code> (Pig, Notch)</li>
     <li><code>{last_hit_uuid}</code> / <code>{lhu}</code> (b354c639-b534-48fa-b4c3-48192dba8dd3)</li>
     <li><code>{last_hit_distance}</code> / <code>{lhd}</code> (Distance between you and the entity at the time you hit)</li>
+    <li><code>{last_hit_ago}</code> / <code>{lha}</code> Seconds since last hit</li>
   </ul></details></li>
   <li><details><summary>Information about the entity you are riding</summary><ul>
     <li><code>{ve}</code> / <code>{vehicle}</code> (Pig, Player)</li>
@@ -818,6 +895,7 @@
     <li><code>{hedy}</code> / <code>{hooked_entity_direction_yaw}</code></li>
     <li><code>{hedp}</code> / <code>{hooked_entity_direction_pitch}</code></li>
   </ul></li>
+  <li>Added <code>{unix_time}</code> (milliseconds since epoch)</li>
   <li>Added plural variants to time variables<ul>
     <li>People, including myself, kept adding an s to the end, so why not allow it</li>
     <li><code>{seconds}</code> , <code>{minutes}</code> , <code>{hours}</code> , <code>{hours12}</code> , <code>{hours24}</code></li>
@@ -975,6 +1053,7 @@
     <li><code>{bar, &lt;value&gt;, &lt;max_value&gt;}</code></li>
     <li><code class="hide_on_open">{bar:&lt;style&gt;, &lt;value&gt;, &lt;max_value&gt;}</code></li>
     <li><code>{bar, &lt;value&gt;, &lt;max_value&gt;, &lt;flags&gt;}</code></li>
+    <li>Replace <code>bar</code> with <code>nb_bar</code> to remove the bar's background. Great for stacking</li>
     <li><details><summary>Styles:</summary><ul>
       <li><code>xp</code> / <code>experience</code> , <code>jump</code> / <code>horse</code></li>
       <li><code>villager</code> / <code>villager_green</code> , <code>villager_white</code></li>
@@ -1023,6 +1102,18 @@
     <li><code>{getmacro:&lt;name&gt;}</code></li>
   </ul></li>
   <li><code>{window_focused}</code> : If the minecraft window is focused or in the background</li>
+  <li><code>{refresh_profiler_timings}</code> (also available as a keybind) <ul>
+    <li>Refreshes timings from the profiler. Don't run often, or it'll flicker</li>
+  </ul></li>
+  <li><details><summary>Profiler Timing (a specific one) <code>{profiler_timing:&lt;path&gt;:&lt;method&gt;}</code></summary><ul>
+    <li>Methods:<ul>
+      <li><code>name</code> , <code>path</code> , <code>color</code></li>
+      <li><code>per_of_parent</code> / <code>percent_of_parent</code></li>
+      <li><code>per_of_total</code> / <code>percent_of_total</code></li>
+      <li>List <code>entries</code> (sub-entries). See <code>profiler_timings</code> for child vars</li>
+      <li><code>parent:&lt;method&gt;</code> Same methods as this</li>
+    </ul></li>
+  </ul></details></li>
   <li>F3 Parity:<ul>
     <li>
       <details><summary>Client/Server Chunk Variables</summary><ul>
@@ -1063,7 +1154,7 @@
 
 <h3 id="variable-changes"> Variable Changes </h3>
 <ul>
-  <li> <code>{itemcount:&lt;item_id&gt;}</code> now works with number variable flags</li>
+  <li> <code>{itemcount:&lt;item_id&gt;}</code> now works with item tags (like <code>#stone</code>) number variable flags</li>
   <li> <code>{tps}</code> and <code>{ms_ticks}</code> / <code>{ticks_ms}</code> are now estimated when on servers!!! </li>
   <li> <code>{ms_ticks}</code> no longer bottoms out at 50ms in singleplayer </li>
   <li> Improvements to <code>{space:#}</code> <ul>
@@ -1132,6 +1223,8 @@
   <li> No longer crashes when using BooleanSupplierElement before minecraft's options are loaded </li>
   <li> Fixed text positioning when line spacing is 0 </li>
   <li> <code>{ var_name}</code> (whitespace before the name) now works</li>
+  <li> Fixed sections' x-offset being doubly applied</li>
+  <li> Numbers larger than 2147483647 without precision (aka whole numbers) now show correctly </li>
 </ul>
 </div>
 
@@ -1143,6 +1236,7 @@
     <li><a href="#new-colors-and-formatting">New Colors and Formatting</a></li>
     <li><a href="#new-variable-flags">New Variable Flags</a></li>
     <li><a href="#new-list-variables">New List Variables</a></li>
+    <li><a href="#new-themeing">New Theme Options</a></li>
     <li><a href="#new-variables">New Variables</a></li>
     <li><a href="#variable-changes">Variable Changes</a></li>
     <li><a href="#other-changes">Other Changes</a></li>
