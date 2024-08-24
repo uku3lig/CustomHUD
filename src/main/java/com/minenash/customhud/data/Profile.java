@@ -270,7 +270,7 @@ public class Profile {
                 else
                     break;
             }
-            if ( !(s.elements.get(s.elements.size()-1) instanceof FunctionalElement.NewLine))
+            if ( !(!s.elements.isEmpty() && s.elements.get(s.elements.size()-1) instanceof FunctionalElement.NewLine))
                 s.elements.add(new FunctionalElement.NewLine());
         }
 

@@ -92,7 +92,12 @@ public abstract class MinecraftClientMixin {
     }
 
     @WrapOperation(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowRenderingChart()Z"))
-    public boolean shouldShowProfiler(DebugHud instance, Operation<Boolean> original) {
+    public boolean activateProfiler(DebugHud instance, Operation<Boolean> original) {
+        if (ComplexData.refreshTimings) {
+            ComplexData.refreshTimings = false;
+            return false;
+        }
+
         Profile p = ProfileManager.getActive();
         return original.call(instance) ||
                 (!options.hudHidden && !inGameHud.getDebugHud().shouldShowDebugHud() && world != null
@@ -106,7 +111,7 @@ public abstract class MinecraftClientMixin {
     }
 
     @WrapOperation(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;tickProfilerResult:Lnet/minecraft/util/profiler/ProfileResult;"))
-    private ProfileResult yourHandlerMethod(MinecraftClient instance, Operation<ProfileResult> original) {
+    private ProfileResult shouldRenderTheActualProfiler(MinecraftClient instance, Operation<ProfileResult> original) {
         Profile p = ProfileManager.getActive();
         if (getDebugHud().shouldShowDebugHud() ||
                 (!options.hudHidden && !inGameHud.getDebugHud().shouldShowDebugHud() && world != null

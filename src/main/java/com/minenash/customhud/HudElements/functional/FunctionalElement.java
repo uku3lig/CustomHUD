@@ -3,6 +3,7 @@ package com.minenash.customhud.HudElements.functional;
 import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.list.*;
+import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
 import com.minenash.customhud.data.HudTheme;
@@ -88,5 +89,9 @@ public class FunctionalElement implements HudElement {
     }
 
     public static class IgnoreErrorElement extends FunctionalElement {}
+
+    public static class RefreshTimings extends FunctionalElement implements ExecuteElement {
+        @Override public void run() { ComplexData.refreshTimings = true; }
+    }
 
 }

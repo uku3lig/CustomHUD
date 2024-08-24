@@ -103,6 +103,7 @@ public class ComplexData {
     public static int fakeVillagerInteract = 0;
     public static long villagerLastRequested = Long.MAX_VALUE;
 
+    public static boolean refreshTimings = false;
     public record ProfilerTimingWithPath(String path, String name, double parent, double total, int color, List<ProfilerTimingWithPath> entries) {}
     public static List<ProfilerTimingWithPath> rootEntries = Collections.EMPTY_LIST;
     public static Map<String,ProfilerTimingWithPath> allEntries = Collections.EMPTY_MAP;

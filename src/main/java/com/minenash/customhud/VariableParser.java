@@ -739,6 +739,11 @@ public class VariableParser {
             return new SudoElements.Bool(  FabricLoader.getInstance().isModLoaded(modid) );
         }
 
+        if (part.startsWith("player_head:")) {
+            String player = part.substring(12);
+
+        }
+
         switch (part) {
             case "gizmo": return Flags.wrap(new DebugGizmoElement(flags), flags);
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
@@ -756,6 +761,7 @@ public class VariableParser {
                                             ProgressBarIcon.VILLAGER_GREEN, flags);
             }
             case "player_head": return new PlayerHeadIconElement(flags);
+            case "refresh_profiler_timings": return new FunctionalElement.RefreshTimings();
         }
 
         HudElement element = getSupplierElement(part, enabled, flags);
@@ -911,10 +917,7 @@ public class VariableParser {
 
     private static Supplier<Boolean> getBooleanSupplier(String element, ComplexData.Enabled enabled) {
         return switch (element) {
-            case "new_renderer" -> NEW_RENDERER;
-
-
-
+//            case "new_renderer" -> NEW_RENDERER;
             case "profile_in_cycle"-> PROFILE_IN_CYCLE;
             case "vsync" -> VSYNC;
             case "sp", "singleplayer" -> SINGLEPLAYER;
@@ -1676,8 +1679,11 @@ public class VariableParser {
                     PACK, ErrorType.UNKNOWN_DATA_PACK, ErrorType.UNKNOWN_PACK_METHOD, profile, debugLine, enabled, original );
 
         if (part.startsWith("profiler_timing:")) {
-            return attrElement(part, PROFILER_TIMING_READER, false, path -> () -> ComplexData.allEntries.get(path),
+            HudElement e = attrElement(part, PROFILER_TIMING_READER, false, path -> () -> ComplexData.allEntries.get(path),
                     PROFILER_TIMING, null, ErrorType.UNKNOWN_PROFILER_TIMING_PROPERTY, profile, debugLine, enabled, original);
+            if (e != null)
+                enabled.profilerTimings = true;
+            return e;
         }
 
         return null;

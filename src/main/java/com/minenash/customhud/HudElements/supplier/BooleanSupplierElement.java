@@ -28,7 +28,7 @@ public class BooleanSupplierElement implements HudElement {
     protected static BlockPos blockPos() { return client.getCameraEntity().getBlockPos(); }
 
 
-    public static final Supplier<Boolean> NEW_RENDERER = () -> CustomHud.useNewRenderer;
+//    public static final Supplier<Boolean> NEW_RENDERER = () -> CustomHud.useNewRenderer;
 
 
     public static final Supplier<Boolean> PROFILE_IN_CYCLE = () -> ProfileManager.getActive() != null && ProfileManager.getActive().cycle;

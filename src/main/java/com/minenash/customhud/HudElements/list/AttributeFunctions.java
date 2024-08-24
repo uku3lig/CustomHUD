@@ -450,11 +450,11 @@ public class AttributeFunctions {
 
 
     // PIE PROFILERS
-    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_NAME = (timing) -> timing.name();
-    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_PATH = (timing) -> timing.path().replace('\u001e', '.');
-    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_PARENT = (timing) -> timing.parent();
-    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_TOTAL = (timing) -> timing.total();
-    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_COLOR = (timing) -> timing.color();
+    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_NAME = (timing) -> timing == null ? null : timing.name();
+    public static final Function<ComplexData.ProfilerTimingWithPath,String> TIMING_PATH = (timing) -> timing == null ? null : timing.path().replace('\u001e', '.');
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_PARENT = (timing) -> timing == null ? null : timing.parent();
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_PER_OF_TOTAL = (timing) -> timing == null ? null : timing.total();
+    public static final Function<ComplexData.ProfilerTimingWithPath,Number> TIMING_COLOR = (timing) -> timing == null ? null : timing.color();
 
     // HELPER METHODS
 

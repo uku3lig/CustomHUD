@@ -11,7 +11,7 @@ public enum ErrorType {
 
     VARIABLE_ERROR ("Report", "CHANGE ME", "An error has accord trying to parse this variable. " +
             "Please report this along with log. You might want to double check your profile though"),
-    PROFILE_ERROR ("Report", "CHANGE ME", "A fatal error has accord trying to parse this profile." +
+    PROFILE_ERROR ("Report", "CHANGE ME", "A fatal error has accord trying to parse this profile. " +
             "Please report this along with log. You might want to double check your profile though"),
 
     EMPTY_VARIABLE ("Variables", "variables", "No Variable Given"),

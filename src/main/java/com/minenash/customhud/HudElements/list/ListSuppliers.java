@@ -176,7 +176,7 @@ public class ListSuppliers {
     PROFILER_TIMINGS = () -> ComplexData.rootEntries
     ;
 
-    public static final Function<ComplexData.ProfilerTimingWithPath,List<?>> TIMINGS_SUB_ENTRIES = ComplexData.ProfilerTimingWithPath::entries;
+    public static final Function<ComplexData.ProfilerTimingWithPath,List<?>> TIMINGS_SUB_ENTRIES = (timing) -> timing == null ? Collections.EMPTY_LIST : timing.entries();
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
     public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> Arrays.asList(team.getPlayerList().toArray());
