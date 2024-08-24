@@ -120,7 +120,7 @@ public abstract class InGameHudMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHeldItemTooltip(Lnet/minecraft/client/gui/DrawContext;)V"))
     public void customhud$disableHotbar(InGameHud instance, DrawContext context) {
-        if (CustomHud.isNotDisabled(HOTBAR))
+        if (CustomHud.isNotDisabled(ITEM_TOOLTIP))
             instance.renderHeldItemTooltip(context);
     }
 
