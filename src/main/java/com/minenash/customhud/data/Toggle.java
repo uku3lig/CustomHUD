@@ -16,6 +16,7 @@ public class Toggle {
 
     public boolean inProfile;
     public boolean value;
+    public long lastPressed = 0;
 
     public Toggle(String name, boolean direct, int line, boolean inProfile, KeyBinding modifier, KeyBinding key) {
         this.name = name;
@@ -33,6 +34,7 @@ public class Toggle {
 
     public void toggle() {
         value = !value;
+        lastPressed = System.currentTimeMillis();
     }
 
     public String getDisplayName() {

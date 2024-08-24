@@ -36,6 +36,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
@@ -79,6 +80,13 @@ public class VariableParser {
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
     private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
 
+    private static final StatFormatter MILLISECONDS_TO_TIME = millisecs -> {
+        int secs = millisecs / 1000;
+        int seconds = secs % 60;
+        int minutes = (secs / 60) % 60;
+        int hours = (secs / 60 / 60);
+        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
+    };
 
 
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProviderSet listProviders) {
@@ -643,7 +651,8 @@ public class VariableParser {
         }
 
         if (part.startsWith("toggle:")) {
-            String name = part.substring(7);
+            boolean lastPressed = part.endsWith(":last_pressed");
+            String name = part.substring(7, part.length() - (lastPressed ? 13 : 0) );
             if (name.isEmpty()) {
                 Errors.addError(profile.name, debugLine, original, ErrorType.EMPTY_TOGGLE, null);
                 return null;
@@ -657,6 +666,14 @@ public class VariableParser {
                 toggle.lines.add(debugLine);
 
             profile.toggles.put(name, toggle);
+
+            if (lastPressed) {
+                Toggle finalToggle = toggle;
+                return new NumberSupplierElement(
+                    new NumberSupplierElement.Entry(
+                        () -> finalToggle.lastPressed == 0 ? null : System.currentTimeMillis() - finalToggle.lastPressed,
+                        0, MILLISECONDS_TO_TIME), flags);
+            }
             return new BooleanSupplierElement(toggle::getValue);
         }
         if (part.startsWith("toggle_keybind:")) {

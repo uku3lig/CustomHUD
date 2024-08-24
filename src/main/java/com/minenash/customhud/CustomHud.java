@@ -50,7 +50,7 @@ public class CustomHud implements ModInitializer {
 	public static final KeyBinding kb_enable = registerKeyBinding("enable", GLFW.GLFW_KEY_UNKNOWN);
 	public static final KeyBinding kb_cycleProfiles = registerKeyBinding("cycle_profiles", GLFW.GLFW_KEY_GRAVE_ACCENT);
 	public static final KeyBinding kb_showErrors = registerKeyBinding("show_errors", GLFW.GLFW_KEY_B);
-	public static final KeyBinding kb_refreshProfilerTimings = registerKeyBinding("refresh_profiler_timings", GLFW.GLFW_KEY_KP_5);
+	public static final KeyBinding kb_refreshProfilerTimings = registerKeyBinding("refresh_profiler_timings", GLFW.GLFW_KEY_UNKNOWN);
 
 //	public static final KeyBinding SWITCH_RENDERER = registerKeyBinding("switch_renderer", GLFW.GLFW_KEY_KP_5);
 //	public static boolean useNewRenderer = true;
