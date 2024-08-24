@@ -7,7 +7,7 @@ public enum DisableElement {
     HORSE_JUMP, HORSE_HEALTH, HORSE_ARMOR, HORSE, TITLES, ACTIONBAR;
 
     private static final EnumSet<DisableElement> STATUS = EnumSet.of(HEALTH, HUNGER, ARMOR, AIR, HORSE_HEALTH);
-    private static final EnumSet<DisableElement> LOWER = EnumSet.of(HEALTH, HUNGER, ARMOR, AIR, XP, HOTBAR, HORSE_HEALTH, HORSE_JUMP);
+    private static final EnumSet<DisableElement> LOWER = EnumSet.of(HEALTH, HUNGER, ARMOR, AIR, XP, HOTBAR, ITEM_TOOLTIP, HORSE_HEALTH, HORSE_JUMP);
     private static final EnumSet<DisableElement> HORSE_SET = EnumSet.of(HORSE_HEALTH, HORSE_JUMP);
 
     public static boolean add(EnumSet<DisableElement> elements, String name) {
