@@ -65,9 +65,9 @@ public class CustomHud implements ModInitializer {
 
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
 //			if (useNewRenderer)
-//				CustomHudRenderer3.render(context, tickDelta);
+				CustomHudRenderer3.render(context, tickDelta);
 //			else
-				CustomHudRenderer.render(context, tickDelta);
+//				CustomHudRenderer.render(context, tickDelta);
 		});
 
 
