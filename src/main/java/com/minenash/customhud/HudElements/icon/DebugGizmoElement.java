@@ -20,7 +20,6 @@ public class DebugGizmoElement extends IconElement {
         this.size = (int)(10*scale) / 2F;
     }
 
-    //TODO: Mark as non-rotatable
     @Override
     public void render(DrawContext context, RenderPiece piece) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();

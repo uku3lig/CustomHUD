@@ -762,7 +762,11 @@ public class VariableParser {
         }
 
         switch (part) {
-            case "gizmo": return Flags.wrap(new DebugGizmoElement(flags), flags);
+            case "gizmo": {
+                if (flags.rotation != 0)
+                    Errors.addError(profile.name, debugLine, original, ErrorType.GIZMO_NO_ROTATE, null);
+                return Flags.wrap(new DebugGizmoElement(flags), flags);
+            }
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
             case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = true;
                 return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);

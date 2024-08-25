@@ -74,6 +74,7 @@ public enum ErrorType {
     MALFORMED_TIMER ("WIP", "references/v4_wip", "Malformed timer: §e"),
     EMPTY_TOGGLE ("WIP", "references/v4_wip", "No toggle name"),
     UNKNOWN_KEY("WIP", "references/v4_wip", "Invalid key name: §e"),
+    GIZMO_NO_ROTATE("WIP", "references/v4_wip", "Gizmo can't be rotated"),
 
     NOT_A_WHOLE_NUMBER (null, null, "Not a whole number: §e"),
 
