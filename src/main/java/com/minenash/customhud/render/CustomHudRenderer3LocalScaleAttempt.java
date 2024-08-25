@@ -70,7 +70,6 @@
 //            List<HudElement> elements = new ArrayList<>(section.elements);
 //            StringBuilder builder = new StringBuilder();
 //
-//            //TODO: Change NewTextureIconElement to not be an execute
 //            main:
 //            for (int i = 0; i < elements.size(); i++) {
 //                HudElement e = elements.get(i);

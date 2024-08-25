@@ -132,7 +132,6 @@ public class CustomHud implements ModInitializer {
 		}
 
 
-		//TODO: Redo KeyBinds!
 //		while (SWITCH_RENDERER.wasPressed()) {
 //			useNewRenderer = !useNewRenderer;
 //		}

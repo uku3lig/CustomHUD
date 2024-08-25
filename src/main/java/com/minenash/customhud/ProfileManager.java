@@ -2,10 +2,8 @@ package com.minenash.customhud;
 
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.data.Toggle;
-//import com.minenash.customhud.gui.editor.EditorWindow;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
@@ -14,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.minenash.customhud.CustomHud.CLIENT;
 
 public class ProfileManager {
 
@@ -124,7 +124,11 @@ public class ProfileManager {
             ConfigManager.save();
         } catch (IOException e) {
             CustomHud.LOGGER.error("Can't rename profile, IO Exception");
-            //TODO: GUI Errors
+            CustomHud.LOGGER.catching(e);
+            CLIENT.getToastManager().add(new SystemToast(SystemToast.Type.PERIODIC_NOTIFICATION,
+                    Text.literal("§cUnable to Rename Profile"),
+                    Text.literal("§eIO Exception")
+            ));
         }
     }
 
