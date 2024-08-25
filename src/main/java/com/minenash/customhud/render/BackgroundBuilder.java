@@ -26,13 +26,11 @@ public class BackgroundBuilder {
     }
 
     public int maxWidth = 0;
-    public int totalHeight = 0;
     List<BgRenderPiece> bgPieces = new ArrayList<>();
     BgRenderPiece nonDynamicBgPiece = null;
 
     public void addLine(int yOffset, int width, int height, int color) {
         maxWidth = Math.max(maxWidth, width);
-        totalHeight += height;
         if (isDynamic)
             bgPieces.add( new BgRenderPiece(0, yOffset, width, height, color) );
         else if (nonDynamicBgPiece == null)

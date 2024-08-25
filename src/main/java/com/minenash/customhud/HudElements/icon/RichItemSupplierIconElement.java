@@ -45,7 +45,7 @@ public class RichItemSupplierIconElement extends IconElement {
 
     @Override
     public int getTextWidth() {
-        return getStack().isEmpty() ? 0 : CustomHudRenderer3.theme.fitItemIconsToLine ? width : (int)(16/11F * width);
+        return CustomHudRenderer3.theme.fitItemIconsToLine ? width : (int)(16/11F * width);
     }
 
     private ItemStack getStack() {

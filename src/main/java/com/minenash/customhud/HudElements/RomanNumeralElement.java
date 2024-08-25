@@ -5,7 +5,7 @@ import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
 import com.minenash.customhud.data.HudTheme;
-import com.minenash.customhud.render.CustomHudRenderer;
+import com.minenash.customhud.render.CustomHudRenderer3;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -38,13 +38,13 @@ public class RomanNumeralElement implements HudElement, MultiElement {
 
     @Override
     public List<HudElement> expand() {
-        HudTheme copy = CustomHudRenderer.theme.copy();
+        HudTheme copy = CustomHudRenderer3.theme.copy();
         copy.font = ROMAN_NUMERAL_FONT;
 
         return List.of(
                 new FunctionalElement.ChangeTheme(copy),
                 new StringElement( precision ? convert(base.getNumber().intValue()) : convert(base.getNumber().doubleValue()) ),
-                new FunctionalElement.ChangeTheme(CustomHudRenderer.theme.copy())
+                new FunctionalElement.ChangeTheme(CustomHudRenderer3.theme.copy())
         );
     }
 

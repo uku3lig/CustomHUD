@@ -59,6 +59,7 @@ public class CustomHudRenderer3 {
 
             theme = profile.baseTheme;
             BackgroundBuilder bgBuilder = new BackgroundBuilder(section);
+            int totalHeight = 0;
 
             int xOffset = 0;
             int yOffset = 0;
@@ -68,7 +69,6 @@ public class CustomHudRenderer3 {
             List<HudElement> elements = new ArrayList<>(section.elements);
             StringBuilder builder = new StringBuilder();
 
-            //TODO: Change NewTextureIconElement to not be an execute
             main:
             for (int i = 0; i < elements.size(); i++) {
                 HudElement e = elements.get(i);
@@ -128,6 +128,7 @@ public class CustomHudRenderer3 {
                         if (xOffset > 0)
                             bgBuilder.addLine(yOffset, xOffset + theme.padding.left() + theme.padding.right(), height, theme.bgColor);
                         yOffset += height;
+                        totalHeight += height;
                         xOffset = 0;
                         formatting = theme.fgColor.copy();
 
@@ -178,7 +179,6 @@ public class CustomHudRenderer3 {
 
             }
 
-            int height = bgBuilder.totalHeight;
             int width = section.width > 0 ? section.width : bgBuilder.maxWidth;
 
             int sectionXOffset = section.xOffset + switch (section.sAlign) {
@@ -188,8 +188,8 @@ public class CustomHudRenderer3 {
             };
             int sectionYOffset = section.yOffset + (
                 section instanceof Section.Top ? 1 :
-                section instanceof Section.Bottom ? (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale())) - height - 8:
-                                                    (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale()))/2 - height/2 - 1
+                section instanceof Section.Bottom ? (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale())) - totalHeight - 8:
+                                                    (int) (client.getWindow().getScaledHeight() * (1 / theme.getScale()))/2 - totalHeight/2 - 1
             );
 
             if (section.textAlign == Section.Align.RIGHT) {

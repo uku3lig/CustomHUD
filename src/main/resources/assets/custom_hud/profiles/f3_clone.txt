@@ -1,12 +1,12 @@
-==LineSpacing: 0==
+==Padding:1,0,1,1==
 ==TextShadow: false==
 ==ForegroundColor: #E0E0E0==
 ==BackgroundColor: #90505050==
 ==Crosshair: Debug==
 
 ==Section:TopLeft,-2==
-Minecraft {version} ({modded_name}/{client_version}){space:-1}
-{fps} fps T: {{max_fps, "inf", "{max_fps}"}} {{vsync, "vsync "}}{graphics_mode} {{clouds, "{clouds}-clouds "}}B:{biome_blend} GPU: {gpu}%
+Minecraft {version} ({client_version}/{modded_name}){space:-1}
+{fps} fps T: {{max_fps, "inf", "{max_fps}"}}{{vsync, " vsync"}}{graphics_mode} {{clouds, "{clouds}-clouds "}}B: {biome_blend} GPU: {gpu}%
 {{singleplayer, "Integrated server @ {ms_ticks -p1}/{ms_per_tick -p1} ms{{tick_sprinting, " (sprinting)", tick_stepping, " (frozen - stepping)", tick_frozen, " (frozen)"}}", "''{server_brand}'' server"}}, {tx} tx, {rx} rx
 C: {chunks_rendered}/{chunks_loaded} {{chunks_culling, "(s) "}}D: {render_distance}, pC: {queued_tasks -zf3}, pU: {upload_queue -zf2}, aB: {buffer_count -zf2}
 E: {entities_rendered}/{entities_loaded}, B: 0, SD: {simulation_distance}
@@ -34,7 +34,7 @@ SC: {sc}, M: {monsters}, C: {creatures}, A: {ambient_mobs}, A: {axolotls}, U: {u
 Sounds: {sounds}/{max_sounds} + {static_sounds}/{max_static_sounds} (Mood {mood}%)
 [Fabric] Active renderer: {active_renderer}
 
-Debug charts: [F3+1] Profiler; [F3+2] FPS + TPS; [F3+3] Ping
+Debug charts: [F3+1] Profiler hidden; [F3+2] FPS + TPS hidden; [F3+3] Ping hidden
 For help: press F3 + Q
 
 ==Section: TopRight==
@@ -53,7 +53,7 @@ Display: {display_width}x{display_height} ({gpu_vendor})
 &nTargeted Block: {tbx}, {tby}, {tbz}
 {target_block_id}
 =for: target_block_properties=
-{bp:name}: {{bp:value = "true", "&a", bp:value = "false", "&c"}}{bp:value}
+{p:name}: {{p:value = "true", "&a", p:value = "false", "&c"}}{p:value}
 =endfor=
 =for: target_block_tags=
 #{t:id}
@@ -64,7 +64,7 @@ Display: {display_width}x{display_height} ({gpu_vendor})
 &nTargeted Fluid: {tfx}, {tfy}, {tfz}
 {target_fluid_id}
 =for: target_fluid_properties=
-{bp:name}: {{bp:value = "true", "&a", bp:value = "false", "&c"}}{bp:value}
+{p:name}: {{p:value = "true", "&a", p:value = "false", "&c"}}{p:value}
 =endfor=
 =for: target_fluid_tags=
 #{t:id}

@@ -9,7 +9,6 @@ import com.minenash.customhud.errors.Errors;
 import com.minenash.customhud.gui.ErrorsScreen;
 import com.minenash.customhud.gui.NewConfigScreen;
 import com.minenash.customhud.gui.TogglesScreen;
-import com.minenash.customhud.render.CustomHudRenderer;
 import com.minenash.customhud.render.CustomHudRenderer3;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
