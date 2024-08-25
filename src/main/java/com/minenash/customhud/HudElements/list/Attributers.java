@@ -62,8 +62,8 @@ public class Attributers {
 
     private static Attributer TEAM2;
     public static final Attributer PLAYER = (sbp, pid, sup, name, flags, context) -> {
-        if (name.startsWith("p_team:")) {
-            String attr = name.substring(7);
+        if (name.startsWith("team:")) {
+            String attr = name.substring(5);
             Supplier sup2 = () -> ((PlayerListEntry) sup.get()).getScoreboardTeam();
             return TEAM2.get(sbp, pid, sup2, attr, flags, context);
         }
