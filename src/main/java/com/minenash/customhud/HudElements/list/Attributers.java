@@ -257,7 +257,10 @@ public class Attributers {
         case "criteria","criterion" -> new Str(sup, OBJECTIVE_CRITIERIA);
         case "display_slot" -> new Str(sup, OBJECTIVE_DISPLAY_SLOT);
         case "scores" -> new CreateListElement(sbp, sup, SCOREBOARD_OBJECTIVE_SCORES, SCOREBOARD_OBJECTIVE_SCORE);
-        case "online_scores" -> new CreateListElement(sbp, sup, SCOREBOARD_OBJECTIVE_SCORES_ONLINE, SCOREBOARD_OBJECTIVE_SCORE);
+        case "online_scores" -> {
+            context.enabled().serverWorld = true;
+            yield new CreateListElement(sbp, sup, SCOREBOARD_OBJECTIVE_SCORES_ONLINE, SCOREBOARD_OBJECTIVE_SCORE);
+        }
         default -> null;
     };
 

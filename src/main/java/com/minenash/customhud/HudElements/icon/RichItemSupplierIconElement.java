@@ -69,7 +69,6 @@ public class RichItemSupplierIconElement extends IconElement {
         return ItemStack.EMPTY;
     }
 
-    //TODO FIX: Conditional in list?
     public void render(DrawContext context, RenderPiece piece) {
         ItemStack stack = getStack(piece);
         if (stack == null || stack.isEmpty())

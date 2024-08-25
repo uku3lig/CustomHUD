@@ -1670,9 +1670,11 @@ public class VariableParser {
             return attrElement(part, src -> src, false, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),
                     TEAM, null, ErrorType.UNKNOWN_TEAM_METHOD, profile, debugLine, enabled, original);
 
-        if (part.startsWith("objective:"))
-            return attrElement(part, src -> src, false, (name) -> () -> CLIENT.world.getScoreboard().getNullableObjective(name),
+        if (part.startsWith("objective:")) {
+            enabled.serverWorld = true;
+            return attrElement(part, src -> src, false, (name) -> () -> AttributeHelpers.scoreboard().getNullableObjective(name),
                     SCOREBOARD_OBJECTIVE, null, ErrorType.UNKNOWN_OBJECTIVE_METHOD, profile, debugLine, enabled, original);
+        }
 
         if (part.startsWith("bossbar:"))
             return attrElement(part, src -> src, true, (name) -> () -> AttributeHelpers.getBossBar(name),

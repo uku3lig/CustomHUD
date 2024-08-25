@@ -26,7 +26,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 
@@ -210,7 +209,7 @@ public class ListSuppliers {
 
     public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES = (obj) -> scoreboard().getScoreboardEntries(obj).stream().sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
     public static final Function<ScoreboardObjective,List<?>> SCOREBOARD_OBJECTIVE_SCORES_ONLINE = (obj) -> scoreboard().getScoreboardEntries(obj).stream()
-            .filter(score -> scoreboardPlayer(score.owner())) //TODO: Make Work with entities
+            .filter(score -> entryOnline(score.owner()))
             .sorted(InGameHud.SCOREBOARD_ENTRY_COMPARATOR).toList();
 
 

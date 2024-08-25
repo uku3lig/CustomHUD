@@ -29,7 +29,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.profiler.ProfilerTiming;
 
 import java.util.*;
 import java.util.function.Function;
@@ -222,8 +221,16 @@ public class AttributeHelpers {
     public static Scoreboard scoreboard() {
         return CLIENT.getServer() != null ? CLIENT.getServer().getScoreboard() : CLIENT.world.getScoreboard();
     }
-    public static boolean scoreboardPlayer(String player) {
-        return  null != (CLIENT.getServer() != null ? CLIENT.getServer().getPlayerManager().getPlayer(player) : CLIENT.getNetworkHandler().getPlayerListEntry(player));
+    public static boolean entryOnline(String entry) {
+        if (null != (CLIENT.getServer() != null ? CLIENT.getServer().getPlayerManager().getPlayer(entry) : CLIENT.getNetworkHandler().getPlayerListEntry(entry)))
+            return true;
+        if (ComplexData.serverWorld == null)
+            return false;
+        try {
+            return ComplexData.serverWorld.entityManager.has(UUID.fromString(entry));
+        }
+        catch (Exception ignored) {}
+        return false;
     }
 
     public static List<?> bossbars(boolean all) {
