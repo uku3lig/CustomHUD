@@ -1,5 +1,7 @@
 package com.minenash.customhud.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.ComplexData;
 import com.minenash.customhud.CustomHud;
 import net.minecraft.client.MinecraftClient;
@@ -44,9 +46,9 @@ public abstract class MinecraftClientMixin {
     }
 
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
-    public boolean getGpuUsageAndOtherPerformanceMetrics(DebugHud hud) {
-        return hud.shouldShowDebugHud() || (CustomHud.getActiveProfile() != null && CustomHud.getActiveProfile().enabled.gpuMetrics);
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;shouldShowDebugHud()Z"))
+    public boolean getGpuUsageAndOtherPerformanceMetrics(DebugHud instance, Operation<Boolean> original) {
+        return original.call(instance) || (CustomHud.getActiveProfile() != null && CustomHud.getActiveProfile().enabled.gpuMetrics);
     }
 
 }
