@@ -48,6 +48,7 @@ public enum ErrorType {
     UNKNOWN_BLOCK_PROPERTY_METHOD("WIP", "references/v4_wip", "Unknown Blockstate Property Method: §e"),
     UNKNOWN_EFFECT_METHOD("WIP", "references/v4_wip", "Unknown Effect Method: §e"),
     UNKNOWN_TEAM_METHOD("WIP", "references/v4_wip", "Unknown Team Method: §e"),
+    UNKNOWN_PLAYER_METHOD("WIP", "references/v4_wip", "Unknown Player Method: §e"),
     UNKNOWN_OBJECTIVE_METHOD("WIP", "references/v4_wip", "Unknown Objective Method: §e"),
     UNKNOWN_BOSSBAR_METHOD("WIP", "references/v4_wip", "Unknown Bossbar Method: §e"),
     UNKNOWN_SCORE_METHOD("WIP", "references/v4_wip", "Unknown Score Method: §e"),

@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.stat.StatFormatter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -36,8 +37,16 @@ public class EntryNumberSuppliers {
         return function.sample(new DensityFunction.UnblendedNoisePos(pos.getX(), pos.getY(), pos.getZ()));
     }
 
-    public static final Entry ACTIONBAR_REMAINING = of( () -> client.inGameHud.overlayRemaining, 0); //TODO Maybe change to seconds
-    public static final Entry TITLE_REMAINING = of( () -> client.inGameHud.titleRemainTicks, 0); //TODO Maybe change to seconds
+    public static final StatFormatter MILLISECONDS_TO_TIME = millisecs -> {
+        int secs = millisecs / 1000;
+        int seconds = secs % 60;
+        int minutes = (secs / 60) % 60;
+        int hours = (secs / 60 / 60);
+        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
+    };
+
+    public static final Entry ACTIONBAR_REMAINING = of( () -> client.inGameHud.overlayRemaining, 0, MILLISECONDS_TO_TIME);
+    public static final Entry TITLE_REMAINING = of( () -> client.inGameHud.titleRemainTicks, 0, MILLISECONDS_TO_TIME);
 
     public static final Entry X = of( () -> cameraEntity().getX(), 3);
     public static final Entry Y = of( () -> cameraEntity().getY(), 3);

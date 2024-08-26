@@ -17,6 +17,7 @@ public class PlayerHeadIconElement extends IconElement {
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
+        context.getMatrices().push();
         int y = piece.y;
         if (!referenceCorner)
             y -= (10*scale-10)/2;
@@ -27,6 +28,7 @@ public class PlayerHeadIconElement extends IconElement {
         int size = (int)(8*scale);
         rotate(context.getMatrices(), size, size);
         PlayerSkinDrawer.draw(context, CLIENT.player.getSkinTextures().texture(), 0, 0, size, hat, flip);
+        context.getMatrices().pop();
     }
 
 }

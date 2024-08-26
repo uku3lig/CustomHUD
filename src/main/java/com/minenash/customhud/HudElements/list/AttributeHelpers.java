@@ -7,6 +7,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.argument.ItemSlotArgumentType;
 import net.minecraft.entity.Entity;
@@ -41,9 +42,9 @@ import static net.minecraft.item.ItemStack.LORE_KEY;
 public class AttributeHelpers {
 
     public static final Function<String, EntityAttribute> ENTITY_ATTR_READER = (src) -> Registries.ATTRIBUTE.get(Identifier.tryParse(src));
-    public static final Function<String, ResourcePackProfile> DATA_PACK_READER = (src) -> {
-        return CLIENT.getServer() == null ? null : CLIENT.getServer().getDataPackManager().getProfile(src);
-    };
+    public static final Function<String, ResourcePackProfile> DATA_PACK_READER = (src) ->
+        CLIENT.getServer() == null ? null : CLIENT.getServer().getDataPackManager().getProfile(src);
+
     private static final Pattern TIMING_PERIOD_TO_SPECIAL = Pattern.compile("(?<!\\\\)\\.");
     public static final Function<String, String> PROFILER_TIMING_READER = (src) -> {
         src = TIMING_PERIOD_TO_SPECIAL.matcher(src).replaceAll("\u001e");
@@ -74,6 +75,16 @@ public class AttributeHelpers {
 
     public record ReceivedPower(Direction direction, int power, int strongPower) {}
 
+    public static PlayerListEntry getPlayer(String src) {
+        PlayerListEntry p = CLIENT.getNetworkHandler().getPlayerListEntry(src);
+        if (p != null)
+            return p;
+        try {
+            return CLIENT.getNetworkHandler().getPlayerListEntry(UUID.fromString(src));
+        }
+        catch (Exception ignored) {}
+        return null;
+    }
 
     public static Entity getFullEntity(Entity entity) {
         return CLIENT.getServer() == null || entity == null? entity :

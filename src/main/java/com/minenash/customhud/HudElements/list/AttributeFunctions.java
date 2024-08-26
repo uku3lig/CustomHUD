@@ -107,7 +107,6 @@ public class AttributeFunctions {
         return scoreboard.getScore(ScoreHolder.fromProfile(player.getProfile()), objective).getScore();
     };
 
-    // SUBTITLES TODO: ADD ALPHA COLOR
     public static final Function<SubtitleEntry,Identifier> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
     public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
     public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;

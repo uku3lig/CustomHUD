@@ -12,16 +12,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class StatusEffectIconElement extends IconElement {
     private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = new Identifier("hud/effect_background_ambient");
     private static final Identifier EFFECT_BACKGROUND_TEXTURE = new Identifier("hud/effect_background");
 
+    private final Supplier<StatusEffectInstance> supplier;
     private final boolean background;
     private final int effectOffset;
 
-    public StatusEffectIconElement(UUID providerID, Flags flags, boolean background) {
+    public StatusEffectIconElement(UUID providerID, Supplier<StatusEffectInstance> supplier, Flags flags, boolean background) {
         super(flags, flags.scale == 1 ? 11 : 12);
+        this.supplier = supplier;
         this.background = background;
         this.effectOffset = scale == 1 ? 1 : Math.round(3F/2*scale);
         this.providerID = providerID;
@@ -30,8 +33,9 @@ public class StatusEffectIconElement extends IconElement {
     @Override
     public void render(DrawContext context, RenderPiece piece) {
         context.getMatrices().push();
-        StatusEffectInstance effect = (StatusEffectInstance) piece.value;
-
+        StatusEffectInstance effect = piece.value != null ? (StatusEffectInstance) piece.value : supplier.get();
+        if (effect == null)
+            return;
 
         int y= piece.y - 2;
         if (!referenceCorner && scale != 1)

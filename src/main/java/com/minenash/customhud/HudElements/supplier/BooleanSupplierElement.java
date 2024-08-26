@@ -1,6 +1,5 @@
 package com.minenash.customhud.HudElements.supplier;
 
-import com.minenash.customhud.CustomHud;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
@@ -61,6 +60,7 @@ public class BooleanSupplierElement implements HudElement {
     public static final Supplier<Boolean> ON_GROUND = () -> client.player.isOnGround();
     public static final Supplier<Boolean> SPRINT_HELD = () -> client.options.sprintKey.isPressed();
 
+    public static final Supplier<Boolean> HUD_HIDDEN = () -> client.options.hudHidden;
     public static final Supplier<Boolean> SCREEN_OPEN = () -> client.currentScreen != null;
     public static final Supplier<Boolean> CHAT_OPEN = () -> client.currentScreen instanceof ChatScreen;
     public static final Supplier<Boolean> PLAYER_LIST_OPEN = () -> ((PlayerListHudAccess)client.inGameHud.getPlayerListHud()).getVisible();

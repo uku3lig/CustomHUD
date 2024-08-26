@@ -62,12 +62,7 @@ public class CustomHud implements ModInitializer {
 	public void onInitialize() {
 		UpdateChecker.check();
 
-		HudRenderCallback.EVENT.register((context, tickDelta) -> {
-//			if (useNewRenderer)
-				CustomHudRenderer3.render(context, tickDelta);
-//			else
-//				CustomHudRenderer.render(context, tickDelta);
-		});
+		HudRenderCallback.EVENT.register(CustomHudRenderer3::render);
 
 
 		ClientTickEvents.END_CLIENT_TICK.register(CustomHud::onTick);
@@ -83,7 +78,6 @@ public class CustomHud implements ModInitializer {
 		MODMENU_INSTALLED = FabricLoader.getInstance().isModLoaded("modmenu");
 
 
-//		readProfiles();
 		ConfigManager.load();
 		updateCrosshairObjectShare();
 

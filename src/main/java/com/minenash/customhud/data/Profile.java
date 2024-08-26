@@ -28,6 +28,7 @@ public class Profile {
 
     public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+)?)? ?(?:, ?([-+]?\\d+)?)? ?(?:, ?(true|false)?)? ?(?:, ?(-?\\d+|fit|max)?)? ?(?:, ?(left|right|center)?)? ?==");
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
+    private static final Pattern RESPECT_HUD_HIDDEN = Pattern.compile("== ?whenhudhidden?: ?(show|showifscreen|hide) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
     private static final Pattern DEBUG_CHART_PATTERN = Pattern.compile("== ?(left|right)chart: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
@@ -44,6 +45,7 @@ public class Profile {
 
     public HudTheme baseTheme = HudTheme.defaults();
     public float targetDistance = 20;
+    public HudHiddenBehavior hudHiddenBehavior = HudHiddenBehavior.SHOW_IF_SCREEN;
     public Crosshairs crosshair = Crosshairs.NORMAL;
     public DebugCharts leftChart = DebugCharts.NONE;
     public DebugCharts rightChart = DebugCharts.NONE;
@@ -95,15 +97,8 @@ public class Profile {
         try {
             if(!Files.exists(path.getParent()))
                 Files.createDirectory(path.getParent());
-            //TODO: ReAdd This!
-            if (!Files.exists(path)) {
+            if (!Files.exists(path))
                 Files.createFile(path);
-//                if (profileID == 1) {
-//                    try (OutputStream writer = Files.newOutputStream(path); InputStream input = Profile.class.getClassLoader().getResourceAsStream("assets/custom_hud/example_profile.txt")) {
-//                        input.transferTo(writer);
-//                    }
-//                }
-            }
             lines = Files.readAllLines(path);
             dateTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
@@ -128,6 +123,11 @@ public class Profile {
                 Matcher matcher = TARGET_RANGE_FLAG_PATTERN.matcher(lineLC);
                 if (matcher.matches()) {
                     profile.targetDistance = matcher.group(1).equals("max") ? 725 : Integer.parseInt(matcher.group(1));
+                    continue;
+                }
+                matcher = RESPECT_HUD_HIDDEN.matcher(lineLC);
+                if (matcher.matches()) {
+                    profile.hudHiddenBehavior = HudHiddenBehavior.parse(matcher.group(1));
                     continue;
                 }
                 matcher = CROSSHAIR_PATTERN.matcher(lineLC);

@@ -80,15 +80,6 @@ public class VariableParser {
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
     private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
 
-    private static final StatFormatter MILLISECONDS_TO_TIME = millisecs -> {
-        int secs = millisecs / 1000;
-        int seconds = secs % 60;
-        int minutes = (secs / 60) % 60;
-        int hours = (secs / 60 / 60);
-        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
-    };
-
-
     public static List<HudElement> addElements(String str, Profile profile, int debugLine, ComplexData.Enabled enabled, boolean line, ListProviderSet listProviders) {
 //        System.out.println("[Line " + debugLine+ "] '" + id + "'");
 
@@ -756,11 +747,6 @@ public class VariableParser {
             return new SudoElements.Bool(  FabricLoader.getInstance().isModLoaded(modid) );
         }
 
-        if (part.startsWith("player_head:")) {
-            String player = part.substring(12);
-
-        }
-
         switch (part) {
             case "gizmo": {
                 if (flags.rotation != 0)
@@ -962,6 +948,7 @@ public class VariableParser {
             case "gliding", "flying_with_style" -> FALLING_WITH_STYLE;
             case "on_ground" -> ON_GROUND;
             case "sprint_held" -> SPRINT_HELD;
+            case "hud_hidden" -> HUD_HIDDEN;
             case "screen_open" -> SCREEN_OPEN;
             case "chat_open" -> CHAT_OPEN;
             case "player_list_open","tab_open" -> PLAYER_LIST_OPEN;
@@ -1665,6 +1652,10 @@ public class VariableParser {
                 enabled.world = enabled.targetBlock = true;
             return e;
         }
+
+        if (part.startsWith("player:"))
+            return attrElement(part, src -> src, false, (player) -> () -> getPlayer(player),
+                    PLAYER, null, ErrorType.UNKNOWN_TEAM_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("team:"))
             return attrElement(part, src -> src, false, (team) -> () -> CLIENT.world.getScoreboard().getTeam(team),

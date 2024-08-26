@@ -10,21 +10,27 @@ import net.minecraft.client.render.entity.PlayerModelPart;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 
-public class ListPlayerHeadIconElement extends IconElement {
+public class SupPlayerHeadIconElement extends IconElement {
 
-    public ListPlayerHeadIconElement(UUID providerID, Flags flags) {
+    private final Supplier<PlayerListEntry> supplier;
+    public SupPlayerHeadIconElement(UUID providerID, Supplier<PlayerListEntry> supplier, Flags flags) {
         super(flags, 10);
         this.providerID = providerID;
+        this.supplier = supplier;
     }
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
         int y = piece.y;
-        PlayerListEntry playerEntry = (PlayerListEntry) piece.value;
+        PlayerListEntry playerEntry = piece.value != null ? (PlayerListEntry) piece.value : supplier.get();
+        if (playerEntry == null)
+            return;
 
+        context.getMatrices().push();
         if (!referenceCorner)
             y -= (10*scale-10)/2;
 
@@ -35,6 +41,7 @@ public class ListPlayerHeadIconElement extends IconElement {
         int size = (int)(8*scale);
         rotate(context.getMatrices(), size, size);
         PlayerSkinDrawer.draw(context, playerEntry.getSkinTextures().texture(), 0, 0, size, hat, flip);
+        context.getMatrices().pop();
     }
 
 }

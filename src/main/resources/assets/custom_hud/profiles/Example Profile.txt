@@ -1,3 +1,4 @@
+==WhenHudHidden: ShowIfScreen==
 ==Section:TopLeft==
 {{fps >= 60, "&a", fps < 30, "&c", "&e"}}{fps}&f fps
 &cX&aY&bZ: &c{bx} &a{by} &b{bz} &f| &e{velocity_xz}
@@ -14,13 +15,13 @@
 &ehttps://customhud.dev/#docs
 
 // Only download this mod from Modrinth or CurseForge
-// Don't download from 9minecraft, mediafire&c, or mega.nz
+// Don't download from 9minecraft, mediafire, or mega.nz
 
 ==Section:TopRight==
 Mem: &e{memory_used_percentage}%&f of &e{memory_total}
 CPU Usage: &e{cpu}%
 Packets: &e{tx} {rx}
-{{tps, "TPS: &e{tps}", "Ping: &e{ping}"}}
+Ping: &e{ping} &fTPS: &e{tps}
 
 {{target_block|target_fluid|target_entity, "&nTargets"}}
 {{target_block, "&e{target_block} &f| &c{tbx}, &a{tby}, &b{tbz}&f [Block]"}}
@@ -30,3 +31,10 @@ Packets: &e{tx} {rx}
 {{item:main|item:off, "&nItems in Hands"}}
 {{item:main, "&e{item:main} {{item:main:max_dur,'(&a{item:main:dur}&e/&a{item:main:max_dur}&e) '}}&f[Main]"}}
 {{item:off, "&e{item:off} {{item:off:max_dur,'(&a{item:off:dur}&e/&a{item:off:max_dur}&e) '}}&f[Off]"}}
+
+==Section:BottomLeft==
+//=BackgroundColor: none=
+{item:head:icon -rich}
+{item:chest:icon -rich}
+{item:legs:icon -rich}
+{item:feet:icon -rich}

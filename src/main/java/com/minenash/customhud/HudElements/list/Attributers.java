@@ -55,8 +55,8 @@ public class Attributers {
         case "show_icon" -> new Bool(sup,STATUS_SHOW_ICON);
         case "color" -> new Num(sup, STATUS_COLOR, flags);
         case "category", "cat" -> new Special(sup,STATUS_CATEGORY);
-        case "icon" -> new StatusEffectIconElement(pid, flags, true); //TODO: LIST ONLY
-        case "icon_no_bg" -> new StatusEffectIconElement(pid, flags, false); //TODO: LIST ONLY
+        case "icon" -> new StatusEffectIconElement(pid, sup, flags, true);
+        case "icon_no_bg" -> new StatusEffectIconElement(pid, sup, flags, false);
         default -> null;
     };
 
@@ -80,7 +80,7 @@ public class Attributers {
             case "creative" -> new Bool(sup,PLAYER_ENTRY_CREATIVE);
             case "adventure" -> new Bool(sup,PLAYER_ENTRY_ADVENTURE);
             case "spectator" -> new Bool(sup,PLAYER_ENTRY_SPECTATOR);
-            case "head" -> new ListPlayerHeadIconElement(pid, flags); //TODO FIX
+            case "head" -> new SupPlayerHeadIconElement(pid, sup, flags);
         default -> null;
     };};
 
@@ -286,7 +286,7 @@ public class Attributers {
         case "text_color" -> new Special(sup, BOSSBAR_TEXT_COLOR);
         case "enabled", "visible" -> new Bool(sup, BOSSBAR_IS_VISIBLE); //SP Only
         case "players" -> new CreateListElement(sbp, sup, BOSSBAR_PLAYERS, PLAYER); //SP Only
-        case "icon", "bar" -> new BossbarIcon(pid, flags);
+        case "icon", "bar" -> new BossbarIcon(pid, sup, flags);
         default -> null;
     };
 

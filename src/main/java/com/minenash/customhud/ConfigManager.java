@@ -8,6 +8,9 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,6 +35,10 @@ public class ConfigManager {
         }
         if(!Files.exists(CONFIG)) {
             CustomHud.LOGGER.info("[CustomHud] Couldn't find the config File, creating one");
+
+            if (isDirEmpty(CustomHud.PROFILE_FOLDER))
+                populate();
+
             CustomHud.readProfiles();
             save();
             return;
@@ -50,6 +57,35 @@ public class ConfigManager {
             if (!readProfiles)
                 CustomHud.readProfiles();
             CustomHud.LOGGER.error("[CustomHud] Couldn't read the config");
+        }
+    }
+
+    private static boolean isDirEmpty(Path path) {
+        try(Stream<Path> files = Files.list(path)) {
+            return files.findAny().isEmpty();
+        }
+        catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static void populate() {
+        URL folder = Profile.class.getClassLoader().getResource("assets/custom_hud/profiles");
+        try (Stream<Path> files = Files.list(Path.of(folder.toURI()))) {
+            files.forEach(file -> {
+                try (OutputStream writer = Files.newOutputStream(CustomHud.PROFILE_FOLDER.resolve(file.getFileName()));
+                     InputStream input = Files.newInputStream(file)){
+                    input.transferTo(writer);
+                }
+                catch (Exception e) {
+                    CustomHud.LOGGER.error("[CustomHud] Can't write default profiles");
+                    CustomHud.LOGGER.catching(e);
+                }
+            });
+        }
+        catch (Exception e) {
+            CustomHud.LOGGER.error("[CustomHud] Can't write default profiles");
+            CustomHud.LOGGER.catching(e);
         }
     }
 
