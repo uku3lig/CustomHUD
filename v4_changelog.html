@@ -339,6 +339,13 @@
       <li>Graphs: Profiler, Fps, Tick, Ping, PacketSize, None</li>
     </ul></li>
   </ul>
+  <ul>
+    <li><code>==WhenHudHidden: &lt;Show|ShowIfScreen|Hide&gt;==</code> (global only)<ul>
+      <li>Default: ShowIfScreen</li>
+      <li>Determines if the profile should show ehn the hud is hidden via F1</li>
+      <li>You can use <code>{hud_hidden}</code> in a conditional to limit what info is shown when the hud is hidden</li>
+    </ul></li>
+  </ul>
   <b style="font-size: 14px">&nbsp;&nbsp;Change how the profile is read (Works Globally and Locally)</b>
 <ul>
   <li><code>==IgnoreBlankLines: &lt;true|false&gt;==</code> <ul>
@@ -403,7 +410,7 @@
     <li><code>{p:latency}</code> , <code>{p:list_score}</code></li>
     <li><code>{p:gamemode}</code> , <code>{p:survival}</code> , <code>{p:creative}</code> , <code>{p:adventure}</code> , <code>{p:spectator}</code></li>
     <li><code>{p:head}</code> (icon)</li>
-    <li><code>{p:team}</code> , <code>{p:team:&lt;team child var&gt;}</code> (see <code>teams</code>)<ul>
+    <li><code>{p:team}</code> , <code>{p:team:&lt;team method&gt;}</code> (see <code>{team:&lt;team&gt;:&lt;method&gt;}</code>)<ul>
       <li>Example <code>{p:team:id}</code></li>
     </ul></li>
   </ul>
@@ -838,6 +845,7 @@
   <li><code>{toggle:&lt;name&gt;:last_pressed}</code> Milliseconds since it was last pressed</li>
   <li><code>{gliding}</code> Flying using an elytra</li>
   <li><code>{perspective}</code> F5 Camera perspective (first, front, back)</li>
+  <li><code>{hud_hidden}</code> If the hud is hidden via F1</li>
   <li><code>{slime_chunk:&lt;seed&gt;}</code><ul>
     <li>You should still use <code>{slime_chunk}</code> in singleplayer</li>
   </ul></li>
@@ -981,6 +989,24 @@
       <li><code>modifiers</code> (a list variable, see the attribute modifiers)</li>
     </ul></details></li>
   </ul></li>
+  <li><details><summary>Player Info <code>{player:&lt;player&gt;:&lt;method&gt;}</code></summary><ul>
+    <li>Methods:<ul>
+
+      <li><code>name</code> / <code>display_name</code> , <code>username</code></li>
+      <li><code>id</code> / <code>uuid</code></li>
+      <li><code>latency</code> , <code>list_score</code></li>
+      <li><code>gamemode</code> , <code>survival</code> , <code>creative</code> , <code>adventure</code> , <code>spectator</code></li>
+      <li><code>head</code> (icon)</li>
+      <li><code>team</code> , <code>team:&lt;team method&gt;}</code> (see Team Info<code>{team::&lt;team&gt;:&lt;method&gt;}</code>)</li>
+
+      <li><code>name</code> , <code>id</code></li>
+      <li><code>color</code> (see new color feature)</li>
+      <li><code>friendly_fire</code> , <code>see_friendly_invis</code> , <code>collision</code></li>
+      <li><code>name_tag_visibility</code> / <code>name_tag</code> , <code>death_msg_visibility</code> / <code>death_msg</code></li>
+      <li>List <code>members</code> with child <code>{member}</code> (members include offline players)</li>
+      <li>List <code>online_players</code> / <code>players</code> (See <code>players</code> child vars)</li>
+    </ul></li>
+  </ul></details></li>
   <li><details><summary>Team Info <code>{team:&lt;team&gt;:&lt;method&gt;}</code></summary><ul>
     <li>Methods:<ul>
       <li><code>name</code> , <code>id</code></li>
@@ -1087,6 +1113,10 @@
     <li><code>{set:&lt;names&gt;, &lt;expression&gt;}</code><ul>
       <li><code>&lt;expression&gt;</code> is the same type as used in conditionals and <code>{$&lt;expression&gt;}</code></li>
       <li>Runs the expression on <strong>set</strong></li>
+    </ul></li>
+    <li><code>{set:&lt;name&gt;, &quot;stuff here&quot;}</code><ul>
+      <li><code>&quot;stuff here&quot;</code> the same as <code>{{&lt;condition&gt;, &quot;stuff here if true&quot;}}</code></li>
+      <li>Example: <code>{set:item_name, &quot;{item:main:name}&quot;}</code></li>
     </ul></li>
     <li><code>{get:&lt;name&gt;}</code></li>
   </ul></li>
