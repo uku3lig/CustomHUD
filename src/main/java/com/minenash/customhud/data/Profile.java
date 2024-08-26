@@ -28,7 +28,7 @@ public class Profile {
 
     public static final Pattern SECTION_DECORATION_PATTERN = Pattern.compile("== ?section: ?(topleft|topcenter|topright|centerleft|centercenter|centerright|bottomleft|bottomcenter|bottomright) ?(?:, ?([-+]?\\d+)?)? ?(?:, ?([-+]?\\d+)?)? ?(?:, ?(true|false)?)? ?(?:, ?(-?\\d+|fit|max)?)? ?(?:, ?(left|right|center)?)? ?==");
     private static final Pattern TARGET_RANGE_FLAG_PATTERN = Pattern.compile("== ?targetrange: ?(\\d+|max) ?==");
-    private static final Pattern RESPECT_HUD_HIDDEN = Pattern.compile("== ?whenhudhidden?: ?(show|showifscreen|hide) ?==");
+    private static final Pattern WHEN_HUD_HIDDEN = Pattern.compile("== ?whenhudhidden?: ?(show|showifscreen|hide) ?==");
     private static final Pattern CROSSHAIR_PATTERN = Pattern.compile("== ?crosshair: ?(.*) ?==");
     private static final Pattern DEBUG_CHART_PATTERN = Pattern.compile("== ?(left|right)chart: ?(.*) ?==");
     private static final Pattern DISABLE_PATTERN = Pattern.compile("== ?disable: ?(.*) ?==");
@@ -126,7 +126,7 @@ public class Profile {
                     profile.targetDistance = matcher.group(1).equals("max") ? 725 : Integer.parseInt(matcher.group(1));
                     continue;
                 }
-                matcher = RESPECT_HUD_HIDDEN.matcher(lineLC);
+                matcher = WHEN_HUD_HIDDEN.matcher(lineLC);
                 if (matcher.matches()) {
                     profile.hudHiddenBehavior = HudHiddenBehavior.parse(matcher.group(1));
                     continue;
