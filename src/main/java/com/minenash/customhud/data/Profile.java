@@ -52,7 +52,8 @@ public class Profile {
     public boolean charts = false;
     public EnumSet<DisableElement> disabled = EnumSet.noneOf(DisableElement.class);
     public Map<String,Toggle> toggles = new LinkedHashMap<>();
-    public Map<String, Double> values = new LinkedHashMap<>();
+    public Map<String, Double> numValues = new LinkedHashMap<>();
+    public Map<String, String> strValues = new LinkedHashMap<>();
     public Map<String, Macro> macros = new LinkedHashMap<>();
 
     private MultiLineStacker stacker = new MultiLineStacker();

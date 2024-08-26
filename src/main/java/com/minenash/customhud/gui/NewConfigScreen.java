@@ -64,12 +64,12 @@ public class NewConfigScreen extends Screen {
         this.addDrawableChild( ButtonWidget.builder(ScreenTexts.DONE, button -> close())
                 .position(this.width / 2 - 155 + 160, this.height - 26).size(150, 20).build() );
 
-        this.addDrawableChild( ButtonWidget.builder(Text.literal("Debug Mode: " + CustomHud.DEBUG_MODE),
+        this.addDrawableChild( ButtonWidget.builder(Text.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")),
                (ButtonWidget button) -> {
                     CustomHud.DEBUG_MODE = !CustomHud.DEBUG_MODE;
-                    button.setMessage( Text.literal("Debug Mode: " + CustomHud.DEBUG_MODE) );
+                    button.setMessage( Text.literal("Debug Log: " + (CustomHud.DEBUG_MODE ? "On" : "Off")) );
                 })
-                .position(6, 6).size(100, 20).build() );
+                .position(6, 6).size(86, 16).build() );
 
         this.addDrawableChild( ButtonWidget.builder(linkText("D", " Support"),
                 button -> Util.getOperatingSystem().open("https://jakobt.dev/discord"))

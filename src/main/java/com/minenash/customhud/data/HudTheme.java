@@ -158,7 +158,7 @@ public class HudTheme {
             }
             padded = true;
 
-            if (!matcher.group(4).isEmpty()) { //Top, Bottom, Left, Right
+            if (!empty(matcher,4)) { //Top, Bottom, Left, Right
                 padding = new Padding(
                         empty(matcher,1) ? padding.top : Integer.parseInt(matcher.group(1)),
                         empty(matcher,3) ? padding.bottom : Integer.parseInt(matcher.group(3)),
@@ -166,7 +166,7 @@ public class HudTheme {
                         empty(matcher,7) ? padding.right : Integer.parseInt(matcher.group(7))
                 );
             }
-            else if (!matcher.group(2).isEmpty()) { //Vertical, Horizontal
+            else if (!empty(matcher,2)) { //Vertical, Horizontal
                 padding = new Padding(
                         empty(matcher, 1) ? padding.top : Integer.parseInt(matcher.group(1)),
                         empty(matcher, 1) ? padding.bottom : Integer.parseInt(matcher.group(1)),
@@ -174,7 +174,7 @@ public class HudTheme {
                         empty(matcher, 3) ? padding.right : Integer.parseInt(matcher.group(3))
                 );
             }
-            else if (!matcher.group(1).isEmpty()) { // All
+            else if (!empty(matcher,1)) { // All
                 int p = Integer.parseInt(matcher.group(1));
                 padding = new Padding(p, p, p, p);
             }

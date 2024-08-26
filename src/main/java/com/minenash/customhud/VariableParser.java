@@ -379,10 +379,20 @@ public class VariableParser {
             int commaIndex = part.indexOf(",");
             if (commaIndex == -1) {
                 String valueName = part.substring(4).trim();
-                return new SetValueElement(valueName, new Operation.Literal(0));
+                return new SetValueElement(valueName, new Operation.Literal(0), null);
             }
-            Operation op = ExpressionParser.parseExpression(part.substring(commaIndex+1).trim(), part, profile, debugLine, enabled, listProviders, false);
-            return new SetValueElement(part.substring(4,commaIndex).toLowerCase(), op);
+            String name = part.substring(4,commaIndex).toLowerCase();
+            String valueStr = part.substring(commaIndex+1).trim();
+
+            Matcher matcher = SPACE_STR_PATTERN.matcher(valueStr);
+            if (matcher.matches()) {
+                return new SetValueElement(name, null, addElements(matcher.group(1), profile, debugLine, enabled, false, listProviders));
+            }
+            else {
+                Operation op = ExpressionParser.parseExpression(valueStr, part, profile, debugLine, enabled, listProviders, false);
+                return new SetValueElement(name, op, null);
+            }
+
         }
 
         if (part.startsWith("setmacro:") || part.startsWith("setm:")) {

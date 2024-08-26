@@ -32,9 +32,6 @@ Ping: &e{ping} &fTPS: &e{tps}
 {{item:main, "&e{item:main} {{item:main:max_dur,'(&a{item:main:dur}&e/&a{item:main:max_dur}&e) '}}&f[Main]"}}
 {{item:off, "&e{item:off} {{item:off:max_dur,'(&a{item:off:dur}&e/&a{item:off:max_dur}&e) '}}&f[Off]"}}
 
-==Section:BottomLeft==
-//=BackgroundColor: none=
-{item:head:icon -rich}
-{item:chest:icon -rich}
-{item:legs:icon -rich}
-{item:feet:icon -rich}
+==Section:TopCenter==
+=BackgroundColor: none=
+{item:head:icon -rich}{item:chest:icon -rich}{item:legs:icon -rich}{item:feet:icon -rich}

@@ -155,7 +155,7 @@ public class CustomHud implements ModInitializer {
 
 		while (kb_showErrors.wasPressed()) {
 			if (client.currentScreen == null)
-				if (ProfileManager.getActive() != null)
+				if (ProfileManager.getActive() != null && Errors.hasErrors(ProfileManager.getActive().name))
 					CLIENT.setScreen(new ErrorsScreen(null));
 				else
 					CLIENT.setScreen(new NewConfigScreen(null));

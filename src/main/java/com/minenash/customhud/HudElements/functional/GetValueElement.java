@@ -2,11 +2,9 @@ package com.minenash.customhud.HudElements.functional;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
-import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.ProfileManager;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.NumberFlags;
-import net.minecraft.stat.StatFormatter;
 
 public class GetValueElement implements HudElement, NumElement {
 
@@ -21,21 +19,28 @@ public class GetValueElement implements HudElement, NumElement {
 
     @Override
     public String getString() {
-        return flags.formatString( getNumber().doubleValue() );
+        String strValue = ProfileManager.getActive().strValues.get(valueName);
+        return strValue != null ? strValue : flags.formatString( getNum() );
     }
 
     @Override
     public Number getNumber() {
-        return ProfileManager.getActive().values.getOrDefault(valueName, Double.NaN);
+        String strValue = ProfileManager.getActive().strValues.get(valueName);
+        return strValue != null ? strValue.length() : getNum();
     }
 
     @Override
     public boolean getBoolean() {
-        return getNumber().doubleValue() > 0;
+        String strValue = ProfileManager.getActive().strValues.get(valueName);
+        return strValue != null ? strValue.isEmpty() : getNum() > 0;
     }
 
     @Override
     public int getPrecision() {
         return flags.precision();
+    }
+
+    private double getNum() {
+        return ProfileManager.getActive().numValues.getOrDefault(valueName, Double.NaN);
     }
 }
