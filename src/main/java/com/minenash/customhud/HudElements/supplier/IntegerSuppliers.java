@@ -210,6 +210,7 @@ public class IntegerSuppliers {
     public static final Supplier<Number> SATURATION_LEVEL = () -> client.player.getHungerManager().getSaturationLevel();
     public static final Supplier<Number> ARMOR_LEVEL = () -> client.player.getArmor();
     public static final Supplier<Number> AIR_LEVEL = () -> Math.round(20F * client.player.getAir() / client.player.getMaxAir());
+    public static final Supplier<Number> SCORE = () -> client.player.getScore();
     public static final Supplier<Number> XP_LEVEL = () -> client.player.experienceLevel;
     public static final Supplier<Number> XP_POINTS = () -> client.player.experienceProgress * client.player.getNextLevelExperience();
     public static final Supplier<Number> XP_POINTS_NEEDED = () -> client.player.getNextLevelExperience();

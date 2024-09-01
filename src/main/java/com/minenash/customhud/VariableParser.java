@@ -1120,6 +1120,7 @@ public class VariableParser {
             case "armor","armour" -> ARMOR_LEVEL;
             case "armor_per","armor_percentage","armour_per","armour_percentage" -> ARMOR_LEVEL_PERCENTAGE;
             case "air" -> AIR_LEVEL;
+            case "score" -> SCORE;
             case "xp_level" -> XP_LEVEL;
             case "xp" -> XP_POINTS;
             case "xp_needed" -> XP_POINTS_NEEDED;
