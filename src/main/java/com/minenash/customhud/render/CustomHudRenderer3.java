@@ -27,6 +27,7 @@ import java.util.UUID;
 public class CustomHudRenderer3 {
 
     private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Identifier defaultFont = Identifier.of("minecraft", "default");
 
     public static Identifier font;
     public static HudTheme theme;
@@ -58,6 +59,7 @@ public class CustomHudRenderer3 {
                 continue;
 
             theme = profile.baseTheme;
+            font = profile.baseTheme.font;
             BackgroundBuilder bgBuilder = new BackgroundBuilder(section);
             int totalHeight = 0;
 
@@ -231,8 +233,10 @@ public class CustomHudRenderer3 {
                 }
             else if (piece.element instanceof String value && !value.isEmpty())
                 context.drawText(client.textRenderer, value, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
-            else if (piece.element instanceof Text text)
-                context.drawText(client.textRenderer, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y-1 : piece.y, piece.color, piece.shadow);
+            else if (piece.element instanceof Text text) {
+                text = text.getStyle().getFont().equals(defaultFont) ? text.copy().setStyle(text.getStyle().withFont(font)) : text;
+                context.drawText(client.textRenderer, text, piece.x, piece.shiftTextUpOrFitItemIcon ? piece.y - 1 : piece.y, piece.color, piece.shadow);
+            }
 
         }
 
@@ -258,6 +262,7 @@ public class CustomHudRenderer3 {
 
         client.getProfiler().pop();
         context.getMatrices().pop();
+        font = null;
         client.getProfiler().pop();
 
     }
