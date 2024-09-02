@@ -60,7 +60,7 @@ public class CustomHud implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		UpdateChecker.check();
+//		UpdateChecker.check();
 
 		HudRenderCallback.EVENT.register(CustomHudRenderer3::render);
 

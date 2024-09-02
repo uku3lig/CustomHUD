@@ -448,7 +448,12 @@ public class VariableParser {
             }
 
             if (!part.contains(",")) {
-                Identifier id = new Identifier(main.endsWith(".png") ? main : main + ".png");
+                String path = main.endsWith(".png") ? main : main + ".png";
+                Identifier id = Identifier.tryParse(path);
+                if (id == null) {
+                    Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, path);
+                    return null;
+                }
                 Flags flags = Flags.parse(profile.name, debugLine, flagParts);
                 SimpleTextureIconElement element = new SimpleTextureIconElement(id, flags);
                 if (element.isIconAvailable())
@@ -464,7 +469,12 @@ public class VariableParser {
             }
 
             String[] mainParts = matcher.group(1).split(" ");
-            Identifier id = new Identifier(mainParts[0].endsWith(".png") ? mainParts[0] : mainParts[0] + ".png");
+            String path = mainParts[0].endsWith(".png") ? mainParts[0] : mainParts[0] + ".png";
+            Identifier id = Identifier.tryParse(path);
+            if (id == null) {
+                Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ICON, path);
+                return null;
+            }
             Operation u = matcher.group(3) == null || matcher.group(3).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(3), original, profile, debugLine, enabled, listProviders, false);
             Operation v = matcher.group(4) == null || matcher.group(4).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(4), original, profile, debugLine, enabled, listProviders, false);
             Operation w = matcher.group(5) == null || matcher.group(5).isBlank() ? null : ExpressionParser.parseExpression(matcher.group(5), original, profile, debugLine, enabled, listProviders, false);
