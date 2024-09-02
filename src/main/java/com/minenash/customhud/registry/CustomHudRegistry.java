@@ -8,6 +8,7 @@ import com.minenash.customhud.data.Flags;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class CustomHudRegistry {
 
@@ -15,7 +16,7 @@ public class CustomHudRegistry {
     private static final Map<String, BiFunction<String,ParseContext,HudElement>> parseRegistry = new LinkedHashMap<>();
     private static final Map<String, ListProvider> listRegistry = new HashMap<>();
     private static final Map<String, ComplexData.Enabled> listRegistryEnabled = new HashMap<>();
-    private static final List<Runnable> complexData = new ArrayList<>();
+    private static final List<Consumer<ComplexData.Enabled>> complexData = new ArrayList<>();
 
     public static void registerElement(String name, BiFunction<Flags,ParseContext,HudElement> element) {
         elementRegistry.put(name, element);
@@ -77,13 +78,13 @@ public class CustomHudRegistry {
     }
 
 
-    public static void registerComplexData(Runnable function) {
+    public static void registerComplexData(Consumer<ComplexData.Enabled> function) {
         complexData.add(function);
     }
 
-    public static void runComplexData() {
-        for (Runnable runnable : complexData)
-            runnable.run();
+    public static void runComplexData(ComplexData.Enabled enabled) {
+        for (var complex : complexData)
+            complex.accept(enabled);
     }
 
 }

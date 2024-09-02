@@ -361,7 +361,7 @@ public class ComplexData {
 
         SubtitleTracker.INSTANCE.setEnable(profile.enabled.subtitles);
         CLIENT.getProfiler().push("registry");
-        CustomHudRegistry.runComplexData();
+        CustomHudRegistry.runComplexData(profile.enabled);
         CLIENT.getProfiler().pop();
         CLIENT.getProfiler().pop();
     }
@@ -441,6 +441,8 @@ public class ComplexData {
 
     public static class Enabled {
         public static final Enabled DISABLED = new Enabled();
+        public final Map<String,Boolean> custom = new HashMap<>();
+
         public boolean clientChunk = false;
         public boolean serverChunk = false;
         public boolean serverWorld = false;
@@ -475,6 +477,17 @@ public class ComplexData {
                 try { field.setBoolean(this, field.getBoolean(this) || field.getBoolean(enabled)); }
                 catch (Exception ignored) {}
             }
+            this.custom.putAll(enabled.custom);
+        }
+
+        public boolean get(String name) {
+            return custom.getOrDefault(name, false);
+        }
+        public void set(String name) {
+            custom.put(name, true);
+        }
+        public void set(String name, boolean value) {
+            custom.put(name, value);
         }
     }
 
