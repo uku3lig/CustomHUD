@@ -40,7 +40,7 @@ public class CustomHud implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("CustomHud");
 	public static boolean MODMENU_INSTALLED = false;
 
-	public static boolean DEBUG_MODE = true;
+	public static boolean DEBUG_MODE = false;
 
 	public static final Path CONFIG_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud");
 	public static final Path PROFILE_FOLDER = FabricLoader.getInstance().getConfigDir().resolve("custom-hud/profiles");
