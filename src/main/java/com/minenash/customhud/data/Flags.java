@@ -51,7 +51,7 @@ public class Flags {
     private static final Pattern SCALE_PATTERN = Pattern.compile("-(?:s|scale)((\\d+)/(\\d+)|\\d+(\\.\\d+)?)");
     private static final Pattern FREQUENCY_PATTERN = Pattern.compile("-(?:v|freq|frequency)((\\d+)/(\\d+)|\\d+(\\.\\d+)?)");
     private static final Pattern WIDTH_PATTERN = Pattern.compile("-(?:w|width)(\\d+)");
-    private static final Pattern SHIFT_PATTERN = Pattern.compile("-(?:sh|shift)(-?\\d+)(?:,(-?\\d+))?");
+    public static final Pattern SHIFT_PATTERN = Pattern.compile("-(?:sh|shift)(-?\\d+)(?:[,|](-?\\d+))?");
     private static final Pattern ROTATE_PATTERN = Pattern.compile("-(?:r|rotation)(-?\\d+)");
     private static final Pattern PREFIX_PATTERN = Pattern.compile("-(?:pre|prefix):(-?\\w+)");
     private static final Pattern BASE_PATTERN = Pattern.compile("-base(\\d+)");

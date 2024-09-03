@@ -209,15 +209,15 @@ public class AttributeHelpers {
         if (stack.isEmpty() || nbt == null)
             return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
         if (nbt.contains("Items", NbtElement.LIST_TYPE))
-            return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE) );
+            return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
         if (!nbt.contains("BlockEntityTag"))
             return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
         nbt = nbt.getCompound("BlockEntityTag");
         if (!nbt.contains("Items", NbtElement.LIST_TYPE))
             return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
-        return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE) );
+        return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
     }
-    private static List<ItemStack> getItemItemsInternal(ItemStack stack, NbtList list) {
+    private static List<ItemStack> getItemItemsInternal(ItemStack stack, NbtList list, boolean returnStack) {
         List<ItemStack> items = new ArrayList<>(list.size());
 
         for(int i = 0; i < list.size(); ++i) {
@@ -226,6 +226,10 @@ public class AttributeHelpers {
                 is.setCount(is.getCount() * stack.getCount());
             items.addAll(inner);
         }
+
+        if (items.isEmpty() && returnStack)
+            return Collections.singletonList(stack);
+
         return items;
     }
 

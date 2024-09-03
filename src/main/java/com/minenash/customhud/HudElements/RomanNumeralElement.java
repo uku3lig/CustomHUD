@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-public class RomanNumeralElement implements HudElement, MultiElement {
+public class RomanNumeralElement extends FunctionalElement implements HudElement, MultiElement {
 
     private static final Identifier ROMAN_NUMERAL_FONT = new Identifier("custom_hud", "roman");
     private final HudElement base;

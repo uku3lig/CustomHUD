@@ -76,7 +76,7 @@ public class VariableParser {
 
     private static final Pattern HEX_COLOR_VARIABLE_PATTERN = Pattern.compile("&\\{(?:0x|#)?([0-9a-fA-F]{3,8})}");
     private static final Pattern EXPRESSION_WITH_PRECISION = Pattern.compile("\\$(?:(\\d+) *,)?(.*)");
-    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::([\\w.: /-]*))?.*");
+    private static final Pattern ITEM_VARIABLE_PATTERN = Pattern.compile("([\\w.-]*)(?::?([\\w.: /|-]*))?.*");
     private static final Pattern SPACE_STR_PATTERN = Pattern.compile("\"(.*)\"");
     private static final Pattern IS_LIST_PATTERN = Pattern.compile("([\\w\\s:-]+),\\s*\".*");
 
@@ -775,9 +775,9 @@ public class VariableParser {
             }
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
             case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags, false), flags);
             case "target_fluid_icon", "tficon": enabled.targetFluid = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags), flags);
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags, false), flags);
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
@@ -1739,12 +1739,23 @@ public class VariableParser {
     public static <T> HudElement attrElement(String part, Function<String,T> reader, boolean tryWithNamespace, Function<T,Supplier<?>> supplier,
                                               Attributer attributer, ErrorType unknownX, ErrorType unknownAttribute,
                                               Profile profile, int debugLine, ComplexData.Enabled enabled, String original) {
-        Matcher matcher = ITEM_VARIABLE_PATTERN.matcher(part.substring(part.indexOf(':')+1));
+        part = part.substring(part.indexOf(':')+1);
+        Matcher m = ITEM_VARIABLE_PATTERN.matcher(part);
 
-        if (!matcher.matches()) return null;
+        if (!m.matches()) return null;
 
-        String src = matcher.group(1) == null ? "" : matcher.group(1);
-        String method = matcher.group(2) == null ? "" : matcher.group(2);
+        Matcher shiftFlagMatcher = Flags.SHIFT_PATTERN.matcher(part);
+        if (shiftFlagMatcher.find() && shiftFlagMatcher.start() < m.end(2)) {
+            int index = m.end(2);
+            part = part.substring(0, index) + "|" + part.substring(index+1);
+            m = ITEM_VARIABLE_PATTERN.matcher(part);
+            m.matches();
+        }
+
+
+
+        String src = m.group(1) == null ? "" : m.group(1);
+        String method = m.group(2) == null ? "" : m.group(2);
         String oMethod = method;
         int dotIndex = method.lastIndexOf('.');
         if (dotIndex != -1 && dotIndex > method.lastIndexOf(":"))

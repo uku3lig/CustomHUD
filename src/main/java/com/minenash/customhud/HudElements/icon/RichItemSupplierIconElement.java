@@ -22,15 +22,17 @@ public class RichItemSupplierIconElement extends IconElement {
     private final Supplier<?> supplier;
     private final boolean showCount, showDur, showCooldown;
     private final int numSize;
+    private final boolean invCount;
 
-    public RichItemSupplierIconElement(UUID providerID, Supplier<?> supplier, Flags flags) {
+    public RichItemSupplierIconElement(UUID providerID, Supplier<?> supplier, Flags flags, boolean invCount) {
         super(flags, 11);
         this.supplier = supplier;
-        this.showCount = flags.iconShowCount;
+        this.showCount = flags.iconShowCount | invCount;
         this.showDur = flags.iconShowDur;
         this.showCooldown = flags.iconShowCooldown;
         this.numSize = flags.numSize;
         this.providerID = providerID;
+        this.invCount = invCount;
     }
 
     @Override
@@ -85,8 +87,10 @@ public class RichItemSupplierIconElement extends IconElement {
 
         context.drawItem(stack, 0, 0);
 
-        if (showCount && stack.getCount() != 1) {
-            String string = String.valueOf(stack.getCount());
+        int count = !invCount ? stack.getCount() : client.player.getInventory().count(stack.getItem());
+
+        if (showCount && count != 1) {
+            String string = String.valueOf(count);
             string = numSize == 0 ? string : numSize == 1 ? Flags.subNums(string) : Flags.supNums(string);
             matrices.translate(0.0F, 0.0F, 200.0F);
             context.drawText(client.textRenderer, string, 19 - 2 - client.textRenderer.getWidth(string), numSize == 2 ? 0 : 9, 16777215, true);

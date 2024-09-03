@@ -180,13 +180,15 @@ public class Attributers {
             case "name" -> new SpecialText(sup, ITEM_CUSTOM_NAME);
             case "count" -> new NumBool(sup, ITEM_COUNT, ITEM_IS_NOT_EMPTY, flags);
             case "max_count" -> new NumBool(sup, ITEM_MAX_COUNT, ITEM_IS_STACKABLE, flags);
+            case "inv_count" -> new NumBool(sup, ITEM_INV_COUNT, ITEM_HAS_MORE_OUT_OF_STACK, flags);
             case "dur","durability" -> new NumBool(sup, ITEM_DURABILITY, ITEM_HAS_DURABILITY, flags);
             case "max_dur","max_durability" -> new NumBool(sup, ITEM_MAX_DURABILITY, ITEM_HAS_MAX_DURABILITY, flags);
             case "dur_per","durability_percentage" -> new NumBool(sup, ITEM_DURABILITY_PERCENT, ITEM_HAS_MAX_DURABILITY, flags);
             case "dur_color","durability_color" -> new NumBool(sup, ITEM_DURABILITY_COLOR, ITEM_HAS_MAX_DURABILITY, flags);
             case "unbreakable" -> new Bool(sup, ITEM_UNBREAKABLE);
             case "repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
-            case "icon" -> new RichItemSupplierIconElement(pid, sup, flags);
+            case "icon" -> new RichItemSupplierIconElement(pid, sup, flags, false);
+            case "inv_count_icon" -> new RichItemSupplierIconElement(pid, sup, flags, true);
             case "hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
             case "rarity" -> new Special(sup, ITEM_RARITY);
             case "armor_slot" -> new Special(sup, ITEM_ARMOR_SLOT);
@@ -419,7 +421,7 @@ public class Attributers {
     public static final Attributer ITEM_CONVERTABLE_TAG_ENTRY = (pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Tex(sup, TAG_ENTRY_NAME);
         case "", "id" -> new Id(sup, TAG_ENTRY_ID,flags);
-        case "icon" -> new RichItemSupplierIconElement(pid, () -> new ItemStack(((ItemConvertible) sup.get()).asItem()), flags);
+        case "icon" -> new RichItemSupplierIconElement(pid, () -> new ItemStack(((ItemConvertible) sup.get()).asItem()), flags, false);
         default -> null;
     };
 

@@ -186,7 +186,9 @@ public class AttributeFunctions {
 
     public static final Function<ItemStack, Number> ITEM_COUNT = (stack) -> stack.getCount();
     public static final Function<ItemStack, Number> ITEM_MAX_COUNT = (stack) -> stack.getMaxCount();
+    public static final Function<ItemStack, Number> ITEM_INV_COUNT = (stack) -> CLIENT.player.getInventory().count(stack.getItem());
     public static final Function<ItemStack, Boolean> ITEM_IS_STACKABLE = (stack) -> stack.getMaxCount() > 1;
+    public static final Function<ItemStack, Boolean> ITEM_HAS_MORE_OUT_OF_STACK = (stack) -> CLIENT.player.getInventory().count(stack.getItem()) > stack.getCount();
     public static final Function<ItemStack, Boolean> ITEM_HAS_DURABILITY = (stack) -> stack.getItem().getMaxDamage() - CLIENT.player.getMainHandStack().getDamage() > 0;
     public static final Function<ItemStack, Boolean> ITEM_HAS_MAX_DURABILITY = (stack) -> stack.getItem().getMaxDamage() > 0;
     public static final Function<ItemStack, Number> ITEM_DURABILITY = (stack) -> stack.getMaxDamage() - stack.getDamage();
