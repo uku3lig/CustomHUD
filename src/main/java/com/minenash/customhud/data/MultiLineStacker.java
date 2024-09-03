@@ -103,12 +103,13 @@ public class MultiLineStacker {
     public void startFor(String list, Profile profile, int line, ComplexData.Enabled enabled, String source) {
         List<String> parts = VariableParser.partitionConditional(list);
         list = parts.get(0);
+        boolean reverse = false;
 
         ListProviderSet.Entry provider = VariableParser.getListProvider(list, profile, line, enabled, source, listProviders);
         if (provider != null && provider.provider() == ListProvider.REGUIRES_MODMENU) {
             Errors.addError(profile.name, line, source, ErrorType.REQUIRES_MODMENU, "");
             listProviders.push(null);
-            stack.push( new ListElement.MultiLineBuilder(null, null, null) );
+            stack.push( new ListElement.MultiLineBuilder(null, null, null, false) );
             return;
         }
 
@@ -116,7 +117,7 @@ public class MultiLineStacker {
             HudElement e = VariableParser.getAttributeElement(list, profile, line, enabled, source);
             if (e instanceof FunctionalElement.IgnoreErrorElement) {
                 listProviders.push(null);
-                stack.push( new ListElement.MultiLineBuilder(null, null, null) );
+                stack.push( new ListElement.MultiLineBuilder(null, null, null, false) );
                 return;
             }
             if (e instanceof FunctionalElement.CreateListElement cle)
@@ -133,6 +134,7 @@ public class MultiLineStacker {
             if (e instanceof FunctionalElement.CreateListElement cle) {
                 provider = cle.entry;
             }
+            reverse = flags.reverseList;
 
         }
 
@@ -140,7 +142,7 @@ public class MultiLineStacker {
 
         if (provider == null) {
             Errors.addError(profile.name, line, source, ErrorType.UNKNOWN_LIST, list);
-            stack.push( new ListElement.MultiLineBuilder(null, null, null) );
+            stack.push( new ListElement.MultiLineBuilder(null, null, null, false) );
             return;
         }
 
@@ -151,7 +153,7 @@ public class MultiLineStacker {
             filter.printTree(2);
         }
 
-        stack.push( new ListElement.MultiLineBuilder(provider.provider(), provider.id(), filter) );
+        stack.push( new ListElement.MultiLineBuilder(provider.provider(), provider.id(), filter, reverse) );
     }
 
     public void forSeparator(Profile profile, int line, String source) {

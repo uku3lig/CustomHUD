@@ -102,9 +102,9 @@ public class AttributeHelpers {
         AttributeContainerAccessor container = (AttributeContainerAccessor) le.getAttributes();
         Map<EntityAttribute, EntityAttributeInstance> instances = new HashMap<>(((DefaultAttributeContainerAccessor)container.getFallback()).getInstances());
         instances.putAll(container.getCustom());
-        return (entity.getWorld().isClient ?
+        return Arrays.asList( (EntityAttributeInstance[]) (entity.getWorld().isClient ?
                 instances.values().stream().filter(a -> a.getAttribute().isTracked()) : instances.values().stream())
-                .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().getTranslationKey()))).toList();
+                .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().getTranslationKey()))).toArray() );
     }
 
     public record ItemAttribute(EntityAttribute attribute, EntityAttributeModifier modifier, String slot) {}
@@ -256,7 +256,7 @@ public class AttributeHelpers {
             return serverBossbars;
 
         Set<UUID> client = CLIENT.inGameHud.getBossBarHud().bossBars.keySet();
-        return serverBossbars.stream().filter(bar -> client.contains(bar.getUuid())).toList();
+        return Arrays.asList( serverBossbars.stream().filter(bar -> client.contains(bar.getUuid())).toArray() );
     }
 
     public static BossBar getBossBar(String input) {

@@ -22,6 +22,7 @@ public class Flags {
     public boolean noDelimiters = false;
     public IdPart idPart = IdPart.FULL;
     public String listPrefix = "";
+    public boolean reverseList = false;
 
     public int precision = -1;
     public double scale = 1;
@@ -88,6 +89,7 @@ public class Flags {
                 case "-count" -> flags.iconShowCount = true;
                 case "-dur" -> flags.iconShowDur = true;
                 case "-cooldown" -> flags.iconShowCooldown = true;
+                case "-r", "-reverse" -> flags.reverseList = true;
                 default -> {
                     //Decimals
                     Matcher matcher = PRECISION_PATTERN.matcher(parts[i]);

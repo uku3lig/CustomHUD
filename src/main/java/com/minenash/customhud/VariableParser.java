@@ -601,7 +601,7 @@ public class VariableParser {
             int dotIndex = method.lastIndexOf('.');
             if (dotIndex != -1)
                 method = method.substring(0, dotIndex);
-            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(flags.listPrefix, null, () -> CLIENT.player.getScoreboardTeam(), method, flags, null );
+            HudElement element = ATTRIBUTER_MAP.get(TEAMS).get(null, () -> CLIENT.player.getScoreboardTeam(), method, flags, null );
             if (element instanceof CreateListElement cle) {
                 String attr = dotIndex == -1 ? "" : flagParts[0].substring(dotIndex + 1);
                 cle.attribute = Attributers.get(new ListProviderSet().with(cle.entry), attr, new Flags(), profile, debugLine);
@@ -1391,7 +1391,7 @@ public class VariableParser {
 
         return ListElement.of(provider.provider(), provider.id(),
                 addElements(format, profile, debugLine, enabled, false, listProviders),
-                addElements(seperator, profile, debugLine, enabled, false, listProviders), operation);
+                addElements(seperator, profile, debugLine, enabled, false, listProviders), operation, provider.reverse());
     }
 
     public static ListProviderSet.Entry getListProvider(String variable, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
@@ -1453,20 +1453,31 @@ public class VariableParser {
         if (provider == null)
             return null;
 
-        return new ListProviderSet.Entry(provider, randomUUID(), getPrefix(provider, flagParts, profile.name, debugLine, variable));
+        var flags = getPrefix(provider, flagParts, profile.name, debugLine, variable);
+        return new ListProviderSet.Entry(provider, randomUUID(), flags.getLeft(), flags.getRight());
     }
 
-    public static String getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
+    public static Pair<String,Boolean> getPrefix(ListProvider provider, String[] flagParts, String profile, int line, String part) {
         String prefix = Attributers.defaultPrefix(provider);
+        boolean reversed = false;
         for (int i = 1; i < flagParts.length; i++) {
             if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:")) {
                 prefix = flagParts[i].substring(flagParts[i].indexOf(':')+1);
+            }
+            else if (flagParts[i].equalsIgnoreCase("-r") || flagParts[i].equalsIgnoreCase("-reverse")) {
+                reversed = true;
             }
             else {
                 Errors.addError(profile, line, part, ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, flagParts[i]);
             }
         }
-        return prefix;
+        return new Pair<>(prefix, reversed);
+    }
+    public static boolean getReversed(String[] flagParts) {
+        for (int i = 1; i < flagParts.length; i++)
+            if (flagParts[i].equalsIgnoreCase("-r") || flagParts[i].equalsIgnoreCase("-reverse"))
+                return true;
+        return false;
     }
 
     public static ListProviderSet.Entry getLoopProvider(String variable, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
@@ -1511,6 +1522,7 @@ public class VariableParser {
         ATTRIBUTER_MAP.put(provider, LOOP_ITEM);
 
         String[] flagParts = ("loop" + argsStr.substring(endIndex+1)).split(" ");
+
         String prefix = Attributers.DEFAULT_PREFIX.get(LOOP_ITEM);
         for (int i = 1; i < flagParts.length; i++) {
             if (flagParts[i].startsWith("-pre:") || flagParts[i].startsWith("-prefix:"))
@@ -1519,7 +1531,7 @@ public class VariableParser {
                 Errors.addError(profile.name, debugLine, variable, ErrorType.UNKNOWN_LIST_VARIABLE_FLAG, flagParts[i]);
         }
 
-        return new ListProviderSet.Entry(provider, randomUUID(), prefix);
+        return new ListProviderSet.Entry(provider, randomUUID(), prefix, getReversed(flagParts));
     }
 
     public static HudElement barElement(boolean background, String part, Profile profile, int debugLine, ComplexData.Enabled enabled, String original, ListProviderSet listProviders) {
@@ -1568,8 +1580,8 @@ public class VariableParser {
         ListProvider provider = getProvider.apply(flagParts[0]);
         if (provider == null)
             return null;
-        String prefix = getPrefix(provider, flagParts, profile.name, debugLine, original);
-        return listElement( new ListProviderSet.Entry(provider, randomUUID(), prefix), part, commaIndex, profile, debugLine, enabled, original, listProviders);
+        var flags = getPrefix(provider, flagParts, profile.name, debugLine, original);
+        return listElement( new ListProviderSet.Entry(provider, randomUUID(), flags.getLeft(), flags.getRight()), part, commaIndex, profile, debugLine, enabled, original, listProviders);
     }
 
 
@@ -1633,7 +1645,7 @@ public class VariableParser {
 
         return ListElement.of(provider.provider(), provider.id(),
                 addElements(format, profile, debugLine, enabled, false, listProviders),
-                addElements(seperator, profile, debugLine, enabled, false, listProviders), operation);
+                addElements(seperator, profile, debugLine, enabled, false, listProviders), operation, provider.reverse());
 
     }
 
@@ -1757,7 +1769,7 @@ public class VariableParser {
         String[] flagParts = oMethod.split(" ");
         Flags flags = Flags.parse(profile.name, debugLine, flagParts);
         ParseContext context = new ParseContext(profile, debugLine, enabled, null);
-        HudElement element = attributer.get(flags.listPrefix, null, supplier.apply(value), flagParts[0], flags, context);
+        HudElement element = attributer.get(null, supplier.apply(value), flagParts[0], flags, context);
 
         if (element == null) {
             Errors.addError(profile.name, debugLine, original, unknownAttribute, method);

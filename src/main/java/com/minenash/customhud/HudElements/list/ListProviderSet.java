@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class ListProviderSet {
 
-    public record Entry(ListProvider provider, UUID id, String prefix) {}
+    public record Entry(ListProvider provider, UUID id, String prefix, boolean reverse) {}
 
     public final List<Entry> entries;
 
@@ -18,8 +18,8 @@ public class ListProviderSet {
         this.entries = entries;
     }
 
-    public ListProviderSet with(ListProvider provider, UUID providerID, String prefix) {
-        return with( new Entry(provider, providerID, prefix) );
+    public ListProviderSet with(ListProvider provider, UUID providerID, String prefix, boolean reverse) {
+        return with( new Entry(provider, providerID, prefix, reverse) );
     }
     public ListProviderSet with(Entry entry) {
         List<Entry> es = new ArrayList<>(entries);

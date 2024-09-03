@@ -88,11 +88,11 @@ public enum ErrorType {
     ErrorType(String linkText, String link, String msg) {
         this.message = msg;
         this.linkText = linkText == null ? null : Text.literal(linkText).formatted(Formatting.AQUA, Formatting.UNDERLINE);
-        this.link = "https://customhud.dev/v3/" + link;
+        this.link = "https://customhud.dev/v4/" + link;
     }
     ErrorType(String linkText, String link, String msg, boolean directLink) {
         this.message = msg;
         this.linkText = linkText == null ? null : Text.literal(linkText).formatted(Formatting.AQUA, Formatting.UNDERLINE);
-        this.link = directLink ? link : "https://customhud.dev/v3/" + link;
+        this.link = directLink ? link : "https://customhud.dev/v4/" + link;
     }
 }

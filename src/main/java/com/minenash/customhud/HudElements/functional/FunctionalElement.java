@@ -6,6 +6,7 @@ import com.minenash.customhud.HudElements.list.*;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.ListManager;
 import com.minenash.customhud.data.CHFormatting;
+import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.HudTheme;
 
 import java.util.List;
@@ -80,9 +81,9 @@ public class FunctionalElement implements HudElement {
         public final ListProviderSet.Entry entry;
         public final Attributers.Attributer attributer;
         public HudElement attribute;
-        public CreateListElement(String prefixFlag, Supplier<?> supplier, Function<?,List<?>> function, Attributers.Attributer attributer) {
-            String prefix = prefixFlag.isEmpty() ? Attributers.DEFAULT_PREFIX.get(attributer) : prefixFlag;
-            this.entry = new ListProviderSet.Entry(new ListProvider.ListFunctioner(supplier,function), UUID.randomUUID(), prefix);
+        public CreateListElement(Supplier<?> supplier, Function<?,List<?>> function, Attributers.Attributer attributer, Flags flags) {
+            String prefix = flags.listPrefix.isEmpty() ? Attributers.DEFAULT_PREFIX.get(attributer) : flags.listPrefix;
+            this.entry = new ListProviderSet.Entry(new ListProvider.ListFunctioner(supplier,function), UUID.randomUUID(), prefix, flags.reverseList);
             this.attributer = attributer;
             Attributers.ATTRIBUTER_MAP.put(entry.provider(), attributer);
         }

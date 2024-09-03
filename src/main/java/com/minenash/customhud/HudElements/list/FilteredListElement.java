@@ -21,14 +21,16 @@ public class FilteredListElement extends FunctionalElement implements HudElement
     private final List<HudElement> last;
     private final Operation operation;
     private final boolean multiline;
+    private final boolean reverse;
 
-    public FilteredListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation, boolean multiline) {
+    public FilteredListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation, boolean multiline, boolean reverse) {
         this.provider = provider;
         this.providerID = providerID;
         this.operation = operation;
         this.popList = new FunctionalElement.PopList(providerID);
         this.advanceList = new FunctionalElement.AdvanceList(providerID);
         this.multiline = multiline;
+        this.reverse = reverse;
         last = format;
 
         if (format == null)
@@ -47,6 +49,8 @@ public class FilteredListElement extends FunctionalElement implements HudElement
         List<?> values = provider.get();
         if (values.isEmpty())
             return Collections.emptyList();
+        if (reverse)
+            Collections.reverse(values);
 
         List notFiltered = new ArrayList<>(values.size());
         ListManager.push(providerID, values);

@@ -1,5 +1,7 @@
 package com.minenash.customhud.HudElements.list;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
@@ -19,13 +21,15 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
     private final List<HudElement> main;
     private final List<HudElement> last;
     private final boolean multiline;
+    private final boolean reverse;
 
-    public ListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, boolean multiline) {
+    public ListElement(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, boolean multiline, boolean reverse) {
         this.provider = provider;
         this.providerID = providerID;
         this.popList = new FunctionalElement.PopList(providerID);
         this.advanceList = new FunctionalElement.AdvanceList(providerID);
         this.multiline = multiline;
+        this.reverse = reverse;
         last = format;
 
         if (format == null)
@@ -38,9 +42,9 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
 
     }
 
-    public static HudElement of(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation) {
-        return operation == null ? new ListElement(provider, providerID, format, separator, false)
-                : new FilteredListElement(provider, providerID, format, separator, operation, false);
+    public static HudElement of(ListProvider provider, UUID providerID, List<HudElement> format, List<HudElement> separator, Operation operation, boolean reverse) {
+        return operation == null ? new ListElement(provider, providerID, format, separator, false, reverse)
+                : new FilteredListElement(provider, providerID, format, separator, operation, false, reverse);
     }
 
     public List<HudElement> expand() {
@@ -49,6 +53,8 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
         List<?> values = provider.get();
         if (values.isEmpty())
             return Collections.emptyList();
+        if (reverse)
+            Collections.reverse(values);
 
         List<HudElement> expanded = new ArrayList<>();
         expanded.add(new FunctionalElement.PushList(providerID, values));
@@ -90,12 +96,14 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
         private final List<HudElement> elements = new ArrayList<>();
         private final List<HudElement> separator = new ArrayList<>();
         private final Operation filter;
+        private final boolean reverse;
         private boolean separatorMode = false;
 
-        public MultiLineBuilder(ListProvider provider, UUID providerID, Operation filter) {
+        public MultiLineBuilder(ListProvider provider, UUID providerID, Operation filter, boolean reverse) {
             this.provider = provider == null ? EMPTY : provider;
             this.providerID = providerID;
             this.filter = filter;
+            this.reverse = reverse;
         }
 
         public void add(HudElement element) {
@@ -111,8 +119,8 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
         }
 
         public HudElement build() {
-            return filter == null ? new ListElement(provider, providerID, elements, separator, true)
-                    : new FilteredListElement(provider, providerID, elements, separator, filter, true);
+            return filter == null ? new ListElement(provider, providerID, elements, separator, true, reverse)
+                    : new FilteredListElement(provider, providerID, elements, separator, filter, true, reverse);
         }
 
     }

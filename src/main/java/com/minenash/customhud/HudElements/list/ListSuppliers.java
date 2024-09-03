@@ -14,6 +14,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registry;
@@ -50,20 +51,22 @@ public class ListSuppliers {
     public static final Comparator<?> MOD_ORDERING = Comparator.comparing(mod -> ((Mod)mod).getTranslatedName().toLowerCase(Locale.ROOT));
     public static final Predicate<?> MOD_PREDICATE = (mod) -> !(((Mod)mod).isHidden() || ((Mod)mod).getBadges().contains(Mod.Badge.LIBRARY) || ((Mod)mod).getBadges().contains(Mod.Badge.MINECRAFT) );
     public static final Predicate<?> ALL_ROOT_MODS_PREDICATE = (mod) -> !(((Mod)mod).isHidden() || IGNORE_MODS.contains(((Mod)mod).getId()) );
+    public static final Comparator<StatusEffectInstance> EFFECT_ORDERING = Comparator.comparingInt(e -> e.getDuration() == -1 ? Integer.MAX_VALUE : e.getDuration());
+//    public static final Comparator<StatusEffectInstance> ALL_EFFECT_ORDERING = Comparator.comparingLong(e -> (3000000000L * e.getEffectType().getCategory().ordinal()) + (e.getDuration() == -1 ? Integer.MAX_VALUE : e.getDuration()));
 
     public static final ListProvider
-        STATUS_EFFECTS = () -> CLIENT.player.getStatusEffects().stream().sorted(Comparator.comparingInt(e -> e.getEffectType().getCategory().ordinal())).toList(),
-        STATUS_EFFECTS_POSITIVE = () -> CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.BENEFICIAL).toList(),
-        STATUS_EFFECTS_NEGATIVE = () -> CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.HARMFUL).toList(),
-        STATUS_EFFECTS_NEUTRAL = () -> CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.NEUTRAL).toList(),
+        STATUS_EFFECTS = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_POSITIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.BENEFICIAL).sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_NEGATIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.HARMFUL).sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_NEUTRAL = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.NEUTRAL).sorted(EFFECT_ORDERING).toArray() ),
 
-        ONLINE_PLAYERS = () -> CLIENT.getNetworkHandler().getPlayerList().stream().sorted(ENTRY_ORDERING).toList(),
+        ONLINE_PLAYERS = () -> Arrays.asList( CLIENT.getNetworkHandler().getPlayerList().stream().sorted(ENTRY_ORDERING).toArray() ),
         SUBTITLES = () -> SubtitleTracker.INSTANCE.entries,
 
         TARGET_BLOCK_STATES = () ->  ComplexData.targetBlock == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetBlock.getEntries().entrySet().toArray()),
-        TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : ComplexData.targetBlock.streamTags().toList(),
+        TARGET_BLOCK_TAGS = () -> ComplexData.targetBlock == null ? Collections.EMPTY_LIST : Arrays.asList( ComplexData.targetBlock.streamTags().toArray() ),
         TARGET_FLUID_STATES = () ->  ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList(ComplexData.targetFluid.getEntries().entrySet().toArray()),
-        TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : ComplexData.targetFluid.streamTags().toList(),
+        TARGET_FLUID_TAGS = () -> ComplexData.targetFluid == null ? Collections.EMPTY_LIST : Arrays.asList( ComplexData.targetFluid.streamTags().toArray() ),
 
         TARGET_BLOCK_POWERS = () -> {
             if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
@@ -74,24 +77,6 @@ public class ListSuppliers {
             }
             return powers;
         },
-//        TARGET_BLOCK_ITEMS = () -> {
-//            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
-//            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
-//            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
-//            List<ItemStack> items = new ArrayList<>(inv.size());
-//            for (int i = 0; i < inv.size(); i++)
-//                items.add(inv.getStack(i));
-//            return items;
-//        },
-//        TARGET_BLOCK_COMPACT_ITEMS = () -> {
-//            if (ComplexData.targetBlockPos == null) return Collections.EMPTY_LIST;
-//            BlockEntity be = CLIENT.world.getBlockEntity(ComplexData.targetBlockPos);
-//            if ( !(be instanceof Inventory inv) ) return Collections.EMPTY_LIST;
-//            List<ItemStack> items = new ArrayList<>(inv.size());
-//            for (int i = 0; i < inv.size(); i++)
-//                items.add(inv.getStack(i));
-//            return AttributeHelpers.compactItems(items);
-//        },
 
         PLAYER_ATTRIBUTES = () -> getEntityAttributes(CLIENT.player),
         TARGET_ENTITY_ATTRIBUTES = () -> ComplexData.targetEntity == null ? Collections.EMPTY_LIST : getEntityAttributes(ComplexData.targetEntity),
@@ -144,9 +129,9 @@ public class ListSuppliers {
 
         RECORDS = () -> MusicAndRecordTracker.records,
 
-        MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>) MOD_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
-        ALL_ROOT_MODS = () -> ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>)ALL_ROOT_MODS_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
-        ALL_MODS = () -> ModMenu.MODS.values().stream().sorted((Comparator<? super Mod>)MOD_ORDERING).toList(),
+        MODS = () -> Arrays.asList( ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>) MOD_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toArray() ),
+        ALL_ROOT_MODS = () -> Arrays.asList(ModMenu.ROOT_MODS.values().stream().filter((Predicate<? super Mod>)ALL_ROOT_MODS_PREDICATE).sorted((Comparator<? super Mod>)MOD_ORDERING).toArray() ),
+        ALL_MODS = () -> Arrays.asList( ModMenu.MODS.values().stream().sorted((Comparator<? super Mod>)MOD_ORDERING).toArray() ),
 
         RESOURCE_PACKS = () -> {
             List<ResourcePackProfile> packs = new ArrayList<>(CLIENT.getResourcePackManager().getEnabledProfiles());
