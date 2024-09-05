@@ -224,7 +224,7 @@ public class CustomHudRenderer3 {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BufferRenderer.drawWithGlobalProgram(bgBuffer.end());
-        RenderSystem.disableBlend();
+//        RenderSystem.disableBlend();
 
         for (RenderPiece piece : pieces) {
             font = piece.font;
