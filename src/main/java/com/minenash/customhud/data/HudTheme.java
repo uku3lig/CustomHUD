@@ -221,8 +221,9 @@ public class HudTheme {
     public static CHFormatting parseHexNumber(String str) {
         if (str.equals("none"))
             return new CHFormatting().color(0x00000000, 0xFF000000);
+        int length = str.length();
 
-        str = switch (str.length()) {
+        str = switch (length) {
             case 1 -> "" + str.charAt(0) + str.charAt(0) + "000000";
             case 2 -> "" + str.charAt(0) + str.charAt(1) + "000000";
             case 3 -> "00" + str.charAt(0) + str.charAt(0) + str.charAt(1) + str.charAt(1) + str.charAt(2) + str.charAt(2);
@@ -236,7 +237,7 @@ public class HudTheme {
         long colorL = Long.parseLong(str,16);
         int color = (int) (colorL >= 0x100000000L ? colorL - 0x100000000L : colorL);
 
-        int bitmask = switch (str.length()) {
+        int bitmask = switch (length) {
             case 1, 2 -> 0xFF000000;
             case 3, 6 -> 0x00FFFFFF;
             default-> 0xFFFFFFFF;

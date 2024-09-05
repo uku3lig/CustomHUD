@@ -40,7 +40,7 @@ public class BackgroundBuilder {
     }
 
     public void onThemeChange(FunctionalElement.ChangeTheme cte) {
-        if (!isDynamic && nonDynamicBgPiece.color != cte.theme.bgColor) {
+        if (!isDynamic && nonDynamicBgPiece != null && nonDynamicBgPiece.color != cte.theme.bgColor) {
             int yOffset = nonDynamicBgPiece.y + nonDynamicBgPiece.height;
             bgPieces.add( nonDynamicBgPiece );
             nonDynamicBgPiece = new BgRenderPiece(0, yOffset, 0, 0, cte.theme.bgColor);
