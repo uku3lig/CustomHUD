@@ -35,16 +35,10 @@ public class ConditionalElement extends FunctionalElement implements HudElement,
         return !multiline;
     }
 
-//    @Override
-//    public String getString() {
-//        List<HudElement> elements = expand();
-//
-//        StringBuilder builder = new StringBuilder();
-//        for (HudElement element : elements)
-//            builder.append(element.getString());
-//
-//        return builder.toString();
-//    }
+    @Override
+    public String getString() {
+        return expandIntoString();
+    }
 //
 //    @Override
 //    public Number getNumber() {

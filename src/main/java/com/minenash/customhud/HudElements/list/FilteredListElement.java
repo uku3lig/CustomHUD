@@ -81,10 +81,10 @@ public class FilteredListElement extends FunctionalElement implements HudElement
         return !multiline;
     }
 
-//    @Override
-//    public String getString() {
-//        return getNumber().toString();
-//    }
+    @Override
+    public String getString() {
+        return expandIntoString();
+    }
 //
 //    @Override
 //    public Number getNumber() {

@@ -25,7 +25,9 @@ public class SetValueElement extends FunctionalElement.IgnoreNewLineIfSurrounded
         else if (elements != null) {
             StringBuilder builder = new StringBuilder();
             for (var element : elements) {
-                builder.append(element.getString());
+                String str = element.getString();
+                if (str != null)
+                    builder.append(str);
             }
             ProfileManager.getActive().strValues.put(valueName, builder.toString());
         }

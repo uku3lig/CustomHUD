@@ -73,10 +73,10 @@ public class ListElement extends FunctionalElement implements HudElement, MultiE
         return !multiline;
     }
 
-//    @Override
-//    public String getString() {
-//        return getNumber().toString();
-//    }
+    @Override
+    public String getString() {
+        return expandIntoString();
+    }
 //
 //    @Override
 //    public Number getNumber() {

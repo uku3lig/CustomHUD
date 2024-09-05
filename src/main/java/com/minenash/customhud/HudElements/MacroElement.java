@@ -1,6 +1,7 @@
 package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.functional.FunctionalElement;
+import com.minenash.customhud.HudElements.interfaces.ExecuteElement;
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.MultiElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
@@ -32,10 +33,13 @@ public class MacroElement implements HudElement, MultiElement, NumElement {
         if (macro.elements() != null) {
             StringBuilder builder = new StringBuilder();
             for (HudElement element : macro.elements()) {
-                if (element instanceof FunctionalElement.XList xl)
-                    xl.run();
-                else
-                    builder.append(element.getString());
+                if (element instanceof ExecuteElement ee)
+                    ee.run();
+                else {
+                    String str = element.getString();
+                    if (str != null)
+                        builder.append(str);
+                }
             }
             return builder.toString();
         }
