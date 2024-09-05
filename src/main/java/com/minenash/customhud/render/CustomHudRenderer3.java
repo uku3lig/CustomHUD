@@ -113,6 +113,8 @@ public class CustomHudRenderer3 {
                                     listUUID = pl.providerID;
                                 else if (listUUID != null && element instanceof FunctionalElement.PushList pl && listUUID.equals(pl.providerID))
                                     listUUID = null;
+                                else if (listUUID == null && FunctionalElement.isList(element))
+                                    continue;
                                 else
                                     break;
                             }
