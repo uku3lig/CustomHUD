@@ -60,8 +60,20 @@ public abstract class FuncElements<T> implements HudElement {
         public Tex(Supplier<T> supplier, Function<T,Text> func) { this.supplier = supplier; function = func;}
 
         @Override public String getString() { return getText().getString(); }
-        @Override public boolean getBoolean() { return getNumber().doubleValue() > 0; }
-        @Override public Number getNumber() { return getText().getString().length(); }
+        @Override public boolean getBoolean() { return getNumber().intValue() > 0; }
+        @Override public Number getNumber() {
+            try {
+                T sup = supplier.get();
+                if (sup == null)
+                    return Double.NaN;
+                Text text = function.apply(sup);
+                return text == null ? Double.NaN : text.getString().length();
+
+            }
+            catch (Exception e) {
+                return Double.NaN;
+            }
+        }
 
         @Override public int getTextWidth() { return CLIENT.textRenderer.getWidth(getText()); }
         @Override public Text getText() { return FuncElements.sanitize(supplier, function, Text.literal("-")); }

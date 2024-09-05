@@ -875,7 +875,7 @@ public class VariableParser {
             case "vehicle_horse_armor", "horse_armor", "vha" -> VEHICLE_HORSE_ARMOR;
             case "team_name" -> PLAYER_TEAM_NAME;
             case "record_name" -> {enabled.music = true; yield RECORD_NAME;}
-            case "team", "pteam", "player_team" -> PLAYER_TEAM;
+            case "team", "pteam", "player_team" -> PLAYER_TEAM_NAME;
             default -> null;
         };
     }
