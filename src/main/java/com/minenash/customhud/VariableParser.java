@@ -1185,7 +1185,7 @@ public class VariableParser {
             case "target_entity_z", "tez" -> {enabled.targetEntity = true; yield TARGET_ENTITY_Z;}
             case "target_entity_distance", "ted" -> {enabled.targetEntity = true; yield TARGET_ENTITY_DISTANCE;}
             case "last_hit_distance", "lhd" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_DISTANCE;}
-            case "last_hit_time_ago", "lhta" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_AGO;}
+            case "last_hit_ago", "lha" -> {enabled.targetEntity = true; yield LAST_HIT_ENTITY_AGO;}
             case "hooked_entity_x", "hex" -> HOOKED_ENTITY_X;
             case "hooked_entity_y", "hey" -> HOOKED_ENTITY_Y;
             case "hooked_entity_z", "hez" -> HOOKED_ENTITY_Z;
