@@ -1743,8 +1743,8 @@ public class VariableParser {
 
         if (!m.matches()) return null;
 
-        Matcher shiftFlagMatcher = Flags.SHIFT_PATTERN.matcher(part);
-        if (shiftFlagMatcher.find() && shiftFlagMatcher.start() < m.end(2)) {
+        Matcher shflagMatch = Flags.SHIFT_PATTERN.matcher(part);
+        if (shflagMatch.find() && shflagMatch.group(2) != null && !shflagMatch.group(2).isEmpty() && shflagMatch.start() < m.end(2)) {
             int index = m.end(2);
             part = part.substring(0, index) + "|" + part.substring(index+1);
             m = ITEM_VARIABLE_PATTERN.matcher(part);
