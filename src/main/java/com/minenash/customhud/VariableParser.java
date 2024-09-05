@@ -1233,7 +1233,7 @@ public class VariableParser {
             case "tps_min" -> { enabled.tpsMetrics = true; yield TPS_MIN;}
             case "tps_max" -> { enabled.tpsMetrics = true; yield TPS_MAX;}
             case "tps_avg" -> { enabled.tpsMetrics = true; yield TPS_AVG;}
-            case "tps_samples" -> { enabled.tpsMetrics = true; yield TICK_MS_SAMPLES;}
+            case "tps_samples" -> { enabled.tpsMetrics = true; yield TPS_SAMPLES;}
             case "ping_min" -> { enabled.pingMetrics = true; yield PING_MIN;}
             case "ping_max" -> { enabled.pingMetrics = true; yield PING_MAX;}
             case "ping_avg" -> { enabled.pingMetrics = true; yield PING_AVG;}

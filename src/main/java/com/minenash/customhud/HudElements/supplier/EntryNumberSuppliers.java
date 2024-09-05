@@ -83,6 +83,7 @@ public class EntryNumberSuppliers {
     public static final Entry TPS_MIN = of( () -> ComplexData.tpsMetrics[1], 0);
     public static final Entry TPS_MAX = of( () -> ComplexData.tpsMetrics[2], 0);
     public static final Entry TPS_AVG = of( () -> ComplexData.tpsMetrics[0], 1);
+    public static final Entry TPS_SAMPLES = of( () -> ComplexData.tpsMetrics[3], 0);
 
     public static final Entry PING_MIN = of( () -> ComplexData.pingMetrics[1], 0);
     public static final Entry PING_MAX = of( () -> ComplexData.pingMetrics[2], 0);
