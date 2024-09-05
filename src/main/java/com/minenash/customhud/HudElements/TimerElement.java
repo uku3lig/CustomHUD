@@ -2,11 +2,9 @@ package com.minenash.customhud.HudElements;
 
 import com.minenash.customhud.HudElements.interfaces.HudElement;
 import com.minenash.customhud.HudElements.interfaces.NumElement;
-import com.minenash.customhud.HudElements.supplier.NumberSupplierElement;
 import com.minenash.customhud.conditionals.Operation;
 import com.minenash.customhud.data.Flags;
 import com.minenash.customhud.data.NumberFlags;
-import net.minecraft.stat.StatFormatter;
 
 public class TimerElement implements HudElement, NumElement {
 

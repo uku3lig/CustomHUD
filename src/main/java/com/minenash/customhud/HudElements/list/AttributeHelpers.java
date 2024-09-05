@@ -96,13 +96,13 @@ public class AttributeHelpers {
         return le.getAttributeInstance(attribute);
     }
 
-    public static List<EntityAttributeInstance> getEntityAttributes(Entity entity) {
+    public static List<?> getEntityAttributes(Entity entity) {
         entity = getFullEntity(entity);
         if (!(entity instanceof LivingEntity le) ) return Collections.EMPTY_LIST;
         AttributeContainerAccessor container = (AttributeContainerAccessor) le.getAttributes();
         Map<EntityAttribute, EntityAttributeInstance> instances = new HashMap<>(((DefaultAttributeContainerAccessor)container.getFallback()).getInstances());
         instances.putAll(container.getCustom());
-        return Arrays.asList( (EntityAttributeInstance[]) (entity.getWorld().isClient ?
+        return Arrays.asList( (entity.getWorld().isClient ?
                 instances.values().stream().filter(a -> a.getAttribute().isTracked()) : instances.values().stream())
                 .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().getTranslationKey()))).toArray() );
     }

@@ -36,7 +36,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
@@ -683,7 +682,7 @@ public class VariableParser {
                 return new NumberSupplierElement(
                     new NumberSupplierElement.Entry(
                         () -> finalToggle.lastPressed == 0 ? null : System.currentTimeMillis() - finalToggle.lastPressed,
-                        0, MILLISECONDS_TO_TIME), flags);
+                        0, StatFormatters.MIL_HMS), flags);
             }
             return new BooleanSupplierElement(toggle::getValue);
         }

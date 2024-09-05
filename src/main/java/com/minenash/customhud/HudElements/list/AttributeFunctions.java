@@ -30,7 +30,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.*;
-import net.minecraft.stat.StatFormatter;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -39,7 +38,6 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
@@ -52,27 +50,18 @@ import java.util.function.Function;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeHelpers.getItemItems;
+import static com.minenash.customhud.data.StatFormatters.*;
 
 @SuppressWarnings("ALL")
 public class AttributeFunctions {
-    private static final StatFormatter HMS = ticks -> {
-        if (ticks < 0) return "∞";
-        int rawSeconds = ticks / 20;
-        int seconds = rawSeconds % 60;
-        int minutes = (rawSeconds / 60) % 60;
-        int hours = (rawSeconds / 60 / 60);
-        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
-    };
-
 
     public static final Function<?,?> DIRECT = (str) -> str;
-
 
 
     // STATUS EFFECTS
     public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> status == null ? null : I18n.translate(status.getTranslationKey());
     public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> status == null ? null : Registries.STATUS_EFFECT.getId(status.getEffectType());
-    public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(HMS, (status) -> status == null ? null : status.getDuration());
+    public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(TICKS_HMS, (status) -> status == null ? null : status.getDuration());
     public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status == null ? null : status.getDuration() == -1;
     public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = (status) -> status == null ? null : status.getAmplifier();
     public static final Function<StatusEffectInstance,Number> STATUS_LEVEL = (status) -> status == null ? null : status.getAmplifier() + (status.getAmplifier() >= 0 ? 1 : 256);
@@ -396,10 +385,12 @@ public class AttributeFunctions {
     // RECORDS
     public static final Function<MusicAndRecordTracker.RecordInstance,Text> RECORD_NAME = (rec) -> rec.name;
     public static final Function<MusicAndRecordTracker.RecordInstance, Identifier> RECORD_ID = (rec) -> rec.id;
-    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_LENGTH = (rec) -> rec.length / 20F;
-    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED = (rec) -> rec.elapsed / 20F;
-    public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_REMAINING = (rec) -> (rec.length - rec.elapsed) / 20F;
+    public static final NumEntry<MusicAndRecordTracker.RecordInstance> RECORD_LENGTH = Num.of(SEC_HMS, (rec) -> rec.length / 20F);
+    public static final NumEntry<MusicAndRecordTracker.RecordInstance> RECORD_ELAPSED = Num.of(SEC_HMS, (rec) -> rec.elapsed / 20F);
+    public static final NumEntry<MusicAndRecordTracker.RecordInstance> RECORD_REMAINING = Num.of(SEC_HMS, (rec) -> (rec.length - rec.elapsed) / 20F);
     public static final Function<MusicAndRecordTracker.RecordInstance,Number> RECORD_ELAPSED_PER = (rec) -> 100F * rec.elapsed / rec.length;
+
+
 
 
     // OFFERS
@@ -441,7 +432,7 @@ public class AttributeFunctions {
 
     //CHAT MESSAGES
     public static final Function<ChatHudLine,Text> CHAT_MESSAGE_TEXT = (line) -> line.content();
-    public static final NumEntry<ChatHudLine> CHAT_MESSAGE_TIME_AGO = Num.of(HMS, (line) -> line == null ? null : CLIENT.inGameHud.getTicks() - line.creationTick());
+    public static final NumEntry<ChatHudLine> CHAT_MESSAGE_TIME_AGO = Num.of(TICKS_HMS, (line) -> line == null ? null : CLIENT.inGameHud.getTicks() - line.creationTick());
     public static final Function<ChatHudLine,String> CHAT_MESSAGE_TYPE = (line) -> {
         if (line == null) return null;
         if (line.indicator() == null) return "Normal";

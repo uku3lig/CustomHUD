@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.supplier;
 
 import com.minenash.customhud.HudElements.list.AttributeHelpers;
 import com.minenash.customhud.complex.ComplexData;
+import com.minenash.customhud.data.StatFormatters;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -45,12 +46,7 @@ public class EntitySuppliers {
     public static final Supplier<Text> LAST_HIT_ENTITY_NAME = () -> name(ComplexData.lastHitEntity);
     public static final Supplier<String> LAST_HIT_ENTITY_UUID = () -> uuid(ComplexData.lastHitEntity);
     public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_DISTANCE = of( () -> ComplexData.lastHitEntityDist, 1);
-    public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_AGO = of( () -> (System.currentTimeMillis() - ComplexData.lastHitEntityTime) / 1000D, 0, secs -> {
-        int seconds = secs % 60;
-        int minutes = (secs / 60) % 60;
-        int hours = (secs / 60 / 60);
-        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
-    });
+    public static final NumberSupplierElement.Entry LAST_HIT_ENTITY_AGO = of( () -> (System.currentTimeMillis() - ComplexData.lastHitEntityTime) / 1000D, 0, StatFormatters.SEC_HMS);
 
 
 

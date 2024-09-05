@@ -3,11 +3,11 @@ package com.minenash.customhud.HudElements.supplier;
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.complex.EstimatedTick;
 import com.minenash.customhud.complex.MusicAndRecordTracker;
+import com.minenash.customhud.data.StatFormatters;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.stat.StatFormatter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -37,16 +37,8 @@ public class EntryNumberSuppliers {
         return function.sample(new DensityFunction.UnblendedNoisePos(pos.getX(), pos.getY(), pos.getZ()));
     }
 
-    public static final StatFormatter MILLISECONDS_TO_TIME = millisecs -> {
-        int secs = millisecs / 1000;
-        int seconds = secs % 60;
-        int minutes = (secs / 60) % 60;
-        int hours = (secs / 60 / 60);
-        return hours > 0 ? String.format("%d:%02d:%02d", hours, minutes, seconds) : String.format("%d:%02d", minutes, seconds);
-    };
-
-    public static final Entry ACTIONBAR_REMAINING = of( () -> client.inGameHud.overlayRemaining, 0, MILLISECONDS_TO_TIME);
-    public static final Entry TITLE_REMAINING = of( () -> client.inGameHud.titleRemainTicks, 0, MILLISECONDS_TO_TIME);
+    public static final Entry ACTIONBAR_REMAINING = of( () -> client.inGameHud.overlayRemaining, 0, StatFormatters.MIL_HMS);
+    public static final Entry TITLE_REMAINING = of( () -> client.inGameHud.titleRemainTicks, 0, StatFormatters.MIL_HMS);
 
     public static final Entry X = of( () -> cameraEntity().getX(), 3);
     public static final Entry Y = of( () -> cameraEntity().getY(), 3);
@@ -104,9 +96,9 @@ public class EntryNumberSuppliers {
 
     public static final Entry SLOTS_PERCENTAGE = of( () -> 100F * ComplexData.slots_used / client.player.getInventory().main.size(), 0);
 
-    public static final Entry RECORD_LENGTH = of( () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().length / 20F : Double.NaN, 0);
-    public static final Entry RECORD_ELAPSED = of( () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().elapsed / 20F : Double.NaN, 0);
-    public static final Entry RECORD_REMAINING = of( () -> MusicAndRecordTracker.isRecordPlaying ? (MusicAndRecordTracker.getClosestRecord().length - MusicAndRecordTracker.getClosestRecord().elapsed) / 20F : Double.NaN, 0);
+    public static final Entry RECORD_LENGTH = of( () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().length / 20F : Double.NaN, 0, StatFormatters.SEC_HMS);
+    public static final Entry RECORD_ELAPSED = of( () -> MusicAndRecordTracker.isRecordPlaying ? MusicAndRecordTracker.getClosestRecord().elapsed / 20F : Double.NaN, 0, StatFormatters.SEC_HMS);
+    public static final Entry RECORD_REMAINING = of( () -> MusicAndRecordTracker.isRecordPlaying ? (MusicAndRecordTracker.getClosestRecord().length - MusicAndRecordTracker.getClosestRecord().elapsed) / 20F : Double.NaN, 0, StatFormatters.SEC_HMS);
     public static final Entry RECORD_ELAPSED_PER = of( () -> 100F * MusicAndRecordTracker.getClosestRecord().elapsed / MusicAndRecordTracker.getClosestRecord().length, 0);
 
     public static final Entry XP_POINTS_PER = of( () -> client.player.experienceProgress * 100, 0);
