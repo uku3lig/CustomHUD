@@ -2,6 +2,7 @@ package com.minenash.customhud.HudElements.list;
 
 import com.minenash.customhud.complex.ComplexData;
 import com.minenash.customhud.mixin.accessors.AttributeContainerAccessor;
+import com.minenash.customhud.mixin.accessors.BlockPredicatesCheckerAccessor;
 import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,6 +11,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.argument.ItemSlotArgumentType;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +23,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
+import net.minecraft.item.BlockPredicatesChecker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -24,7 +31,6 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -36,8 +42,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
-import static net.minecraft.item.ItemStack.DISPLAY_KEY;
-import static net.minecraft.item.ItemStack.LORE_KEY;
 
 public class AttributeHelpers {
 
@@ -93,7 +97,7 @@ public class AttributeHelpers {
     public static EntityAttributeInstance getEntityAttr(Entity entity, EntityAttribute attribute) {
         Entity e = getFullEntity(entity);
         if (!(e instanceof LivingEntity le)) return null;
-        return le.getAttributeInstance(attribute);
+        return le.getAttributeInstance(Registries.ATTRIBUTE.getEntry(attribute));
     }
 
     public static List<?> getEntityAttributes(Entity entity) {
@@ -103,89 +107,37 @@ public class AttributeHelpers {
         Map<EntityAttribute, EntityAttributeInstance> instances = new HashMap<>(((DefaultAttributeContainerAccessor)container.getFallback()).getInstances());
         instances.putAll(container.getCustom());
         return Arrays.asList( (entity.getWorld().isClient ?
-                instances.values().stream().filter(a -> a.getAttribute().isTracked()) : instances.values().stream())
-                .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().getTranslationKey()))).toArray() );
+                instances.values().stream().filter(a -> a.getAttribute().value().isTracked()) : instances.values().stream())
+                .sorted(Comparator.comparing(a -> I18n.translate(a.getAttribute().value().getTranslationKey()))).toArray() );
     }
 
     public record ItemAttribute(EntityAttribute attribute, EntityAttributeModifier modifier, String slot) {}
     public static List<ItemAttribute> getItemStackAttributes(ItemStack stack) {
-        if (!stack.hasNbt() || !stack.getNbt().contains("AttributeModifiers", 9)) {
-            List<ItemAttribute> attributes = new ArrayList<>();
-            for (EquipmentSlot slot : EquipmentSlot.values())
-                for (var entry : stack.getItem().getAttributeModifiers(slot).entries())
-                    attributes.add( new ItemAttribute(entry.getKey(), entry.getValue(), slot.getName()) );
-            return attributes;
-        }
-
         List<ItemAttribute> attributes = new ArrayList<>();
-        NbtList nbtList = stack.getNbt().getList("AttributeModifiers", 10);
 
-        for(int i = 0; i < nbtList.size(); ++i) {
-            NbtCompound nbtCompound = nbtList.getCompound(i);
-
-            EntityAttribute attribute = Registries.ATTRIBUTE.get(Identifier.tryParse(nbtCompound.getString("AttributeName")));
-            if (attribute == null) continue;
-            EntityAttributeModifier modifier = EntityAttributeModifier.fromNbt(nbtCompound);
-            if (modifier != null
-                    && modifier.getId().getLeastSignificantBits() != 0L
-                    && modifier.getId().getMostSignificantBits() != 0L) {
-                String slot = nbtCompound.getString("Slot");
-                if (slot.isEmpty()) slot = "all";
-                attributes.add( new ItemAttribute(attribute, modifier, slot) );
-            }
-        }
-
+        AttributeModifiersComponent component = stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+        if (component != null)
+            for (var entry : component.modifiers())
+                attributes.add( new ItemAttribute(entry.attribute().value(), entry.modifier(), entry.slot().asString()) );
         return attributes;
     }
 
     public static List<Text> getLore(ItemStack stack) {
-        List<Text> lines = new ArrayList<>();
-        if (stack.hasNbt()) {
-            if (stack.getNbt().contains(DISPLAY_KEY, NbtElement.COMPOUND_TYPE)) {
-                NbtCompound nbtCompound = stack.getNbt().getCompound(DISPLAY_KEY);
-                if (nbtCompound.getType(LORE_KEY) == NbtElement.LIST_TYPE) {
-                    NbtList nbtList = nbtCompound.getList(LORE_KEY, NbtElement.STRING_TYPE);
-                    for (int j = 0; j < nbtList.size(); ++j) {
-                        try {
-                            MutableText mutableText2 = Text.Serialization.fromJson(nbtList.getString(j));
-                            if (mutableText2 == null) continue;
-                            lines.add(mutableText2);
-                        }
-                        catch (Exception ignored) {}
-                    }
-                }
+        LoreComponent component = stack.get(DataComponentTypes.LORE);
+        return component != null ? component.lines() : new ArrayList<>();
+    }
+
+    public static List<Block> getCanX(ItemStack stack, DataComponentType<BlockPredicatesChecker> type) {
+        BlockPredicatesChecker component = stack.get(type);
+        Set<Block> blocks = new HashSet<>();
+        if (component != null) {
+            for (var e : ((BlockPredicatesCheckerAccessor) component).getPredicates()) {
+                if (e.blocks().isPresent())
+                    for (var ee : e.blocks().get())
+                        blocks.add(ee.value());
             }
         }
-        return lines;
-    }
-
-    public static List<Block> getCanX(ItemStack stack, String tag) {
-        NbtCompound nbtCompound = stack.getNbt();
-
-        if (nbtCompound == null || !nbtCompound.contains(tag, NbtElement.LIST_TYPE))
-            return Collections.EMPTY_LIST;
-
-        List<Block> items = new ArrayList<>();
-        NbtList nbtList = nbtCompound.getList(tag, NbtElement.STRING_TYPE);
-
-        for(int i = 0; i < nbtList.size(); ++i) {
-            String string = nbtList.getString(i);
-
-           Block block = Registries.BLOCK.get(Identifier.tryParse(string));
-           if (block != Blocks.AIR)
-               items.add(block);
-        }
-
-        return items;
-    }
-
-    public static List<String> getHideFlagStrings(ItemStack stack, boolean shown) {
-        List<String> sections = new ArrayList<>();
-        int flags = stack.getHideFlags();
-        for (ItemStack.TooltipSection flag : ItemStack.TooltipSection.values())
-            if (shown == ((flags & flag.getFlag()) == 0))
-                sections.add(flag.name().toLowerCase());
-        return sections;
+        return new ArrayList<>(blocks);
     }
 
     public static List<ItemStack> compactItems(List<ItemStack> stacks) {
@@ -194,7 +146,7 @@ public class AttributeHelpers {
         for (ItemStack stack : stacks) {
             if (stack.isEmpty()) continue;
             for (ItemStack cStack : compact) {
-                if (ItemStack.canCombine(stack, cStack)) {
+                if (ItemStack.areItemsAndComponentsEqual(stack, cStack)) {
                     cStack.setCount(cStack.getCount() + stack.getCount());
                     continue outer;
                 }
@@ -205,33 +157,64 @@ public class AttributeHelpers {
     }
 
     public static List<ItemStack> getItemItems(ItemStack stack, boolean returnStack) {
-        NbtCompound nbt = stack.getNbt();
-        if (stack.isEmpty() || nbt == null)
+        if (stack.isEmpty())
             return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
-        if (nbt.contains("Items", NbtElement.LIST_TYPE))
-            return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
-        if (!nbt.contains("BlockEntityTag"))
-            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
-        nbt = nbt.getCompound("BlockEntityTag");
-        if (!nbt.contains("Items", NbtElement.LIST_TYPE))
-            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
-        return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
-    }
-    private static List<ItemStack> getItemItemsInternal(ItemStack stack, NbtList list, boolean returnStack) {
-        List<ItemStack> items = new ArrayList<>(list.size());
 
-        for(int i = 0; i < list.size(); ++i) {
-            List<ItemStack> inner = getItemItems(ItemStack.fromNbt(list.getCompound(i)), true);
-            for (ItemStack is : inner)
-                is.setCount(is.getCount() * stack.getCount());
-            items.addAll(inner);
+        Iterator<ItemStack> iter = null;
+        get_iter:
+        {
+            var bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
+            if (bundle != null) {
+                iter = bundle.iterate().iterator();
+                break get_iter;
+            }
+            var container = stack.get(DataComponentTypes.CONTAINER);
+            if (container != null) {
+                iter = container.iterateNonEmpty().iterator();
+                break get_iter;
+            }
+//            var blockEntity = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+//            if (blockEntity != null) {
+//                blockEntity.
+//            }
         }
 
-        if (items.isEmpty() && returnStack)
-            return Collections.singletonList(stack);
+        if (iter == null || !iter.hasNext())
+            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
 
+        int count = stack.getCount();
+        List<ItemStack> items = new ArrayList<>();
+        for (ItemStack item = iter.next(); iter.hasNext(); stack = iter.next())
+            items.add(item.copyWithCount(item.getCount() * count));
         return items;
+
+//        NbtCompound nbt = stack.getNbt();
+//        if (stack.isEmpty() || nbt == null)
+//            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+//        if (nbt.contains("Items", NbtElement.LIST_TYPE))
+//            return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
+//        if (!nbt.contains("BlockEntityTag"))
+//            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+//        nbt = nbt.getCompound("BlockEntityTag");
+//        if (!nbt.contains("Items", NbtElement.LIST_TYPE))
+//            return returnStack ? Collections.singletonList(stack) : Collections.EMPTY_LIST;
+//        return getItemItemsInternal(stack, nbt.getList("Items", NbtElement.COMPOUND_TYPE), returnStack );
     }
+//    private static List<ItemStack> getItemItemsInternal(ItemStack stack, NbtList list, boolean returnStack) {
+//        List<ItemStack> items = new ArrayList<>(list.size());
+//
+//        for(int i = 0; i < list.size(); ++i) {
+//            List<ItemStack> inner = getItemItems(ItemStack.fromNbt(list.getCompound(i)), true);
+//            for (ItemStack is : inner)
+//                is.setCount(is.getCount() * stack.getCount());
+//            items.addAll(inner);
+//        }
+//
+//        if (items.isEmpty() && returnStack)
+//            return Collections.singletonList(stack);
+//
+//        return items;
+//    }
 
     public static Scoreboard scoreboard() {
         return CLIENT.getServer() != null ? CLIENT.getServer().getScoreboard() : CLIENT.world.getScoreboard();

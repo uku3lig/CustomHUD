@@ -10,6 +10,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import org.joml.Matrix4fStack;
 
 public class DebugGizmoElement extends IconElement {
 
@@ -22,12 +23,11 @@ public class DebugGizmoElement extends IconElement {
 
     @Override
     public void render(DrawContext context, RenderPiece piece) {
+        float scale = -1 * this.scale;
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        MatrixStack matrixStack = RenderSystem.getModelViewStack();
-        matrixStack.push();
-        matrixStack.multiplyPositionMatrix(context.getMatrices().peek().getPositionMatrix());
-        float profileScale = ProfileManager.getActive().baseTheme.getScale();
-        matrixStack.scale(profileScale,profileScale,1);
+        Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
+        matrix4fStack.pushMatrix();
+//        matrix4fStack.scale(profileScale,profileScale,1);
 
         float yaw = MathHelper.wrapDegrees(camera.getYaw());
         float pitch = MathHelper.wrapDegrees(camera.getPitch());
@@ -53,17 +53,13 @@ public class DebugGizmoElement extends IconElement {
             y_offset += 0;
         }
 
-        matrixStack.translate(piece.x + shiftX + x_offset, piece.y + shiftY + y_offset + (size/2), 100);
-        if (!referenceCorner)
-            matrixStack.translate(0, -(10*scale-10)/2, 0);
-        matrixStack.scale(-1, -1, -1);
-
-        matrixStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(camera.getPitch()));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw()));
-
+        matrix4fStack.translate(piece.x + shiftX + x_offset, piece.y + shiftY + y_offset + (size/2), 100);
+        matrix4fStack.rotateX(-camera.getPitch() * (float) (Math.PI / 180.0));
+        matrix4fStack.rotateY(camera.getYaw() * (float) (Math.PI / 180.0));
+        matrix4fStack.scale(scale, scale, scale);
         RenderSystem.applyModelViewMatrix();
         RenderSystem.renderCrosshair((int) size);
-        matrixStack.pop();
+        matrix4fStack.popMatrix();
         RenderSystem.applyModelViewMatrix();
     }
 

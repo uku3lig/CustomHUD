@@ -21,12 +21,15 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradedItem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -134,7 +137,6 @@ public class Attributers {
         case "max_level" -> new Special(sup,ENCHANT_MAX_LEVEL);
         case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
         case "max_num", "max_number" -> new Num(sup,ENCHANT_MAX_NUM, flags);
-        case "rarity" -> new Str(sup,ENCHANT_RARITY);
         default -> null;
     };
 
@@ -170,8 +172,8 @@ public class Attributers {
                     (enchant) -> () -> {
                         ItemStack stack = (ItemStack) sup.get();
                         if (stack.isEmpty()) return null;
-                        Integer lvl = EnchantmentHelper.get((ItemStack)sup.get()).get(enchant);
-                        return lvl == null ? null : Map.entry(enchant, lvl);
+                        int lvl = stack.getEnchantments().getLevel(enchant);
+                        return Map.entry(enchant, lvl);
                     },
                     ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, context.profile(), context.line(), context.enabled(), name);
         return switch (name) {
@@ -189,7 +191,6 @@ public class Attributers {
             case "repair_cost" -> new Num(sup, ITEM_REPAIR_COST, flags);
             case "icon" -> new RichItemSupplierIconElement(pid, sup, flags, false);
             case "inv_count_icon" -> new RichItemSupplierIconElement(pid, sup, flags, true);
-            case "hide_flags" -> new Num(sup, ITEM_HIDE_FLAGS_NUM, flags);
             case "rarity" -> new Special(sup, ITEM_RARITY);
             case "armor_slot" -> new Special(sup, ITEM_ARMOR_SLOT);
 
@@ -198,8 +199,6 @@ public class Attributers {
             case "attributes", "attrs" -> new CreateListElement(sup, ITEM_ATTRIBUTES, ITEM_ATTRIBUTE_MODIFIER, flags);
             case "can_destroy" -> new CreateListElement(sup, ITEM_CAN_DESTROY, ITEM_CAN_X, flags);
             case "can_place_on" -> new CreateListElement(sup, ITEM_CAN_PLAY_ON, ITEM_CAN_X, flags);
-            case "info_shown" -> new CreateListElement(sup, ITEM_SHOWN, ITEM_INFO_INFO, flags);
-            case "info_hidden" -> new CreateListElement(sup, ITEM_HIDDEN, ITEM_INFO_INFO, flags);
             case "tags" -> new CreateListElement(sup, ITEM_TAGS, TAG, flags);
             case "items" -> new CreateListElement(sup, ITEM_ITEMS, ITEM2, flags);
             case "items_compact" -> new CreateListElement(sup, ITEM_ITEMS_COMPACT, ITEM2, flags);
@@ -385,14 +384,14 @@ public class Attributers {
             boolean isIcon = attr.equals("icon");
             Supplier sup2 = switch (name.substring(0, collinIndex)) {
                 case "first" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getAdjustedFirstBuyItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getAdjustedFirstBuyItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getDisplayedFirstBuyItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getDisplayedFirstBuyItem();
                 case "first_base" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getOriginalFirstBuyItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getOriginalFirstBuyItem();
                 case "second" -> isIcon ?
-                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSecondBuyItem()
-                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSecondBuyItem();
+                        () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getDisplayedSecondBuyItem()
+                        : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getDisplayedSecondBuyItem();
                 case "result" -> isIcon ?
                         () -> (Function<RenderPiece, ItemStack>) piece -> ((TradeOffer) (piece == null ? sup.get() : piece.value)).getSellItem()
                         : (Supplier<ItemStack>) () -> ((TradeOffer)sup.get()).getSellItem();
@@ -417,6 +416,9 @@ public class Attributers {
             default -> null;
         };
     };
+    private static ItemStack secondItem(Optional<TradedItem> item) {
+        return item.isEmpty() ? new ItemStack(Items.AIR) : item.get().itemStack();
+    }
 
     public static final Attributer ITEM_CONVERTABLE_TAG_ENTRY = (pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Tex(sup, TAG_ENTRY_NAME);

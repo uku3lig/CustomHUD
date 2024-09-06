@@ -16,6 +16,7 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -27,6 +28,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.*;
@@ -39,6 +41,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradedItem;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -60,7 +63,7 @@ public class AttributeFunctions {
 
     // STATUS EFFECTS
     public static final Function<StatusEffectInstance,String> STATUS_NAME = (status) -> status == null ? null : I18n.translate(status.getTranslationKey());
-    public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> status == null ? null : Registries.STATUS_EFFECT.getId(status.getEffectType());
+    public static final Function<StatusEffectInstance,Identifier> STATUS_ID = (status) -> status == null ? null : Registries.STATUS_EFFECT.getId(status.getEffectType().value());
     public static final NumEntry<StatusEffectInstance> STATUS_DURATION = Num.of(TICKS_HMS, (status) -> status == null ? null : status.getDuration());
     public static final Function<StatusEffectInstance,Boolean> STATUS_INFINITE = (status) -> status == null ? null : status.getDuration() == -1;
     public static final Function<StatusEffectInstance,Number> STATUS_AMPLIFICATION = (status) -> status == null ? null : status.getAmplifier();
@@ -68,11 +71,11 @@ public class AttributeFunctions {
     public static final Function<StatusEffectInstance,Boolean> STATUS_AMBIENT = (status) -> status == null ? null : status.isAmbient();
     public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_PARTICLES = (status) -> status == null ? null : status.shouldShowParticles();
     public static final Function<StatusEffectInstance,Boolean> STATUS_SHOW_ICON = (status) -> status == null ? null : status.shouldShowIcon();
-    public static final Function<StatusEffectInstance,Number> STATUS_COLOR = (status) -> status == null ? null : status.getEffectType().getColor();
+    public static final Function<StatusEffectInstance,Number> STATUS_COLOR = (status) -> status == null ? null : status.getEffectType().value().getColor();
     public static final Entry<StatusEffectInstance> STATUS_CATEGORY = new Entry<>(
-            (status) -> status == null ? null : WordUtils.capitalize(status.getEffectType().getCategory().name().toLowerCase()),
-            (status) -> status == null ? null : status.getEffectType().getCategory().ordinal(),
-            (status) -> status == null ? null : status.getEffectType().getCategory().ordinal() != 1);
+            (status) -> status == null ? null : WordUtils.capitalize(status.getEffectType().value().getCategory().name().toLowerCase()),
+            (status) -> status == null ? null : status.getEffectType().value().getCategory().ordinal(),
+            (status) -> status == null ? null : status.getEffectType().value().getCategory().ordinal() != 1);
 
 
     // PLAYERS (From PlayerList)
@@ -145,14 +148,13 @@ public class AttributeFunctions {
     public static final Function<AttributeHelpers.ReceivedPower,Number> REC_STRONG_POWER = (rec) -> rec.strongPower();
 
     // ENCHANTMENTS
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_NAME = (enchant) -> enchant == null ? null : I18n.translate(enchant.getKey().getTranslationKey());
-    public static final Function<Map.Entry<Enchantment,Integer>,Identifier> ENCHANT_ID = (enchant) -> enchant == null ? null : Registries.ENCHANTMENT.getId(enchant.getKey());
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_RARITY = (enchant) -> enchant == null ? null : enchant.getKey().getRarity().toString().toLowerCase();
-    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant == null ? null : enchant.getValue();
-    public static final Function<Map.Entry<Enchantment,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant == null ? null : enchant.getKey().getMaxLevel();
-    public static final Function<Map.Entry<Enchantment,Integer>,String> ENCHANT_FULL = (enchant) -> enchant == null ? null :
-            enchant.getKey().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().getTranslationKey())
-                    : I18n.translate(enchant.getKey().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,String> ENCHANT_NAME = (enchant) -> enchant == null ? null : I18n.translate(enchant.getKey().value().getTranslationKey());
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Identifier> ENCHANT_ID = (enchant) -> enchant == null ? null : Registries.ENCHANTMENT.getId(enchant.getKey().value());
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant == null ? null : enchant.getValue();
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant == null ? null : enchant.getKey().value().getMaxLevel();
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,String> ENCHANT_FULL = (enchant) -> enchant == null ? null :
+            enchant.getKey().value().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().value().getTranslationKey())
+                    : I18n.translate(enchant.getKey().value().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
             (enchant) -> enchant == null ? null : I18n.translate("enchantment.level." + enchant.getValue()),
             (enchant) -> enchant == null ? null : enchant.getValue(),
@@ -178,19 +180,18 @@ public class AttributeFunctions {
     public static final Function<ItemStack, Number> ITEM_INV_COUNT = (stack) -> CLIENT.player.getInventory().count(stack.getItem());
     public static final Function<ItemStack, Boolean> ITEM_IS_STACKABLE = (stack) -> stack.getMaxCount() > 1;
     public static final Function<ItemStack, Boolean> ITEM_HAS_MORE_OUT_OF_STACK = (stack) -> CLIENT.player.getInventory().count(stack.getItem()) > stack.getCount();
-    public static final Function<ItemStack, Boolean> ITEM_HAS_DURABILITY = (stack) -> stack.getItem().getMaxDamage() - CLIENT.player.getMainHandStack().getDamage() > 0;
-    public static final Function<ItemStack, Boolean> ITEM_HAS_MAX_DURABILITY = (stack) -> stack.getItem().getMaxDamage() > 0;
+    public static final Function<ItemStack, Boolean> ITEM_HAS_DURABILITY = (stack) -> stack.getMaxDamage() - CLIENT.player.getMainHandStack().getDamage() > 0;
+    public static final Function<ItemStack, Boolean> ITEM_HAS_MAX_DURABILITY = (stack) -> stack.getMaxDamage() > 0;
     public static final Function<ItemStack, Number> ITEM_DURABILITY = (stack) -> stack.getMaxDamage() - stack.getDamage();
     public static final Function<ItemStack, Number> ITEM_MAX_DURABILITY = (stack) -> stack.getMaxDamage();
     public static final Function<ItemStack, Number> ITEM_DURABILITY_PERCENT = (stack) -> 100 - stack.getDamage() / (float) stack.getMaxDamage() * 100;
-    public static final Function<ItemStack, Number> ITEM_DURABILITY_COLOR = (stack) ->  stack.getItem().getMaxDamage() > 0 ? stack.getItemBarColor() : null;
-    public static final Function<ItemStack, Boolean> ITEM_UNBREAKABLE = (stack) -> stack.hasNbt() && stack.getNbt().getBoolean("Unbreakable");
-    public static final Function<ItemStack, Number> ITEM_REPAIR_COST = (stack) -> stack.getRepairCost();
-    public static final Function<ItemStack, Number> ITEM_HIDE_FLAGS_NUM = (stack) -> stack.getHideFlags();
+    public static final Function<ItemStack, Number> ITEM_DURABILITY_COLOR = (stack) ->  stack.getMaxDamage() > 0 ? stack.getItemBarColor() : null;
+    public static final Function<ItemStack, Boolean> ITEM_UNBREAKABLE = (stack) -> stack.contains(DataComponentTypes.UNBREAKABLE);
+    public static final Function<ItemStack, Number> ITEM_REPAIR_COST = (stack) -> stack.getOrDefault(DataComponentTypes.REPAIR_COST, Double.NaN);
     public static final Entry<ItemStack> ITEM_RARITY = new Entry<>(
-            (stack) -> stack.getItem().getRarity(stack).name(),
-            (stack) -> stack.getItem().getRarity(stack).formatting.getColorValue(),
-            (stack) -> stack.getItem().getRarity(stack) != Rarity.COMMON
+            (stack) -> stack.getOrDefault(DataComponentTypes.RARITY, Rarity.COMMON).name(),
+            (stack) -> stack.getOrDefault(DataComponentTypes.RARITY, Rarity.COMMON).getFormatting().getColorValue(),
+            (stack) -> stack.getOrDefault(DataComponentTypes.RARITY, Rarity.COMMON) != Rarity.COMMON
     );
     public static final Entry<ItemStack> ITEM_ARMOR_SLOT = new Entry<>(
             (stack) -> {
@@ -208,26 +209,26 @@ public class AttributeFunctions {
     public static final Function<Block, String> BLOCK_NAME = (block) -> I18n.translate(block.getTranslationKey());
 
     // ATTRIBUTES
-    public static final Function<EntityAttributeInstance,String> ATTRIBUTE_NAME = (attr) -> I18n.translate(attr.getAttribute().getTranslationKey());
-    public static final Function<EntityAttributeInstance,Identifier> ATTRIBUTE_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.getAttribute());
-    public static final Function<EntityAttributeInstance,Boolean> ATTRIBUTE_TRACKED = (attr) -> attr.getAttribute().isTracked();
-    public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE_DEFAULT = (attr) -> attr.getAttribute().getDefaultValue();
+    public static final Function<EntityAttributeInstance,String> ATTRIBUTE_NAME = (attr) -> I18n.translate(attr.getAttribute().value().getTranslationKey());
+    public static final Function<EntityAttributeInstance,Identifier> ATTRIBUTE_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.getAttribute().value());
+    public static final Function<EntityAttributeInstance,Boolean> ATTRIBUTE_TRACKED = (attr) -> attr.getAttribute().value().isTracked();
+    public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE_DEFAULT = (attr) -> attr.getAttribute().value().getDefaultValue();
     public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE_BASE = EntityAttributeInstance::getBaseValue;
     public static final Function<EntityAttributeInstance,Number> ATTRIBUTE_VALUE = EntityAttributeInstance::getValue;
 
 
     // ATTRIBUTE MODIFIERS
     public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_NAME = (modifier) -> modifier.name;
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_ID = (modifier) -> modifier.getId().toString();
-    public static final Function<EntityAttributeModifier,Number> ATTRIBUTE_MODIFIER_VALUE = (modifier) -> modifier.getValue();
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION_NAME = (modifier) -> switch (modifier.getOperation()) {
-        case ADDITION -> "Addition";
-        case MULTIPLY_BASE -> "Multiplication Base";
-        case MULTIPLY_TOTAL -> "Multiplication Total"; };
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION = (modifier) -> switch (modifier.getOperation()) {
-        case ADDITION -> "+";
-        case MULTIPLY_BASE -> "☒";
-        case MULTIPLY_TOTAL -> "×"; };
+    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_ID = (modifier) -> modifier.uuid().toString();
+    public static final Function<EntityAttributeModifier,Number> ATTRIBUTE_MODIFIER_VALUE = (modifier) -> modifier.value();
+    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION_NAME = (modifier) -> switch (modifier.operation()) {
+        case ADD_VALUE -> "Addition";
+        case ADD_MULTIPLIED_BASE -> "Multiplication Base";
+        case ADD_MULTIPLIED_TOTAL -> "Multiplication Total"; };
+    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION = (modifier) -> switch (modifier.operation()) {
+        case ADD_VALUE -> "+";
+        case ADD_MULTIPLIED_BASE -> "☒";
+        case ADD_MULTIPLIED_TOTAL -> "×"; };
 
 
     // ITEM ATTRIBUTE MODIFIERS
@@ -236,21 +237,21 @@ public class AttributeFunctions {
     public static final Function<ItemAttribute,Identifier> ITEM_ATTR_ID = (attr) -> Registries.ATTRIBUTE.getId(attr.attribute());
     public static final Function<ItemAttribute,Boolean> ITEM_ATTR_TRACKED = (attr) -> attr.attribute().isTracked();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_DEFAULT = (attr) -> attr.attribute().getDefaultValue();
-    public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_BASE = (attr) -> CLIENT.player.getAttributeBaseValue(attr.attribute());
-    public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE = (attr) -> CLIENT.player.getAttributeValue(attr.attribute());
+    public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_BASE = (attr) -> CLIENT.player.getAttributeBaseValue(Registries.ATTRIBUTE.getEntry(attr.attribute()));
+    public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE = (attr) -> CLIENT.player.getAttributeValue(Registries.ATTRIBUTE.getEntry(attr.attribute()));
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_NAME = (attr) -> {
         String key = "attribute.name." + attr.modifier().name;
         return I18n.hasTranslation(key) ? I18n.translate(key) : attr.modifier().name; };
-    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().getId().toString();
-    public static final Function<ItemAttribute,Number> ITEM_ATTR_MODIFIER_VALUE = (attr) -> attr.modifier().getValue();
-    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION_NAME = (attr) -> switch (attr.modifier().getOperation()) {
-        case ADDITION -> "Addition";
-        case MULTIPLY_BASE -> "Multiplication Base";
-        case MULTIPLY_TOTAL -> "Multiplication Total"; };
-    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION = (attr) -> switch (attr.modifier().getOperation()) {
-        case ADDITION -> "+";
-        case MULTIPLY_BASE -> "☒";
-        case MULTIPLY_TOTAL -> "×"; };
+    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().uuid().toString();
+    public static final Function<ItemAttribute,Number> ITEM_ATTR_MODIFIER_VALUE = (attr) -> attr.modifier().value();
+    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION_NAME = (attr) -> switch (attr.modifier().operation()) {
+        case ADD_VALUE -> "Addition";
+        case ADD_MULTIPLIED_BASE -> "Multiplication Base";
+        case ADD_MULTIPLIED_TOTAL -> "Multiplication Total"; };
+    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION = (attr) -> switch (attr.modifier().operation()) {
+        case ADD_VALUE -> "+";
+        case ADD_MULTIPLIED_BASE -> "☒";
+        case ADD_MULTIPLIED_TOTAL -> "×"; };
 
 
     // TEAM
@@ -373,11 +374,11 @@ public class AttributeFunctions {
 
     // PACKS
     public static final Function<ResourcePackProfile,Text> PACK_NAME = (pack) -> pack.getDisplayName();
-    public static final Function<ResourcePackProfile,String> PACK_ID = (pack) -> pack.getName();
+    public static final Function<ResourcePackProfile,String> PACK_ID = (pack) -> pack.getId();
     public static final Function<ResourcePackProfile,Text> PACK_DESCRIPTION = (pack) -> pack.getDescription();
-    public static final Function<ResourcePackProfile,Number> PACK_VERSION = (pack) -> ((ResourcePackProfileMetadataDuck)(Object)pack.metadata).customhud$getPackVersion();
+    public static final Function<ResourcePackProfile,Number> PACK_VERSION = (pack) -> ((ResourcePackProfileMetadataDuck)(Object)pack.metaData).customhud$getPackVersion();
 
-    public static final Function<ResourcePackProfile,Boolean> PACK_ALWAYS_ENABLED = (pack) -> pack.isAlwaysEnabled();
+    public static final Function<ResourcePackProfile,Boolean> PACK_ALWAYS_ENABLED = (pack) -> pack.isRequired();
     public static final Function<ResourcePackProfile,Boolean> PACK_IS_PINNED = (pack) -> pack.isPinned();
     public static final Function<ResourcePackProfile,Boolean> PACK_IS_COMPATIBLE = (pack) -> pack.getCompatibility().isCompatible();
 
@@ -402,8 +403,8 @@ public class AttributeFunctions {
     public static final Function<TradeOffer,Boolean> OFFER_DISABLED = (offer) -> offer.isDisabled();
     public static final Function<TradeOffer,Boolean> OFFER_CAN_AFFORD = (offer) -> {
         if (offer.isDisabled() || CLIENT.player == null) return false;
-        ItemStack first = offer.getAdjustedFirstBuyItem();
-        ItemStack second = offer.getSecondBuyItem();
+        ItemStack first = offer.getDisplayedFirstBuyItem();
+        ItemStack second = offer.getDisplayedSecondBuyItem();
 
         int amountOfFirst = 0;
         int amountOfSecond = 0;
@@ -414,12 +415,12 @@ public class AttributeFunctions {
             items.addAll(getItemItems(stack, true));
 
         for (ItemStack stack : items) {
-            if (ItemStack.canCombine(first, stack))
+            if (ItemStack.areItemsAndComponentsEqual(first, stack))
                 amountOfFirst += stack.getCount();
-            else if (ItemStack.canCombine(second, stack))
+            else if (second != null && ItemStack.areItemsAndComponentsEqual(second, stack))
                 amountOfSecond += stack.getCount();
 
-            if (amountOfFirst >= first.getCount() && amountOfSecond >= second.getCount())
+            if (amountOfFirst >= first.getCount() && (second == null || amountOfSecond >= second.getCount()) )
                 return true;
         }
         return false;

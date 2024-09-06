@@ -66,7 +66,6 @@ public class TogglesScreen extends Screen {
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(context);
         super.render(context, mouseX, mouseY, delta);
 
         this.listWidget.render(context, mouseX, mouseY, delta);
@@ -136,8 +135,8 @@ public class TogglesScreen extends Screen {
         }
 
         @Override
-        protected int getScrollbarPositionX() {
-            return super.getScrollbarPositionX() + 32;
+        protected int getScrollbarX() {
+            return super.getScrollbarX() + 32;
         }
 
         public abstract class TEntry extends ElementListWidget.Entry<TEntry> {

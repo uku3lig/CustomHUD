@@ -1195,7 +1195,8 @@ public class VariableParser {
             case "vehicle_entity_health", "vehicle_health", "veh" -> VEHICLE_ENTITY_HEALTH;
             case "vehicle_entity_max_health", "vehicle_max_health", "vemh" -> VEHICLE_ENTITY_MAX_HEALTH;
             case "vehicle_horse_jump", "horse_jump", "vhj" -> VEHICLE_HORSE_JUMP;
-            case "reach_distance", "reach" -> REACH_DISTANCE;
+            case "entity_reach_distance", "reach_distance", "entity_reach", "reach" -> ENTITY_REACH_DISTANCE;
+            case "block_reach_distance", "block_reach" -> BLOCK_REACH_DISTANCE;
             case "fishing_hook_distance" -> FISHING_HOOK_DISTANCE;
             case "velocity_xz" -> VELOCITY_XZ;
             case "velocity_y" -> VELOCITY_Y;
@@ -1704,7 +1705,7 @@ public class VariableParser {
                     BOSSBAR, null, ErrorType.UNKNOWN_BOSSBAR_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("effect:"))
-            return attrElement(part, src -> Registries.STATUS_EFFECT.get(Identifier.tryParse(src)), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
+            return attrElement(part, src -> Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(src)).orElse(null), true, (effect) -> () -> CLIENT.player.getStatusEffect(effect),
                     EFFECT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, profile, debugLine, enabled, original);
 
         if (part.startsWith("mod:")) {

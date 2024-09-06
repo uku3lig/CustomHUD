@@ -174,6 +174,9 @@ public class CustomHud implements ModInitializer {
 	public static boolean isNotDisabled(DisableElement element) {
 		return ProfileManager.getActive() == null || !ProfileManager.getActive().disabled.contains(element);
 	}
+	public static boolean isDisabled(DisableElement element) {
+		return ProfileManager.getActive() != null && ProfileManager.getActive().disabled.contains(element);
+	}
 
 	public static boolean ignoreFirstToast = false;
 	private static void updateProfiles() {

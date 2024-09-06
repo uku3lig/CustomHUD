@@ -22,7 +22,6 @@ public class ProfileLinesWidget extends ElementListWidget<LineEntry> {
 
     public ProfileLinesWidget(NewConfigScreen screen, int startY, int endY) {
         super(MinecraftClient.getInstance(), screen.width, endY - startY, startY, 20);
-        setRenderBackground(false);
         this.screen = screen;
 
         for (Profile p : ProfileManager.getProfiles())
@@ -68,13 +67,12 @@ public class ProfileLinesWidget extends ElementListWidget<LineEntry> {
     }
 
     @Override
-    protected int getScrollbarPositionX() {
-        return super.getScrollbarPositionX() + 48 + 16;
+    protected int getScrollbarX() {
+        return super.getScrollbarX() + 48 + 16;
     }
 
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        setRenderBackground(client.world == null);
         super.renderWidget(context, mouseX, mouseY, delta);
     }
 }

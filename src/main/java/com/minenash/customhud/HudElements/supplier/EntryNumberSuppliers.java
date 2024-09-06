@@ -7,6 +7,8 @@ import com.minenash.customhud.data.StatFormatters;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -46,7 +48,14 @@ public class EntryNumberSuppliers {
     public static final Entry NETHER_X = of( () -> inNether() ? cameraEntity().getX() * 8 : cameraEntity().getX() / 8, 0);
     public static final Entry NETHER_Z = of( () -> inNether() ? cameraEntity().getZ() * 8 : cameraEntity().getZ() / 8, 0);
 
-    public static final Entry REACH_DISTANCE = of ( () -> client.interactionManager.getReachDistance(), 1);
+    public static final Entry ENTITY_REACH_DISTANCE = of ( () -> {
+        EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+        return instance == null ? 0 : instance.getValue();
+    }, 1);
+    public static final Entry BLOCK_REACH_DISTANCE = of ( () -> {
+        EntityAttributeInstance instance = client.player.getAttributeInstance(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE);
+        return instance == null ? 0 : instance.getValue();
+    }, 1);
     public static final Entry FISHING_HOOK_DISTANCE = of ( () -> client.player.fishHook.distanceTo(client.player), 1);
 
     public static final Entry VELOCITY_XZ = of( () -> ComplexData.velocityXZ, 1);

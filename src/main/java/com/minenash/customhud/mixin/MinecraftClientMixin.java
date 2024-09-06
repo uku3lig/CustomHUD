@@ -33,10 +33,6 @@ public abstract class MinecraftClientMixin {
     @Shadow @Final public GameOptions options;
     @Shadow private double gpuUtilizationPercentage;
 
-    @Shadow @Final private Window window;
-
-    @Shadow @Nullable public Screen currentScreen;
-
     @Shadow @Final public InGameHud inGameHud;
 
     @Shadow @Nullable public ClientWorld world;

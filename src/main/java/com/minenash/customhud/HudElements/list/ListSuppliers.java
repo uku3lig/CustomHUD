@@ -8,6 +8,7 @@ import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -25,6 +26,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Nullables;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.village.TradeOffer;
@@ -56,9 +58,9 @@ public class ListSuppliers {
 
     public static final ListProvider
         STATUS_EFFECTS = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().sorted(EFFECT_ORDERING).toArray() ),
-        STATUS_EFFECTS_POSITIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.BENEFICIAL).sorted(EFFECT_ORDERING).toArray() ),
-        STATUS_EFFECTS_NEGATIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.HARMFUL).sorted(EFFECT_ORDERING).toArray() ),
-        STATUS_EFFECTS_NEUTRAL = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().getCategory() == StatusEffectCategory.NEUTRAL).sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_POSITIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().value().getCategory() == StatusEffectCategory.BENEFICIAL).sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_NEGATIVE = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().value().getCategory() == StatusEffectCategory.HARMFUL).sorted(EFFECT_ORDERING).toArray() ),
+        STATUS_EFFECTS_NEUTRAL = () -> Arrays.asList( CLIENT.player.getStatusEffects().stream().filter(e -> e.getEffectType().value().getCategory() == StatusEffectCategory.NEUTRAL).sorted(EFFECT_ORDERING).toArray() ),
 
         ONLINE_PLAYERS = () -> Arrays.asList( CLIENT.getNetworkHandler().getPlayerList().stream().sorted(ENTRY_ORDERING).toArray() ),
         SUBTITLES = () -> SubtitleTracker.INSTANCE.entries,
@@ -135,7 +137,7 @@ public class ListSuppliers {
 
         RESOURCE_PACKS = () -> {
             List<ResourcePackProfile> packs = new ArrayList<>(CLIENT.getResourcePackManager().getEnabledProfiles());
-            packs.removeIf(pack -> pack.getName().equals("fabric") || pack.getName().equals("vanilla"));
+            packs.removeIf(pack -> pack.getId().equals("fabric") || pack.getId().equals("vanilla"));
             Collections.reverse(packs);
             return packs;
         },
@@ -162,17 +164,15 @@ public class ListSuppliers {
 
     public static final Function<ComplexData.ProfilerTimingWithPath,List<?>> TIMINGS_SUB_ENTRIES = (timing) -> timing == null ? Collections.EMPTY_LIST : timing.entries();
 
-    public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> attr.getModifiers().stream().toList();
+    public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> new ArrayList<>(attr.getModifiers());
     public static final Function<Team,List<?>> TEAM_MEMBERS = (team) -> Arrays.asList(team.getPlayerList().toArray());
     public static final Function<Team,List<?>> TEAM_PLAYERS = (team) -> CLIENT.getNetworkHandler().getPlayerList().stream().filter(p -> p.getScoreboardTeam() == team).sorted(ENTRY_ORDERING).toList();
 
     public static final Function<ItemStack,List<?>> ITEM_ATTRIBUTES = AttributeHelpers::getItemStackAttributes;
-    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> Arrays.asList(EnchantmentHelper.get(stack).entrySet().toArray());
+    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> new ArrayList<>(stack.getEnchantments().getEnchantmentsMap());
     public static final Function<ItemStack,List<?>> ITEM_LORE_LINES = AttributeHelpers::getLore;
-    public static final Function<ItemStack,List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, "CanDestroy");
-    public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, "CanPlaceOn");
-    public static final Function<ItemStack,List<?>> ITEM_HIDDEN = (stack) -> getHideFlagStrings(stack, false);
-    public static final Function<ItemStack,List<?>> ITEM_SHOWN = (stack) -> getHideFlagStrings(stack, true);
+    public static final Function<ItemStack,List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, DataComponentTypes.CAN_BREAK);
+    public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, DataComponentTypes.CAN_PLACE_ON);
     public static final Function<ItemStack,List<?>> ITEM_TAGS = (stack) -> stack.streamTags().toList();
     public static final Function<ItemStack,List<?>> ITEM_ITEMS = (stack) -> getItemItems(stack, false);
     public static final Function<ItemStack,List<?>> ITEM_ITEMS_COMPACT = (stack) -> compactItems( getItemItems(stack, false) );
@@ -221,8 +221,26 @@ public class ListSuppliers {
 
     // Don't change to method references
     public static final Function<?,List<?>> MOD_AUTHORS = (mod) -> ((Mod)mod).getAuthors();
-    public static final Function<?,List<?>> MOD_CONTRIBUTORS = (mod) -> ((Mod)mod).getContributors();
-    public static final Function<?,List<?>> MOD_CREDITS = (mod) -> ((Mod)mod).getCredits();
+    public static final Function<?,List<?>> MOD_CONTRIBUTORS = (mod) -> {
+        List<Pair<String,String>> contributors = new ArrayList<>();
+        for (var e : ((Mod)mod).getContributors().entrySet()) {
+            String set = e.getKey();
+            for (var contributor : e.getValue()) {
+                contributors.add(new Pair<>(contributor, set));
+            }
+        }
+        return contributors;
+    };
+    public static final Function<?,List<?>> MOD_CREDITS = (mod) -> {
+        List<Pair<String,String>> credits = new ArrayList<>();
+        for (var e : ((Mod)mod).getCredits().entrySet()) {
+            String set = e.getKey();
+            for (var contributor : e.getValue()) {
+                credits.add(new Pair<>(contributor, set));
+            }
+        }
+        return credits;
+    };
     public static final Function<?,List<?>> MOD_BADGES = (mod) -> Arrays.asList(((Mod)mod).getBadges().toArray());
     public static final Function<?,List<?>> MOD_LICENSES = (mod) -> Arrays.asList(((Mod)mod).getLicense().toArray());
     public static final Function<?,List<?>> MOD_PARENTS = (mod) -> {
@@ -233,9 +251,9 @@ public class ListSuppliers {
 
 
 
-    public static final Function<TradeOffer,List<?>> OFFER_FIRST_ADJUSTED = (offer) -> Collections.singletonList( offer.getAdjustedFirstBuyItem() );
+    public static final Function<TradeOffer,List<?>> OFFER_FIRST_ADJUSTED = (offer) -> Collections.singletonList( offer.getDisplayedFirstBuyItem() );
     public static final Function<TradeOffer,List<?>> OFFER_FIRST_BASE = (offer) -> Collections.singletonList( offer.getOriginalFirstBuyItem() );
-    public static final Function<TradeOffer,List<?>> OFFER_SECOND = (offer) -> Collections.singletonList( offer.getSecondBuyItem() );
+    public static final Function<TradeOffer,List<?>> OFFER_SECOND = (offer) -> Collections.singletonList( offer.getDisplayedSecondBuyItem() );
     public static final Function<TradeOffer,List<?>> OFFER_RESULT = (offer) -> Collections.singletonList( offer.getSellItem() );
 
 

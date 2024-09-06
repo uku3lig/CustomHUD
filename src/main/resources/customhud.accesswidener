@@ -9,7 +9,7 @@ accessible	field	net/minecraft/client/sound/SoundEngine	streamingSources	Lnet/mi
 accessible	field	net/minecraft/client/sound/SoundEngine	staticSources	Lnet/minecraft/client/sound/SoundEngine$SourceSet;
 accessible	class	net/minecraft/client/sound/SoundEngine$SourceSet
 accessible	field	net/minecraft/client/particle/ParticleManager	particles	Ljava/util/Map;
-accessible  method  net/minecraft/item/ItemStack	getHideFlags ()I
+#accessible  method  net/minecraft/item/ItemStack	getHideFlags ()I
 accessible	field	net/minecraft/client/gui/hud/BossBarHud	bossBars	Ljava/util/Map;
 accessible	field	net/minecraft/entity/boss/BossBarManager	commandBossBars	Ljava/util/Map;
 accessible	method	net/minecraft/client/gui/hud/BossBarHud	renderBossBar	(Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/entity/boss/BossBar;)V
@@ -45,7 +45,7 @@ accessible field net/minecraft/client/gui/hud/InGameHud titleRemainTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleFadeOutTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleStayTicks I
 accessible field net/minecraft/client/gui/hud/InGameHud titleFadeInTicks I
-accessible field net/minecraft/resource/ResourcePackProfile metadata Lnet/minecraft/resource/ResourcePackProfile$Metadata;
+accessible field net/minecraft/resource/ResourcePackProfile metaData Lnet/minecraft/resource/ResourcePackProfile$Metadata;
 accessible class net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator <init> ()V
 accessible method net/minecraft/client/gui/hud/DebugHud$AllocationRateCalculator get (J)J

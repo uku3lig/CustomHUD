@@ -15,7 +15,6 @@ public class KeyBindingMixin {
 
     @Inject(method = "onKeyPressed", at = @At("TAIL"))
     private static void checkKeybinds(InputUtil.Key key, CallbackInfo ci) {
-//        System.out.println(key.getCode() + " " + key.getTranslationKey());
         for (Profile p : ProfileManager.getProfiles()) {
             if (p.keyBinding.matchesKey(key.getCode(), key.getCode()))
                 ++p.keyBinding.timesPressed;

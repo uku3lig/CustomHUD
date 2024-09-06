@@ -48,7 +48,7 @@ public class PackIconElement extends IconElement {
     }
 
     private Identifier getPackIconTexture(ResourcePackProfile resourcePackProfile) {
-        return this.iconTextures.computeIfAbsent(resourcePackProfile.getName(), (profileName) -> loadPackIcon(CLIENT.getTextureManager(), resourcePackProfile));
+        return this.iconTextures.computeIfAbsent(resourcePackProfile.getId(), (profileName) -> loadPackIcon(CLIENT.getTextureManager(), resourcePackProfile));
     }
 
     private static final Identifier UNKNOWN_PACK = new Identifier("textures/misc/unknown_pack.png");
@@ -58,7 +58,7 @@ public class PackIconElement extends IconElement {
             if (inputSupplier == null)
                 return UNKNOWN_PACK;
 
-            String name = resourcePackProfile.getName();
+            String name = resourcePackProfile.getId();
             String safeName = Util.replaceInvalidChars(name, Identifier::isPathCharacterValid);
             Identifier identifier = new Identifier("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
 
@@ -68,7 +68,7 @@ public class PackIconElement extends IconElement {
                 return identifier;
             }
         } catch (Exception var14) {
-            CustomHud.LOGGER.warn("[CustomHud] Failed to load icon from pack {}", resourcePackProfile.getName(), var14);
+            CustomHud.LOGGER.warn("[CustomHud] Failed to load icon from pack {}", resourcePackProfile.getId(), var14);
             return UNKNOWN_PACK;
         }
     }

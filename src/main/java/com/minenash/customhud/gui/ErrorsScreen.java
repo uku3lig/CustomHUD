@@ -97,7 +97,7 @@ public class ErrorsScreen extends Screen {
     }
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(context);
+        super.render(context, mouseX, mouseY, delta);
 
         y_offset = 0;
         this.listWidget.render(context, mouseX, mouseY, delta);
@@ -132,7 +132,7 @@ public class ErrorsScreen extends Screen {
         protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {}
 
         @Override
-        protected int getScrollbarPositionX() {
+        protected int getScrollbarX() {
             return width - 8;
         }
 
@@ -151,7 +151,7 @@ public class ErrorsScreen extends Screen {
                 else if (n > index)
                     n -= entry.expandedMsg.size() + 1;
             }
-            return x < this.getScrollbarPositionX() && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
+            return x < this.getScrollbarX() && n >= 0 && m >= 0 && n < this.getEntryCount() ? this.children().get(n) : null;
         }
 
         @Override
