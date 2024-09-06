@@ -11,6 +11,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,7 +46,7 @@ public class GameRendererMixin {
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;hudHidden:Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void renderHudAnywaysIfHudHiddenBehaviorIsShown(float tickDelta, long startTime, boolean tickA, CallbackInfo ci, float f, boolean bl, int i, int j, Window window, Matrix4f matrix4f, MatrixStack matrixStack, DrawContext drawContext) {
+    public void renderHudAnywaysIfHudHiddenBehaviorIsShown(float tickDelta, long startTime, boolean tick, CallbackInfo ci, float f, boolean bl, int i, int j, Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext) {
         Profile p = ProfileManager.getActive();
         if (!CLIENT.options.hudHidden || CLIENT.currentScreen != null || p == null || p.hudHiddenBehavior != HudHiddenBehavior.SHOW)
             return;
