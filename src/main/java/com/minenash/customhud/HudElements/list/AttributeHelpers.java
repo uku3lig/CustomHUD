@@ -32,6 +32,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextContent;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -184,8 +186,10 @@ public class AttributeHelpers {
 
         int count = stack.getCount();
         List<ItemStack> items = new ArrayList<>();
-        for (ItemStack item = iter.next(); iter.hasNext(); stack = iter.next())
+        while (iter.hasNext()) {
+            ItemStack item = iter.next();
             items.add(item.copyWithCount(item.getCount() * count));
+        }
         return items;
 
 //        NbtCompound nbt = stack.getNbt();
@@ -299,6 +303,11 @@ public class AttributeHelpers {
         double xDist = other.getX() - player.getX();
         double zDist = other.getZ() - player.getZ();
         return MathHelper.wrapDegrees(CLIENT.player.getPitch() + Math.toDegrees( MathHelper.atan2(other.getY() - player.getY(), Math.sqrt(xDist*xDist + zDist*zDist ) )));
+    }
+
+    public static boolean isFabricRP(ResourcePackProfile pack) {
+        TextContent content = pack.getInfo().title().getContent();
+        return content instanceof TranslatableTextContent ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
     }
 
 }

@@ -18,7 +18,6 @@ import com.minenash.customhud.render.RenderPiece;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -134,7 +133,7 @@ public class Attributers {
         case "", "id" -> new Id(sup,ENCHANT_ID, flags);
         case "full" -> new Str(sup,ENCHANT_FULL);
         case "level","lvl" -> new Special(sup,ENCHANT_LEVEL);
-        case "max_level" -> new Special(sup,ENCHANT_MAX_LEVEL);
+        case "max_level", "max_lvl" -> new Special(sup,ENCHANT_MAX_LEVEL);
         case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
         case "max_num", "max_number" -> new Num(sup,ENCHANT_MAX_NUM, flags);
         default -> null;
@@ -161,7 +160,8 @@ public class Attributers {
 
     public static final Attributer ITEM_CAN_X = (pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Str(sup,BLOCK_NAME);
-        case "", "id" -> new Id(sup,BLOCK_ID,flags);
+        case "", "id" -> new Id(sup,BLOCK_ID, flags);
+        case "icon" -> new ItemConvertableIconElement(pid, sup, flags);
         default -> null;
     };
 
@@ -173,7 +173,7 @@ public class Attributers {
                         ItemStack stack = (ItemStack) sup.get();
                         if (stack.isEmpty()) return null;
                         int lvl = stack.getEnchantments().getLevel(enchant);
-                        return Map.entry(enchant, lvl);
+                        return lvl == 0 ? null : Map.entry(enchant, lvl);
                     },
                     ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, context.profile(), context.line(), context.enabled(), name);
         return switch (name) {
