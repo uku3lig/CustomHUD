@@ -307,7 +307,7 @@ public class AttributeHelpers {
 
     public static boolean isFabricRP(ResourcePackProfile pack) {
         TextContent content = pack.getInfo().title().getContent();
-        return content instanceof TranslatableTextContent ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
+        return pack.getId().equals("fabric") || content instanceof TranslatableTextContent ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
     }
 
 }
