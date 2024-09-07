@@ -35,10 +35,7 @@ import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.*;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.TradeOffer;
@@ -369,6 +366,9 @@ public class AttributeFunctions {
     public static final Function<?,String> BADGE_NAME = (badge) -> ((Mod.Badge)badge).getText().getString();
     public static final Function<?,Number> BADGE_OUTLINE_COLOR = (badge) -> ((Mod.Badge)badge).getOutlineColor();
     public static final Function<?,Number> BADGE_FILL_COLOR = (badge) -> ((Mod.Badge)badge).getFillColor();
+
+    public static final Function<?,String> MOD_C_ENTRY_NAME = (entry) -> ((Pair<String,String>)entry).getLeft();
+    public static final Function<?,String> MOD_C_ENTRY_KEY = (entry) -> ((Pair<String,String>)entry).getRight();
 
 
     // PACKS
