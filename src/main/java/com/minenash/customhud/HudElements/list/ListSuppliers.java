@@ -7,6 +7,7 @@ import com.minenash.customhud.complex.SubtitleTracker;
 import com.terraformersmc.modmenu.ModMenu;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -162,6 +163,7 @@ public class ListSuppliers {
     PROFILER_TIMINGS = () -> ComplexData.rootEntries
     ;
 
+    public static final Function<SubtitlesHud.SubtitleEntry,List<?>> SUBTITLE_SOUNDS = (entry) -> new ArrayList<>(entry.sounds);
     public static final Function<ComplexData.ProfilerTimingWithPath,List<?>> TIMINGS_SUB_ENTRIES = (timing) -> timing == null ? Collections.EMPTY_LIST : timing.entries();
 
     public static final Function<EntityAttributeInstance,List<?>> ATTRIBUTE_MODIFIERS = (attr) -> new ArrayList<>(attr.getModifiers());

@@ -96,27 +96,46 @@ public class AttributeFunctions {
         return scoreboard.getScore(ScoreHolder.fromProfile(player.getProfile()), objective).getScore();
     };
 
-    public static final Function<SubtitleEntry,Identifier> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
-    public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - sound(subtitle).time()) / 1000D;
-    public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - sound(subtitle).time()) / 1000D;
-    public static final Function<SubtitleEntry,Number> SUBTITLE_ALPHA = (subtitle) -> {
+
+    // SUBTITLES SOUND
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_AGE = (sound) -> (Util.getMeasuringTimeMs() - sound.time()) / 1000D;
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_TIME = (sound) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - sound.time()) / 1000D;
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_ALPHA = (sound) -> {
         double d = CLIENT.options.getNotificationDisplayTime().getValue();
-        int p = MathHelper.floor(MathHelper.clampedLerp(255.0F, 75.0F, (float)(Util.getMeasuringTimeMs() - sound(subtitle).time()) / (float)(3000.0 * d)));
+        int p = MathHelper.floor(MathHelper.clampedLerp(255.0F, 75.0F, (float)(Util.getMeasuringTimeMs() - sound.time()) / (float)(3000.0 * d)));
         return  (p << 24);
     };
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> sound(subtitle).location().distanceTo(CLIENT.cameraEntity.getEyePos());
-    public static final Function<SubtitleEntry,Number> SUBTITLE_X = (subtitle) -> sound(subtitle).location().getX();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_Y = (subtitle) -> sound(subtitle).location().getY();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_Z = (subtitle) -> sound(subtitle).location().getZ();
-    public static final Function<SubtitleEntry,Boolean> SUBTITLE_LEFT = (subtitle) -> subtitle$getDirection(subtitle) == -1;
-    public static final Function<SubtitleEntry,Boolean> SUBTITLE_RIGHT = (subtitle) -> subtitle$getDirection(subtitle) == 1;
-    public static final Function<SubtitleEntry,String> SUBTITLE_DIRECTION = (subtitle) -> {
-        int dir = subtitle$getDirection(subtitle);
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_DISTANCE = (sound) -> sound.location().distanceTo(CLIENT.cameraEntity.getEyePos());
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_X = (sound) -> sound.location().getX();
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_Y = (sound) -> sound.location().getY();
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_Z = (sound) -> sound.location().getZ();
+    public static final Function<SubtitlesHud.SoundEntry,Boolean> SUBTITLE_SOUND_LEFT = (sound) -> subtitle$getDirection(sound) == -1;
+    public static final Function<SubtitlesHud.SoundEntry,Boolean> SUBTITLE_SOUND_RIGHT = (sound) -> subtitle$getDirection(sound) == 1;
+    public static final Function<SubtitlesHud.SoundEntry,String> SUBTITLE_SOUND_DIRECTION = (sound) -> {
+        int dir = subtitle$getDirection(sound);
         return dir == 0 ? "=" : dir == 1 ? ">" : "<";
     };
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_YAW = (subtitle) -> AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), sound(subtitle).location());
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_PITCH = (subtitle) -> AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getEyePos(), sound(subtitle).location());;
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_DIRECTION_YAW = (sound) -> AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), sound.location());
+    public static final Function<SubtitlesHud.SoundEntry,Number> SUBTITLE_SOUND_DIRECTION_PITCH = (sound) -> AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getEyePos(), sound.location());
+
+
+    // SUBTITLES
+    public static final Function<SubtitleEntry,Identifier> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
+    public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
+    public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> SUBTITLE_SOUND_AGE.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> SUBTITLE_SOUND_AGE.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_ALPHA = (subtitle) -> SUBTITLE_SOUND_ALPHA.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> SUBTITLE_SOUND_DISTANCE.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_X = (subtitle) -> SUBTITLE_SOUND_X.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_Y = (subtitle) -> SUBTITLE_SOUND_Y.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_Z = (subtitle) -> SUBTITLE_SOUND_Z.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Boolean> SUBTITLE_LEFT = (subtitle) -> SUBTITLE_SOUND_LEFT.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Boolean> SUBTITLE_RIGHT = (subtitle) -> SUBTITLE_SOUND_RIGHT.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,String> SUBTITLE_DIRECTION = (subtitle) -> SUBTITLE_SOUND_DIRECTION.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_YAW = (subtitle) -> SUBTITLE_SOUND_DIRECTION_YAW.apply(sound(subtitle));
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_PITCH = (subtitle) -> SUBTITLE_SOUND_DIRECTION_PITCH.apply(sound(subtitle));
+
+
 
 
     // BLOCK STATES
@@ -455,13 +474,13 @@ public class AttributeFunctions {
         return subtitle.getNearestSound(CLIENT.getSoundManager().getListenerTransform().position());
     }
 
-    public static int subtitle$getDirection(SubtitleEntry subtitle) {
+    public static int subtitle$getDirection(SubtitlesHud.SoundEntry sound) {
         float xRotation = -CLIENT.cameraEntity.getPitch() * ((float)Math.PI / 180);
         float yRotation = -CLIENT.cameraEntity.getYaw() * ((float)Math.PI / 180);
 
         Vec3d vec3d2 = new Vec3d(0.0, 0.0, -1.0).rotateX(xRotation).rotateY(yRotation);
         Vec3d vec3d3 = new Vec3d(0.0, 1.0, 0.0).rotateX(xRotation).rotateY(yRotation);
-        Vec3d vec3d5 = sound(subtitle).location().subtract(CLIENT.cameraEntity.getEyePos()).normalize();
+        Vec3d vec3d5 = sound.location().subtract(CLIENT.cameraEntity.getEyePos()).normalize();
         double e = vec3d2.crossProduct(vec3d3).dotProduct(vec3d5);
 
         return -vec3d2.dotProduct(vec3d5) > 0.5 || e == 0? 0 : e < 0 ? 1 : -1;

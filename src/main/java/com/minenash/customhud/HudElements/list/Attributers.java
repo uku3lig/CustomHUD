@@ -88,6 +88,23 @@ public class Attributers {
         default -> null;
     };};
 
+    public static final Attributer SUBTITLE_SOUND = (pid, sup, name, flags, context) -> switch (name) {
+        case "age" -> new Num(sup, SUBTITLE_SOUND_AGE, flags);
+        case "time" -> new Num(sup, SUBTITLE_SOUND_TIME, flags);
+        case "alpha" -> new Num(sup, SUBTITLE_SOUND_ALPHA, flags);
+        case "x" -> new Num(sup, SUBTITLE_SOUND_X, flags);
+        case "y" -> new Num(sup, SUBTITLE_SOUND_Y, flags);
+        case "z" -> new Num(sup, SUBTITLE_SOUND_Z, flags);
+        case "dist", "distance" -> new Num(sup, SUBTITLE_SOUND_DISTANCE, flags);
+
+        case "dir", "direction" -> new Str(sup, SUBTITLE_SOUND_DIRECTION);
+        case "left" -> new Bool(sup, SUBTITLE_SOUND_LEFT);
+        case "right" -> new Bool(sup, SUBTITLE_SOUND_RIGHT);
+        case "dir_yaw", "direction_yaw" -> new Num(sup, SUBTITLE_SOUND_DIRECTION_YAW, flags);
+        case "dir_pitch", "direction_pitch" -> new Num(sup, SUBTITLE_SOUND_DIRECTION_PITCH, flags);
+        default -> null;
+    };
+
     public static final Attributer SUBTITLE = (pid, sup, name, flags, context) -> switch (name) {
         case "", "id" -> new Id(sup, SUBTITLE_ID,flags);
         case "name" -> new Str(sup, SUBTITLE_NAME);
@@ -105,6 +122,8 @@ public class Attributers {
         case "right" -> new Bool(sup, SUBTITLE_RIGHT);
         case "dir_yaw", "direction_yaw" -> new Num(sup, SUBTITLE_DIRECTION_YAW, flags);
         case "dir_pitch", "direction_pitch" -> new Num(sup, SUBTITLE_DIRECTION_PITCH, flags);
+
+        case "sounds" -> new CreateListElement(sup, SUBTITLE_SOUNDS, SUBTITLE_SOUND, flags);
         default -> null;
     };
 
@@ -495,6 +514,7 @@ public class Attributers {
         DEFAULT_PREFIX.put(EFFECT, "e");
         DEFAULT_PREFIX.put(PLAYER, "p");
         DEFAULT_PREFIX.put(SUBTITLE, "s");
+        DEFAULT_PREFIX.put(SUBTITLE_SOUND, "ss");
         DEFAULT_PREFIX.put(BLOCK_PROPERTY, "p");
         DEFAULT_PREFIX.put(RECEIVED_POWER, "r");
         DEFAULT_PREFIX.put(TAG, "t");
