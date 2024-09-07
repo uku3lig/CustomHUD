@@ -304,7 +304,7 @@ public class Attributers {
     static {
         PROFILER_TIMING2 = PROFILER_TIMING;}
 
-    public static final Attributer MOD_AUTHOR = (pid, sup, name, flags, context) -> name.isEmpty() || name.equals("author") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_AUTHOR = (pid, sup, name, flags, context) -> name.isEmpty() || name.equals("name") ? new Str(sup, DIRECT) : null;
     public static final Attributer MOD_CONTRIBUTOR = (pid, sup, name, flags, context) -> switch (name) {
         case "name", "" -> new Str(sup, MOD_C_ENTRY_NAME);
         case "group" -> new Str(sup, MOD_C_ENTRY_KEY);
@@ -315,7 +315,7 @@ public class Attributers {
         case "group" -> new Str(sup, MOD_C_ENTRY_KEY);
         default -> null;
     };
-    public static final Attributer MOD_LICENSE = (pid, sup, name, flags, context) -> name.isEmpty() || name.equals("license") ? new Str(sup, DIRECT) : null;
+    public static final Attributer MOD_LICENSE = (pid, sup, name, flags, context) -> name.isEmpty() || name.equals("name") ? new Str(sup, DIRECT) : null;
 
     public static final Attributer MOD_BADGE = (pid, sup, name, flags, context) -> switch (name) {
         case "", "name" -> new Str(sup, BADGE_NAME);
