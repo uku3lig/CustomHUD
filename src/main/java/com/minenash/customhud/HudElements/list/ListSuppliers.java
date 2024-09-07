@@ -135,7 +135,7 @@ public class ListSuppliers {
 
         RESOURCE_PACKS = () -> {
             List<ResourcePackProfile> packs = new ArrayList<>(CLIENT.getResourcePackManager().getEnabledProfiles());
-            packs.removeIf(pack -> pack.getName().equals("fabric") || pack.getName().equals("vanilla"));
+            packs.removeIf(pack -> AttributeHelpers.isFabricRP(pack) || pack.getName().equals("vanilla"));
             Collections.reverse(packs);
             return packs;
         },

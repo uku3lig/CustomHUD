@@ -26,6 +26,8 @@ import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextContent;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -316,6 +318,12 @@ public class AttributeHelpers {
         double xDist = other.getX() - player.getX();
         double zDist = other.getZ() - player.getZ();
         return MathHelper.wrapDegrees(CLIENT.player.getPitch() + Math.toDegrees( MathHelper.atan2(other.getY() - player.getY(), Math.sqrt(xDist*xDist + zDist*zDist ) )));
+    }
+
+    public static boolean isFabricRP(ResourcePackProfile pack) {
+        TextContent content = pack.getDisplayName().getContent();
+        return pack.getName().equals("fabric") ||
+                content instanceof TranslatableTextContent ttc && (ttc.getKey().equals("pack.name.fabricMod") || ttc.getKey().equals("pack.name.fabricMods"));
     }
 
 }

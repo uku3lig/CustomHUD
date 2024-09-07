@@ -131,7 +131,7 @@ public class Attributers {
         case "", "id" -> new Id(sup,ENCHANT_ID, flags);
         case "full" -> new Str(sup,ENCHANT_FULL);
         case "level","lvl" -> new Special(sup,ENCHANT_LEVEL);
-        case "max_level" -> new Special(sup,ENCHANT_MAX_LEVEL);
+        case "max_level", "max_lvl" -> new Special(sup,ENCHANT_MAX_LEVEL);
         case "num", "number" -> new Num(sup,ENCHANT_NUM, flags);
         case "max_num", "max_number" -> new Num(sup,ENCHANT_MAX_NUM, flags);
         case "rarity" -> new Str(sup,ENCHANT_RARITY);
@@ -160,6 +160,7 @@ public class Attributers {
     public static final Attributer ITEM_CAN_X = (pid, sup, name, flags, context) -> switch (name) {
         case "name" -> new Str(sup,BLOCK_NAME);
         case "", "id" -> new Id(sup,BLOCK_ID,flags);
+        case "icon" -> new ItemConvertableIconElement(pid, sup, flags);
         default -> null;
     };
 
