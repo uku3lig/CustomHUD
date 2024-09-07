@@ -75,10 +75,10 @@ public class BackgroundBuilder {
         float g = (float)(color >> 16 & 255) / 255.0F;
         float h = (float)(color >> 8 & 255) / 255.0F;
         float j = (float)(color & 255) / 255.0F;
-        buffer.vertex(matrix, (float)x1, (float)y2, 0.0F).color(g, h, j, f).next();
-        buffer.vertex(matrix, (float)x2, (float)y2, 0.0F).color(g, h, j, f).next();
-        buffer.vertex(matrix, (float)x2, (float)y1, 0.0F).color(g, h, j, f).next();
-        buffer.vertex(matrix, (float)x1, (float)y1, 0.0F).color(g, h, j, f).next();
+        buffer.vertex(matrix, (float)x1, (float)y2, 0.0F).color(g, h, j, f);
+        buffer.vertex(matrix, (float)x2, (float)y2, 0.0F).color(g, h, j, f);
+        buffer.vertex(matrix, (float)x2, (float)y1, 0.0F).color(g, h, j, f);
+        buffer.vertex(matrix, (float)x1, (float)y1, 0.0F).color(g, h, j, f);
     }
 
 

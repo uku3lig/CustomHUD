@@ -51,7 +51,7 @@ public class PackIconElement extends IconElement {
         return this.iconTextures.computeIfAbsent(resourcePackProfile.getId(), (profileName) -> loadPackIcon(CLIENT.getTextureManager(), resourcePackProfile));
     }
 
-    private static final Identifier UNKNOWN_PACK = new Identifier("textures/misc/unknown_pack.png");
+    private static final Identifier UNKNOWN_PACK = Identifier.of("textures/misc/unknown_pack.png");
     public static Identifier loadPackIcon(TextureManager textureManager, ResourcePackProfile resourcePackProfile) {
         try (ResourcePack resourcePack = resourcePackProfile.createResourcePack()) {
             InputSupplier<InputStream> inputSupplier = resourcePack.openRoot("pack.png");
@@ -60,7 +60,7 @@ public class PackIconElement extends IconElement {
 
             String name = resourcePackProfile.getId();
             String safeName = Util.replaceInvalidChars(name, Identifier::isPathCharacterValid);
-            Identifier identifier = new Identifier("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
+            Identifier identifier = Identifier.of("minecraft", "pack/" + safeName + "/" + Hashing.sha1().hashUnencodedChars(name) + "/icon");
 
             try (InputStream inputStream = inputSupplier.get()) {
                 NativeImage nativeImage = NativeImage.read(inputStream);

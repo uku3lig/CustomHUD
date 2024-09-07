@@ -15,8 +15,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class StatusEffectIconElement extends IconElement {
-    private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = new Identifier("hud/effect_background_ambient");
-    private static final Identifier EFFECT_BACKGROUND_TEXTURE = new Identifier("hud/effect_background");
+    private static final Identifier EFFECT_BACKGROUND_AMBIENT_TEXTURE = Identifier.of("hud/effect_background_ambient");
+    private static final Identifier EFFECT_BACKGROUND_TEXTURE = Identifier.of("hud/effect_background");
 
     private final Supplier<StatusEffectInstance> supplier;
     private final boolean background;

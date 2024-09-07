@@ -34,7 +34,7 @@ public class ModIconElement extends IconElement {
         Mod mod = (Mod) piece.value;
         int size = (int)(10 * scale * CLIENT.options.getGuiScale().getValue());
 
-        Identifier id = new Identifier("custom_hud", size + "___" + mod.getId());
+        Identifier id = Identifier.of("custom_hud", size + "___" + mod.getId());
 
         if (!cached.contains(id)) {
             try {
@@ -43,7 +43,7 @@ public class ModIconElement extends IconElement {
                 cached.add(id);
             }
             catch (Exception e) {
-                id = new Identifier("textures/misc/unknown_pack.png");
+                id = Identifier.of("textures/misc/unknown_pack.png");
             }
         }
 

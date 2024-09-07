@@ -22,6 +22,7 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradedItem;
@@ -33,6 +34,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.minenash.customhud.CustomHud.CLIENT;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.*;
 import static com.minenash.customhud.HudElements.list.AttributeFunctions.ITEM_ATTR_MODIFIER_NAME;
 import static com.minenash.customhud.HudElements.list.ListSuppliers.*;
@@ -151,7 +153,7 @@ public class Attributers {
         case "default_value" -> new Num(sup,ITEM_ATTR_VALUE_DEFAULT, flags);
         case "attribute_value","attr_value" -> new Num(sup,ITEM_ATTR_VALUE, flags);
         case "", "modifier_name","mod_name" -> new Str(sup,ITEM_ATTR_MODIFIER_NAME);
-        case "modifier_id","mod_id" -> new Str(sup,ITEM_ATTR_MODIFIER_ID);
+        case "modifier_id","mod_id" -> new Id<>(sup,ITEM_ATTR_MODIFIER_ID, flags);
         case "mod_amount","amount" -> new Num(sup,ITEM_ATTR_MODIFIER_VALUE, flags);
         case "op", "operation" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION);
         case "op_name", "operation_name" -> new Str(sup,ITEM_ATTR_MODIFIER_OPERATION_NAME);
@@ -168,11 +170,13 @@ public class Attributers {
     public static Attributer ITEM2;
     public static final Attributer ITEM = (pid, sup, name, flags, context) -> {
         if (name.startsWith("enchant:"))
-            return VariableParser.attrElement(name, src -> Registries.ENCHANTMENT.get(Identifier.tryParse(src)), true,
+            return VariableParser.attrElement(name, src -> src, true,
                     (enchant) -> () -> {
+                        var entry = CLIENT.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Identifier.tryParse(enchant));
+                        if (entry.isEmpty()) return null;
                         ItemStack stack = (ItemStack) sup.get();
                         if (stack.isEmpty()) return null;
-                        int lvl = stack.getEnchantments().getLevel(enchant);
+                        int lvl = stack.getEnchantments().getLevel(entry.get());
                         return lvl == 0 ? null : Map.entry(enchant, lvl);
                     },
                     ENCHANTMENT, ErrorType.UNKNOWN_EFFECT_ID, ErrorType.UNKNOWN_EFFECT_METHOD, context.profile(), context.line(), context.enabled(), name);
@@ -208,8 +212,7 @@ public class Attributers {
     static { ITEM2 = ITEM; }
 
     public static final Attributer ATTRIBUTE_MODIFIER = (pid, sup, name, flags, context) -> switch (name) {
-        case "", "name" -> new Str(sup,ATTRIBUTE_MODIFIER_NAME);
-        case "id" -> new Str(sup,ATTRIBUTE_MODIFIER_ID);
+        case "", "name", "id" -> new Id(sup,ATTRIBUTE_MODIFIER_ID, flags);
         case "value" -> new Num(sup,ATTRIBUTE_MODIFIER_VALUE, flags);
         case "op", "operation" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION);
         case "op_name", "operation_name" -> new Str(sup,ATTRIBUTE_MODIFIER_OPERATION_NAME);

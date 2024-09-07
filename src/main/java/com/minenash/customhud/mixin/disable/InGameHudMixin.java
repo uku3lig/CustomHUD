@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.minenash.customhud.CustomHud;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -19,12 +20,12 @@ import static com.minenash.customhud.data.DisableElement.*;
 public abstract class InGameHudMixin {
 
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void customhud$disableHotbar(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableHotbar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(HOTBAR))
             ci.cancel();
     }
     @Inject(method = "method_55808", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableBossBar(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableBossBar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(BOSSBARS))
             ci.cancel();
     }
@@ -78,7 +79,7 @@ public abstract class InGameHudMixin {
     }
 
     @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableXPLvl(DrawContext context, float x, CallbackInfo ci) {
+    public void customhud$disableXPLvl(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(XP))
             ci.cancel();
     }
@@ -90,37 +91,37 @@ public abstract class InGameHudMixin {
     }
 
     @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableStatusEffects(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableStatusEffects(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(STATUS_EFFECTS))
             ci.cancel();
     }
 
     @Inject(method = "method_55806", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableSubtitles(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableSubtitles(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(SUBTITLES))
             ci.cancel();
     }
 
-    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;F)V", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableScoreboard(DrawContext context, float tickDelta, CallbackInfo ci) {
+    @Inject(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "HEAD"), cancellable = true)
+    public void customhud$disableScoreboard(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(SCOREBOARD))
             ci.cancel();
     }
 
     @Inject(method = "renderChat", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableChat(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableChat(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(CHAT))
             ci.cancel();
     }
 
     @Inject(method = "renderTitleAndSubtitle", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableTitles(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableTitles(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(TITLES))
             ci.cancel();
     }
 
     @Inject(method = "renderOverlayMessage", at = @At(value = "HEAD"), cancellable = true)
-    public void customhud$disableActionbarMsg(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void customhud$disableActionbarMsg(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (CustomHud.isDisabled(ACTIONBAR))
             ci.cancel();
     }

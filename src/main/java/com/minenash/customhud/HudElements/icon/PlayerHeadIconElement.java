@@ -5,7 +5,7 @@ import com.minenash.customhud.render.RenderPiece;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.entity.player.PlayerModelPart;
 
 import static com.minenash.customhud.CustomHud.CLIENT;
 

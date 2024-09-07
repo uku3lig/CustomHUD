@@ -13,6 +13,7 @@ import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
@@ -41,7 +42,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradedItem;
 import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -101,25 +101,25 @@ public class AttributeFunctions {
 
     public static final Function<SubtitleEntry,Identifier> SUBTITLE_ID = (subtitle) -> ((SubtitleEntryDuck)subtitle).customhud$getSoundID();
     public static final Function<SubtitleEntry,String> SUBTITLE_NAME = (subtitle) -> subtitle.getText().getString();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
-    public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - subtitle.getTime()) / 1000D;
+    public static final Function<SubtitleEntry,Number> SUBTITLE_AGE = (subtitle) -> (Util.getMeasuringTimeMs() - sound(subtitle).time()) / 1000D;
+    public static final Function<SubtitleEntry,Number> SUBTITLE_TIME = (subtitle) -> (3*CLIENT.options.getNotificationDisplayTime().getValue()) - (Util.getMeasuringTimeMs() - sound(subtitle).time()) / 1000D;
     public static final Function<SubtitleEntry,Number> SUBTITLE_ALPHA = (subtitle) -> {
         double d = CLIENT.options.getNotificationDisplayTime().getValue();
-        int p = MathHelper.floor(MathHelper.clampedLerp(255.0F, 75.0F, (float)(Util.getMeasuringTimeMs() - subtitle.getTime()) / (float)(3000.0 * d)));
+        int p = MathHelper.floor(MathHelper.clampedLerp(255.0F, 75.0F, (float)(Util.getMeasuringTimeMs() - sound(subtitle).time()) / (float)(3000.0 * d)));
         return  (p << 24);
     };
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> subtitle.getPosition().distanceTo(CLIENT.cameraEntity.getEyePos());
-    public static final Function<SubtitleEntry,Number> SUBTITLE_X = (subtitle) -> subtitle.getPosition().getX();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_Y = (subtitle) -> subtitle.getPosition().getY();
-    public static final Function<SubtitleEntry,Number> SUBTITLE_Z = (subtitle) -> subtitle.getPosition().getZ();
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DISTANCE = (subtitle) -> sound(subtitle).location().distanceTo(CLIENT.cameraEntity.getEyePos());
+    public static final Function<SubtitleEntry,Number> SUBTITLE_X = (subtitle) -> sound(subtitle).location().getX();
+    public static final Function<SubtitleEntry,Number> SUBTITLE_Y = (subtitle) -> sound(subtitle).location().getY();
+    public static final Function<SubtitleEntry,Number> SUBTITLE_Z = (subtitle) -> sound(subtitle).location().getZ();
     public static final Function<SubtitleEntry,Boolean> SUBTITLE_LEFT = (subtitle) -> subtitle$getDirection(subtitle) == -1;
     public static final Function<SubtitleEntry,Boolean> SUBTITLE_RIGHT = (subtitle) -> subtitle$getDirection(subtitle) == 1;
     public static final Function<SubtitleEntry,String> SUBTITLE_DIRECTION = (subtitle) -> {
         int dir = subtitle$getDirection(subtitle);
         return dir == 0 ? "=" : dir == 1 ? ">" : "<";
     };
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_YAW = (subtitle) -> AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), subtitle.getPosition());
-    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_PITCH = (subtitle) -> AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getEyePos(), subtitle.getPosition());;
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_YAW = (subtitle) -> AttributeHelpers.getRelativeYaw(CLIENT.cameraEntity.getPos(), sound(subtitle).location());
+    public static final Function<SubtitleEntry,Number> SUBTITLE_DIRECTION_PITCH = (subtitle) -> AttributeHelpers.getRelativePitch(CLIENT.cameraEntity.getEyePos(), sound(subtitle).location());;
 
 
     // BLOCK STATES
@@ -148,13 +148,13 @@ public class AttributeFunctions {
     public static final Function<AttributeHelpers.ReceivedPower,Number> REC_STRONG_POWER = (rec) -> rec.strongPower();
 
     // ENCHANTMENTS
-    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,String> ENCHANT_NAME = (enchant) -> enchant == null ? null : I18n.translate(enchant.getKey().value().getTranslationKey());
-    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Identifier> ENCHANT_ID = (enchant) -> enchant == null ? null : Registries.ENCHANTMENT.getId(enchant.getKey().value());
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,String> ENCHANT_NAME = (enchant) -> enchant == null ? null : enchant.getKey().value().description().getString();
+    public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Identifier> ENCHANT_ID = (enchant) -> enchant == null ? null : enchant.getKey().getKey().get().getValue();
     public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Number> ENCHANT_NUM = (enchant) -> enchant == null ? null : enchant.getValue();
     public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,Number> ENCHANT_MAX_NUM = (enchant) -> enchant == null ? null : enchant.getKey().value().getMaxLevel();
     public static final Function<Map.Entry<RegistryEntry<Enchantment>,Integer>,String> ENCHANT_FULL = (enchant) -> enchant == null ? null :
-            enchant.getKey().value().getMaxLevel() == 1 ? I18n.translate(enchant.getKey().value().getTranslationKey())
-                    : I18n.translate(enchant.getKey().value().getTranslationKey()) + " " + I18n.translate("enchantment.level." + enchant.getValue());
+            enchant.getKey().value().getMaxLevel() == 1 ? enchant.getKey().value().description().getString()
+                    : enchant.getKey().value().description().getString() + " " + I18n.translate("enchantment.level." + enchant.getValue());
     public static final Entry<Map.Entry<Enchantment,Integer>> ENCHANT_LEVEL = new Entry<> (
             (enchant) -> enchant == null ? null : I18n.translate("enchantment.level." + enchant.getValue()),
             (enchant) -> enchant == null ? null : enchant.getValue(),
@@ -218,8 +218,7 @@ public class AttributeFunctions {
 
 
     // ATTRIBUTE MODIFIERS
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_NAME = (modifier) -> modifier.name;
-    public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_ID = (modifier) -> modifier.uuid().toString();
+    public static final Function<EntityAttributeModifier,Identifier> ATTRIBUTE_MODIFIER_ID = (modifier) -> modifier.id();
     public static final Function<EntityAttributeModifier,Number> ATTRIBUTE_MODIFIER_VALUE = (modifier) -> modifier.value();
     public static final Function<EntityAttributeModifier,String> ATTRIBUTE_MODIFIER_OPERATION_NAME = (modifier) -> switch (modifier.operation()) {
         case ADD_VALUE -> "Addition";
@@ -240,9 +239,9 @@ public class AttributeFunctions {
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE_BASE = (attr) -> CLIENT.player.getAttributeBaseValue(Registries.ATTRIBUTE.getEntry(attr.attribute()));
     public static final Function<ItemAttribute,Number> ITEM_ATTR_VALUE = (attr) -> CLIENT.player.getAttributeValue(Registries.ATTRIBUTE.getEntry(attr.attribute()));
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_NAME = (attr) -> {
-        String key = "attribute.name." + attr.modifier().name;
-        return I18n.hasTranslation(key) ? I18n.translate(key) : attr.modifier().name; };
-    public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().uuid().toString();
+        String key = attr.attribute().getTranslationKey();
+        return I18n.hasTranslation(key) ? I18n.translate(key) : attr.modifier().id().toString(); };
+    public static final Function<ItemAttribute,Identifier> ITEM_ATTR_MODIFIER_ID = (attr) -> attr.modifier().id();
     public static final Function<ItemAttribute,Number> ITEM_ATTR_MODIFIER_VALUE = (attr) -> attr.modifier().value();
     public static final Function<ItemAttribute,String> ITEM_ATTR_MODIFIER_OPERATION_NAME = (attr) -> switch (attr.modifier().operation()) {
         case ADD_VALUE -> "Addition";
@@ -452,13 +451,17 @@ public class AttributeFunctions {
     // HELPER METHODS
 
 
+    public static SubtitlesHud.SoundEntry sound(SubtitleEntry subtitle) {
+        return subtitle.getNearestSound(CLIENT.getSoundManager().getListenerTransform().position());
+    }
+
     public static int subtitle$getDirection(SubtitleEntry subtitle) {
         float xRotation = -CLIENT.cameraEntity.getPitch() * ((float)Math.PI / 180);
         float yRotation = -CLIENT.cameraEntity.getYaw() * ((float)Math.PI / 180);
 
         Vec3d vec3d2 = new Vec3d(0.0, 0.0, -1.0).rotateX(xRotation).rotateY(yRotation);
         Vec3d vec3d3 = new Vec3d(0.0, 1.0, 0.0).rotateX(xRotation).rotateY(yRotation);
-        Vec3d vec3d5 = subtitle.getPosition().subtract(CLIENT.cameraEntity.getEyePos()).normalize();
+        Vec3d vec3d5 = sound(subtitle).location().subtract(CLIENT.cameraEntity.getEyePos()).normalize();
         double e = vec3d2.crossProduct(vec3d3).dotProduct(vec3d5);
 
         return -vec3d2.dotProduct(vec3d5) > 0.5 || e == 0? 0 : e < 0 ? 1 : -1;

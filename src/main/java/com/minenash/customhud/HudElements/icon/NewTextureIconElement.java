@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class NewTextureIconElement extends IconElement {
     private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Identifier TEXTURE_NOT_FOUND = new Identifier("textures/item/barrier.png");
+    private static final Identifier TEXTURE_NOT_FOUND = Identifier.of("textures/item/barrier.png");
 
     private final Identifier texture;
     private final Operation u;

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RomanNumeralElement extends FunctionalElement implements HudElement, MultiElement {
 
-    private static final Identifier ROMAN_NUMERAL_FONT = new Identifier("custom_hud", "roman");
+    private static final Identifier ROMAN_NUMERAL_FONT = Identifier.of("custom_hud", "roman");
     private final HudElement base;
     private final boolean precision;
 

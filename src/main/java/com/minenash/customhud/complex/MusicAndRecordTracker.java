@@ -2,15 +2,20 @@ package com.minenash.customhud.complex;
 
 import com.minenash.customhud.mixin.music.MinecraftClientAccess;
 import com.minenash.customhud.mixin.music.MusicTrackerAccess;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.JukeboxBlockEntity;
+import net.minecraft.block.jukebox.JukeboxSong;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.MusicDiscItem;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.WorldChunk;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
@@ -83,19 +88,45 @@ public class MusicAndRecordTracker {
         }
     }
 
-    public static void setRecord(SoundEvent song, SoundInstance instance) {
+    public static void setRecord(RegistryEntry<JukeboxSong> song, SoundInstance instance, BlockPos jukeboxPos) {
         if (song == null)
             return;
 
+        JukeboxSong jbs = song.value();
+
         RecordInstance record = new RecordInstance();
         record.sound = instance;
-        record.id = song.getId();
+        record.id = song.getKey().isPresent() ? song.getKey().get().getValue() : null;
+        record.name = jbs.description();
+        record.length = jbs.getLengthInTicks();
 
-        MusicDiscItem musicDiscItem = MusicDiscItem.bySound(song);
-        if (musicDiscItem != null) {
-            record.name = musicDiscItem.getName();
-            record.length = musicDiscItem.getSongLengthInTicks();
-            record.icon = new ItemStack(musicDiscItem);
+        if (client.getServer() != null && client.world != null) {
+            BlockEntity state = client.getServer().getWorld(client.world.getRegistryKey()).getWorldChunk(jukeboxPos).getBlockEntity(jukeboxPos, WorldChunk.CreationType.IMMEDIATE);
+            record.icon = state instanceof JukeboxBlockEntity jbe ? jbe.getStack() : ItemStack.EMPTY;
+        }
+        if (record.icon == ItemStack.EMPTY) {
+            record.icon = new ItemStack(switch (record.id.toString()) {
+                case "minecraft:13" -> Items.MUSIC_DISC_13;
+                case "minecraft:cat" -> Items.MUSIC_DISC_CAT;
+                case "minecraft:blocks" -> Items.MUSIC_DISC_BLOCKS;
+                case "minecraft:chirp" -> Items.MUSIC_DISC_CHIRP;
+                case "minecraft:far" -> Items.MUSIC_DISC_FAR;
+                case "minecraft:mall" -> Items.MUSIC_DISC_MALL;
+                case "minecraft:mellohi" -> Items.MUSIC_DISC_MELLOHI;
+                case "minecraft:stal" -> Items.MUSIC_DISC_STAL;
+                case "minecraft:strad" -> Items.MUSIC_DISC_STRAD;
+                case "minecraft:ward" -> Items.MUSIC_DISC_WARD;
+                case "minecraft:11" -> Items.MUSIC_DISC_11;
+                case "minecraft:wait" -> Items.MUSIC_DISC_WAIT;
+                case "minecraft:pigstep" -> Items.MUSIC_DISC_PIGSTEP;
+                case "minecraft:otherside" -> Items.MUSIC_DISC_OTHERSIDE;
+                case "minecraft:5" -> Items.MUSIC_DISC_5;
+                case "minecraft:relic" -> Items.MUSIC_DISC_RELIC;
+                case "minecraft:precipice" -> Items.MUSIC_DISC_PRECIPICE;
+                case "minecraft:creator" -> Items.MUSIC_DISC_CREATOR;
+                case "minecraft:creator_music_box" -> Items.MUSIC_DISC_CREATOR_MUSIC_BOX;
+                default -> Items.AIR;
+            });
         }
 
         records.add(record);

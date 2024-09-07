@@ -146,7 +146,7 @@ public class HudTheme {
         }
 
         else if (( matcher = FONT_FLAG_PATTERN.matcher(line) ).matches())
-            font = new Identifier(matcher.group(1));
+            font = Identifier.of(matcher.group(1));
 
         else if (( matcher = TEXT_SHADOW_FLAG_PATTERN.matcher(line) ).matches())
             textShadow = Boolean.parseBoolean(matcher.group(1));

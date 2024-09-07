@@ -8,6 +8,7 @@ import com.minenash.customhud.data.Profile;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
@@ -23,11 +24,11 @@ import static com.minenash.customhud.CustomHud.CLIENT;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;F)V"))
-    public void changeHudGuiScale(InGameHud instance, DrawContext context, float tickDelta, Operation<Void> original) {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V"))
+    public void changeHudGuiScale(InGameHud instance, DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
         Profile p = ProfileManager.getActive();
         if (p == null || p.baseTheme.hudScale == null) {
-            original.call(instance, context, tickDelta);
+            original.call(instance, context, tickCounter);
             return;
         }
 
@@ -38,7 +39,7 @@ public class GameRendererMixin {
 
         context.getMatrices().push();
         context.getMatrices().scale(scale, scale, 1);
-        original.call(instance, context, tickDelta);
+        original.call(instance, context, tickCounter);
         context.getMatrices().pop();
 
         CLIENT.getWindow().setScaleFactor(originalScale);
@@ -46,13 +47,13 @@ public class GameRendererMixin {
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;hudHidden:Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void renderHudAnywaysIfHudHiddenBehaviorIsShown(float tickDelta, long startTime, boolean tick, CallbackInfo ci, float f, boolean bl, int i, int j, Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext) {
+    public void renderHudAnywaysIfHudHiddenBehaviorIsShown(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, boolean bl, int i, int j, Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext) {
         Profile p = ProfileManager.getActive();
         if (!CLIENT.options.hudHidden || CLIENT.currentScreen != null || p == null || p.hudHiddenBehavior != HudHiddenBehavior.SHOW)
             return;
 
         if (p.baseTheme.hudScale == null) {
-            CLIENT.inGameHud.render(drawContext, tickDelta);
+            CLIENT.inGameHud.render(drawContext, tickCounter);
             return;
         }
 
@@ -63,7 +64,7 @@ public class GameRendererMixin {
 
         drawContext.getMatrices().push();
         drawContext.getMatrices().scale(scale, scale, 1);
-        CLIENT.inGameHud.render(drawContext, tickDelta);
+        CLIENT.inGameHud.render(drawContext, tickCounter);
         drawContext.getMatrices().pop();
 
         CLIENT.getWindow().setScaleFactor(originalScale);

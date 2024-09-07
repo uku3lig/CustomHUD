@@ -130,7 +130,7 @@ public class IntegerSuppliers {
 
     public static final Supplier<Number> CHUNK_CLIENT_CACHED = () -> client.world.getChunkManager().chunks.chunks.length();
     public static final Supplier<Number> CHUNK_CLIENT_LOADED = () -> client.world.getChunkManager().getLoadedChunkCount();
-    public static final Supplier<Number> CHUNK_CLIENT_ENTITIES_LOADED = () -> client.world.entityManager.index.size();
+    public static final Supplier<Number> CHUNK_CLIENT_ENTITIES_LOADED = () -> client.world.getRegularEntityCount();
     public static final Supplier<Number> CHUNK_CLIENT_ENTITIES_CACHED_SECTIONS = () -> client.world.entityManager.cache.sectionCount();
     public static final Supplier<Number> CHUNK_CLIENT_ENTITIES_TICKING_CHUNKS = () -> client.world.entityManager.tickingChunkSections.size();
 

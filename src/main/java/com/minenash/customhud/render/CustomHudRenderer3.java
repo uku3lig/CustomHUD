@@ -32,7 +32,7 @@ public class CustomHudRenderer3 {
     public static Identifier font;
     public static HudTheme theme;
 
-    public static void render(DrawContext context, float tickDelta) {
+    public static void render(DrawContext context, RenderTickCounter tick) {
 
         Profile profile = ProfileManager.getActive();
         if (profile == null || client.getDebugHud().shouldShowDebugHud() || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hudHidden))
@@ -51,8 +51,7 @@ public class CustomHudRenderer3 {
         context.getMatrices().push();
 
         context.getMatrices().scale(profile.baseTheme.getScale(), profile.baseTheme.getScale(), 1);
-        BufferBuilder bgBuffer = Tessellator.getInstance().getBuffer();
-        bgBuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder bgBuffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (Section section : profile.sections) {
             if (section == null || isChatOpen && section.hideOnChat)
@@ -223,7 +222,9 @@ public class CustomHudRenderer3 {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        BufferRenderer.drawWithGlobalProgram(bgBuffer.end());
+        BuiltBuffer bb = bgBuffer.endNullable();
+        if (bb != null)
+            BufferRenderer.drawWithGlobalProgram(bb);
 //        RenderSystem.disableBlend();
 
         for (RenderPiece piece : pieces) {

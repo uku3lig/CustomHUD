@@ -15,10 +15,10 @@ accessible	method	net/minecraft/client/gui/hud/BossBarHud	renderBossBar	(Lnet/mi
 accessible	field	net/minecraft/client/world/ClientChunkManager	chunks	Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
 accessible	class	net/minecraft/client/world/ClientChunkManager$ClientChunkMap
 accessible	field	net/minecraft/client/world/ClientChunkManager$ClientChunkMap	chunks	Ljava/util/concurrent/atomic/AtomicReferenceArray;
-accessible	field	net/minecraft/client/world/ClientWorld	entityManager	Lnet/minecraft/client/world/ClientEntityManager;
-accessible	field	net/minecraft/client/world/ClientEntityManager	index	Lnet/minecraft/world/entity/EntityIndex;
-accessible	field	net/minecraft/client/world/ClientEntityManager	cache	Lnet/minecraft/world/entity/SectionedEntityCache;
-accessible	field	net/minecraft/client/world/ClientEntityManager	tickingChunkSections	Lit/unimi/dsi/fastutil/longs/LongSet;
+accessible  field   net/minecraft/client/world/ClientWorld entityManager    Lnet/minecraft/world/entity/ClientEntityManager;
+accessible	field	net/minecraft/world/entity/ClientEntityManager	index	Lnet/minecraft/world/entity/EntityIndex;
+accessible	field	net/minecraft/world/entity/ClientEntityManager	cache	Lnet/minecraft/world/entity/SectionedEntityCache;
+accessible	field	net/minecraft/world/entity/ClientEntityManager	tickingChunkSections	Lit/unimi/dsi/fastutil/longs/LongSet;
 accessible	field	net/minecraft/server/world/ServerWorld	entityManager	Lnet/minecraft/server/world/ServerEntityManager;
 accessible	field	net/minecraft/server/world/ServerEntityManager	index	Lnet/minecraft/world/entity/EntityIndex;
 accessible	field	net/minecraft/server/world/ServerEntityManager	cache	Lnet/minecraft/world/entity/SectionedEntityCache;
@@ -31,7 +31,6 @@ accessible  field   net/minecraft/client/option/KeyBinding  timesPressed    I
 accessible  method  net/minecraft/scoreboard/Scoreboard getScores (Ljava/lang/String;)Lnet/minecraft/scoreboard/Scores;
 accessible field net/minecraft/scoreboard/Scores scores Lit/unimi/dsi/fastutil/objects/Reference2ObjectOpenHashMap;
 accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARATOR Ljava/util/Comparator;
-accessible field net/minecraft/entity/attribute/EntityAttributeModifier name Ljava/lang/String;
 accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible class net/minecraft/client/MinecraftClient$LoadingContext
@@ -62,3 +61,8 @@ accessible field net/minecraft/client/gui/hud/DebugHud packetSizeChart Lnet/mine
 accessible field net/minecraft/client/render/item/BuiltinModelItemRenderer skullModels Ljava/util/Map;
 accessible field net/minecraft/client/render/item/ItemRenderer builtinModelItemRenderer Lnet/minecraft/client/render/item/BuiltinModelItemRenderer;
 accessible field net/minecraft/client/MinecraftClient tickProfilerResult Lnet/minecraft/util/profiler/ProfileResult;
+accessible class net/minecraft/client/gui/hud/SubtitlesHud$SubtitleEntry
+accessible field net/minecraft/client/gui/hud/SubtitlesHud$SubtitleEntry sounds Ljava/util/List;
+accessible class net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry
+accessible field net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry time J
+accessible field net/minecraft/client/gui/hud/SubtitlesHud$SoundEntry location Lnet/minecraft/util/math/Vec3d;

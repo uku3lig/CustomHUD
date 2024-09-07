@@ -108,10 +108,10 @@ public class ProgressBarIcon extends IconElement {
     }
 
     public static BarStyle DEFAULT = new BossBarStyle(Color.WHITE, Style.PROGRESS);
-    public static BarStyle XP = new TextureStyle(new Identifier("hud/experience_bar_progress"), new Identifier("hud/experience_bar_background"));
-    public static BarStyle JUMP = new TextureStyle(new Identifier("hud/jump_bar_progress"), new Identifier("hud/jump_bar_background"));
-    public static BarStyle VILLAGER_GREEN = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_current"));
-    public static BarStyle VILLAGER_WHITE = new VillagerTextureStyle(new Identifier("container/villager/experience_bar_result"));
+    public static BarStyle XP = new TextureStyle(Identifier.of("hud/experience_bar_progress"), Identifier.of("hud/experience_bar_background"));
+    public static BarStyle JUMP = new TextureStyle(Identifier.of("hud/jump_bar_progress"), Identifier.of("hud/jump_bar_background"));
+    public static BarStyle VILLAGER_GREEN = new VillagerTextureStyle(Identifier.of("container/villager/experience_bar_current"));
+    public static BarStyle VILLAGER_WHITE = new VillagerTextureStyle(Identifier.of("container/villager/experience_bar_result"));
     public interface BarStyle {
         void render(DrawContext context, float progress, boolean background);
     }
@@ -145,7 +145,7 @@ public class ProgressBarIcon extends IconElement {
         }
     }
 
-    private static final Identifier EXPERIENCE_BAR_BACKGROUND_TEXTURE = new Identifier("container/villager/experience_bar_background");
+    private static final Identifier EXPERIENCE_BAR_BACKGROUND_TEXTURE = Identifier.of("container/villager/experience_bar_background");
     public static class VillagerTextureStyle implements BarStyle {
         private final Identifier fg;
         public VillagerTextureStyle(Identifier fg) {this.fg = fg;}

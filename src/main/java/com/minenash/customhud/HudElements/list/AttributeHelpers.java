@@ -7,17 +7,14 @@ import com.minenash.customhud.mixin.accessors.DefaultAttributeContainerAccessor;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.argument.ItemSlotArgumentType;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -25,9 +22,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.item.BlockPredicatesChecker;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.scoreboard.Scoreboard;
@@ -129,7 +123,7 @@ public class AttributeHelpers {
         return component != null ? component.lines() : new ArrayList<>();
     }
 
-    public static List<Block> getCanX(ItemStack stack, DataComponentType<BlockPredicatesChecker> type) {
+    public static List<Block> getCanX(ItemStack stack, ComponentType<BlockPredicatesChecker> type) {
         BlockPredicatesChecker component = stack.get(type);
         Set<Block> blocks = new HashSet<>();
         if (component != null) {

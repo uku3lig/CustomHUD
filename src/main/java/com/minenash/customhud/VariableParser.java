@@ -586,7 +586,7 @@ public class VariableParser {
             if (element != null)
                 return Flags.wrap(element, flags);
 
-            Identifier statId = Registries.CUSTOM_STAT.get(new Identifier(stat));
+            Identifier statId = Registries.CUSTOM_STAT.get(Identifier.of(stat));
             if (Stats.CUSTOM.hasStat(statId)) {
                 enabled.updateStats = true;
                 return Flags.wrap(new CustomStatElement(Stats.CUSTOM.getOrCreateStat(statId), flags), flags);
@@ -616,8 +616,8 @@ public class VariableParser {
 
             try {
                 if (!icon && part.startsWith("#"))
-                    return new ItemTagCountElement(new Identifier(part.substring(1)), flags);
-                Item item = Registries.ITEM.get(new Identifier(part));
+                    return new ItemTagCountElement(Identifier.of(part.substring(1)), flags);
+                Item item = Registries.ITEM.get(Identifier.of(part));
                 if (item != Items.AIR)
                     return Flags.wrap(icon ? new ItemCountIconElement(item, flags) : new ItemCountElement(item, flags), flags);
                 Errors.addError(profile.name, debugLine, original, ErrorType.UNKNOWN_ITEM_ID, part);
@@ -811,7 +811,7 @@ public class VariableParser {
         if (!stat.startsWith(prefix))
             return null;
 
-        Optional<?> entry = registry.getOrEmpty( new Identifier(stat.substring(prefix.length())) );
+        Optional<?> entry = registry.getOrEmpty( Identifier.of(stat.substring(prefix.length())) );
         if (entry.isPresent()) {
             enabled.updateStats = true;
             return new TypedStatElement(type, entry.get(), flags);

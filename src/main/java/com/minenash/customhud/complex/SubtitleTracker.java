@@ -1,6 +1,7 @@
 package com.minenash.customhud.complex;
 
 import com.google.common.collect.Lists;
+import com.minenash.customhud.HudElements.list.AttributeFunctions;
 import com.minenash.customhud.ducks.SubtitleEntryDuck;
 import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.sound.SoundInstance;
@@ -50,6 +51,6 @@ public class SubtitleTracker implements SoundInstanceListener {
 
     public void tick() {
         double d = CLIENT.options.getNotificationDisplayTime().getValue();
-        this.entries.removeIf( e -> e.getTime() + 3000.0 * d <= Util.getMeasuringTimeMs());
+        this.entries.removeIf( e -> AttributeFunctions.sound(e).time + 3000.0 * d <= Util.getMeasuringTimeMs());
     }
 }

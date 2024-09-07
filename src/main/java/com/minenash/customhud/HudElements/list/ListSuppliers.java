@@ -169,7 +169,7 @@ public class ListSuppliers {
     public static final Function<Team,List<?>> TEAM_PLAYERS = (team) -> CLIENT.getNetworkHandler().getPlayerList().stream().filter(p -> p.getScoreboardTeam() == team).sorted(ENTRY_ORDERING).toList();
 
     public static final Function<ItemStack,List<?>> ITEM_ATTRIBUTES = AttributeHelpers::getItemStackAttributes;
-    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> new ArrayList<>(stack.getEnchantments().getEnchantmentsMap());
+    public static final Function<ItemStack,List<?>> ITEM_ENCHANTS = (stack) -> new ArrayList<>(stack.getEnchantments().getEnchantmentEntries());
     public static final Function<ItemStack,List<?>> ITEM_LORE_LINES = AttributeHelpers::getLore;
     public static final Function<ItemStack,List<?>> ITEM_CAN_DESTROY = (stack) -> getCanX(stack, DataComponentTypes.CAN_BREAK);
     public static final Function<ItemStack,List<?>> ITEM_CAN_PLAY_ON = (stack) -> getCanX(stack, DataComponentTypes.CAN_PLACE_ON);
