@@ -73,7 +73,7 @@ public class ConfigManager {
         URL folder = Profile.class.getClassLoader().getResource("assets/custom_hud/profiles");
         try (Stream<Path> files = Files.list(Path.of(folder.toURI()))) {
             files.forEach(file -> {
-                try (OutputStream writer = Files.newOutputStream(CustomHud.PROFILE_FOLDER.resolve(file.getFileName()));
+                try (OutputStream writer = Files.newOutputStream(CustomHud.PROFILE_FOLDER.resolve(file.getFileName().toString()));
                      InputStream input = Files.newInputStream(file)){
                     input.transferTo(writer);
                 }
