@@ -33,7 +33,7 @@ public class ExpressionParser {
 
     public static Operation parseExpression(String input, String source, Profile profile, int debugLine, ComplexData.Enabled enabled, ListProviderSet listSuppliers, boolean forCondition) {
         if (input.isBlank() || input.equals(",") || input.equals(", "))
-            return new Operation.Literal(1);
+            return forCondition ? new Operation.Literal(1) : new Operation.Literal(0);
         try {
             List<Token> tokens = getTokens(input, profile, debugLine, enabled, listSuppliers);
             Operation c = getConditional(tokens, forCondition);
@@ -44,9 +44,9 @@ public class ExpressionParser {
         }
         catch (ErrorException e) {
             Errors.addError(profile.name, debugLine, source, e.type, e.context);
-            CustomHud.LOGGER.warn("[Line: {}] Conditional Couldn't Be Parsed: {}", debugLine, e.getMessage());
-            CustomHud.LOGGER.warn("Input: \"{}\"", input);
-            return new Operation.Literal(1);
+            CustomHud.logInDebugMode("[Line: " + debugLine + "] Conditional Couldn't Be Parsed: " + e.getMessage());
+            CustomHud.logInDebugMode("Input: \"{" + input + "}\"");
+            return forCondition ? new Operation.Literal(1) : new Operation.Literal(0);
         }
     }
 
@@ -432,6 +432,14 @@ public class ExpressionParser {
     private static Operation getMathOperation(List<Token> tokens) throws ErrorException {
         if (tokens.size() == 1)
             return getPrimitiveOperation(tokens.get(0));
+        if (tokens.size() == 2) {
+            if (tokens.get(0).type == TokenType.MATH)
+                throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No value on left side of operator");
+            else if (tokens.get(1).type == TokenType.MATH)
+                throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No value on right side of operator");
+            else
+                throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation");
+        }
 
         Pair<List<List<Token>>, List<MathOperator>> ifNullPairs = split(tokens, List.of(MathOperator.IF_NULL));
         List<Operation> ops0 = new ArrayList<>();
@@ -448,6 +456,7 @@ public class ExpressionParser {
                     Pair<List<List<Token>>, List<MathOperator>> exponentPairs = split(partPartToken, List.of(MathOperator.EXPONENT));
                     List<HudElement> elements = new ArrayList<>();
                     for (var partPartPartToken : exponentPairs.getLeft()) {
+
                         if (partPartPartToken.size() > 1)
                             throw new ErrorException(ErrorType.CONDITIONAL_WRONG_NUMBER_OF_TOKENS, "No operation between values");
                         elements.add( getValueElement(partPartPartToken.get(0)) );

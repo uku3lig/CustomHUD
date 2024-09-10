@@ -23,6 +23,7 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
+import oshi.hardware.CentralProcessor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -186,8 +187,8 @@ public class IntegerSuppliers {
     public static final Supplier<Number> MISC_MOBS = () -> spawnGroup(SpawnGroup.MISC);
 
     public static final Supplier<Number> JAVA_BIT = () -> 64;
-    public static final Supplier<Number> CPU_CORES = () -> ComplexData.cpu.getPhysicalProcessorCount();
-    public static final Supplier<Number> CPU_THREADS = () -> ComplexData.cpu.getLogicalProcessorCount();
+    public static final Supplier<Number> CPU_CORES = () -> ComplexData.cpu == null ? null : ((CentralProcessor)ComplexData.cpu).getPhysicalProcessorCount();
+    public static final Supplier<Number> CPU_THREADS = () -> ComplexData.cpu == null ? null : ((CentralProcessor)ComplexData.cpu).getLogicalProcessorCount();
 
     public static final Supplier<Number> DISPLAY_WIDTH = () -> client.getWindow().getFramebufferWidth();
     public static final Supplier<Number> DISPLAY_HEIGHT = () -> client.getWindow().getFramebufferHeight();
