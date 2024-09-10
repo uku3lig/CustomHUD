@@ -66,7 +66,7 @@ public enum ErrorType {
     CONDITIONAL_NOT_STARTED ("Conditionals", "conditionals", "No =if: §ocond§r= to "),
     CONDITIONAL_NOT_ENDED ("Conditionals", "conditionals", "Missing =endif="),
     CONDITIONAL_UNEXPECTED_VALUE ("Conditionals", "conditionals", "Unexpected Value: §e"),
-    CONDITIONAL_WRONG_NUMBER_OF_TOKENS ("Conditionals", "conditionals", "Expected 4 tokens, found §e"),
+    CONDITIONAL_WRONG_NUMBER_OF_TOKENS ("Conditionals", "conditionals", "Tokens"),
     MALFORMED_CONDITIONAL ("Conditionals", "conditionals", "Malformed conditional: §e"),
     EMPTY_SECTION("Conditionals", "conditionals", "Empty section"),
     MALFORMED_LIST ("WIP", "references/v4_wip", "Malformed list variable: §e"),

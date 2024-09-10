@@ -1,6 +1,5 @@
 package com.minenash.customhud.complex;
 
-import com.minenash.customhud.HudElements.list.AttributeHelpers;
 import com.minenash.customhud.data.Profile;
 import com.minenash.customhud.mixin.accessors.DebugHudAccessor;
 import com.minenash.customhud.registry.CustomHudRegistry;
@@ -75,7 +74,7 @@ public class ComplexData {
     private static int velocityWaitCounter = 0;
     private static int cpsWaitCounter = 0;
 
-    public static final CentralProcessor cpu = new SystemInfo().getHardware().getProcessor();
+    public static Object cpu;
     private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
     public static double cpuLoad = 0;
     public static double gpuUsage = 0;
@@ -240,11 +239,16 @@ public class ComplexData {
         }
 
         if (profile.enabled.cpu) {
+            if (cpu == null)
+                cpu = new SystemInfo().getHardware().getProcessor();
+        }
+        if (profile.enabled.cpuUsage) {
             CLIENT.getProfiler().push("cpu");
-            double load = cpu.getSystemCpuLoadBetweenTicks( prevTicks ) * 100;
+            var c = (CentralProcessor) cpu;
+            double load = c.getSystemCpuLoadBetweenTicks( prevTicks ) * 100;
             if (load > 0)
                 cpuLoad = load;
-            prevTicks = cpu.getSystemCpuLoadTicks();
+            prevTicks = c.getSystemCpuLoadTicks();
             CLIENT.getProfiler().pop();
         }
 
@@ -455,6 +459,7 @@ public class ComplexData {
         public boolean time = false;
         public boolean velocity = false;
         public boolean cpu = false;
+        public boolean cpuUsage = false;
         public boolean updateStats = false;
         public boolean clicksPerSeconds = false;
         public boolean music = false;
