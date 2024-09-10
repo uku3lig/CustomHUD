@@ -924,7 +924,7 @@ public class VariableParser {
             case "server_name" -> SERVER_NAME;
             case "server_address", "address", "ip" -> SERVER_ADDRESS;
             case "java_version" -> JAVA_VERSION;
-            case "cpu_name" -> CPU_NAME;
+            case "cpu_name" -> { enabled.cpu = true; yield CPU_NAME; }
             case "gpu_name" -> GPU_NAME;
             case "gpu_vendor" -> GPU_VENDOR;
             case "gl_version" -> GL_VERSION;
@@ -1101,8 +1101,8 @@ public class VariableParser {
             case "axolotls" -> { enabled.serverWorld = true; yield AXOLOTLS; }
             case "misc_mobs" -> { enabled.serverWorld = true; yield MISC_MOBS; }
             case "java_bit" -> JAVA_BIT;
-            case "cpu_cores" -> CPU_CORES;
-            case "cpu_threads" -> CPU_THREADS;
+            case "cpu_cores" -> { enabled.cpu = true; yield CPU_CORES; }
+            case "cpu_threads" -> { enabled.cpu = true; yield CPU_THREADS; }
             case "display_width" -> DISPLAY_WIDTH;
             case "display_height" -> DISPLAY_HEIGHT;
             case "display_refresh_rate" -> DISPLAY_REFRESH_RATE;
@@ -1216,7 +1216,7 @@ public class VariableParser {
             case "memory_allocated_percentage" -> ALLOCATED_PERCENTAGE;
             case "memory_allocated" -> ALLOCATED;
             case "memory_allocation_rate" -> ALLOCATION_RATE;
-            case "cpu_usage", "cpu" -> {enabled.cpu = true; yield CPU_USAGE;}
+            case "cpu_usage", "cpu" -> {enabled.cpu = true; enabled.cpuUsage = true; yield CPU_USAGE;}
             case "gpu_usage", "gpu" -> {enabled.gpuMetrics = true; yield GPU_USAGE;}
             case "ms_per_tick" -> { enabled.world = true; yield MS_PER_TICK;}
             case "ms_ticks", "tick_ms" -> TICK_MS;

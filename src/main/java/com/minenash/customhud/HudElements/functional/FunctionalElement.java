@@ -39,8 +39,8 @@ public class FunctionalElement implements HudElement {
         public final HudElement element;
         public ChangeFormattingFromElement(HudElement element) {super(null); this.element = element; }
         public CHFormatting getFormatting() {
-            int color = element.getNumber().intValue();
-            return new CHFormatting().color(color, mask(color));
+            Number color = element.getNumber();
+            return color == null ? null : new CHFormatting().color(color.intValue(), mask(color.intValue()));
         }
     }
 
