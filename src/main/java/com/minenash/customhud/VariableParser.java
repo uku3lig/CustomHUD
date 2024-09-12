@@ -28,6 +28,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -773,10 +774,10 @@ public class VariableParser {
                 return Flags.wrap(new DebugGizmoElement(flags), flags);
             }
             case "record_icon": enabled.music = true; return Flags.wrap(new RecordIconElement(flags), flags);
-            case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetBlock.getBlock()), flags, false), flags);
-            case "target_fluid_icon", "tficon": enabled.targetFluid = true;
-                return Flags.wrap(new RichItemSupplierIconElement(null, () -> new ItemStack(ComplexData.targetFluid.getBlockState().getBlock()), flags, false), flags);
+            case "target_block_icon", "target_icon", "tbicon": enabled.targetBlock = enabled.world = true;
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetBlock == null ? null : new ItemStack(ComplexData.targetBlock.getBlock()), flags, false), flags);
+            case "target_fluid_icon", "tficon": enabled.targetFluid = enabled.world = true;
+                return Flags.wrap(new RichItemSupplierIconElement(null, () -> ComplexData.targetFluid == null ? null : new ItemStack(ComplexData.targetFluid.getFluid().getBucketItem()), flags, false), flags);
             case "actionbar_msg", "actionbar": return Flags.wrap(new ActionbarMsgElement(flags), flags);
             case "title_msg", "title": return Flags.wrap(new TitleMsgElement(TITLE_MSG, flags), flags);
             case "subtitle_msg", "subtitle": return Flags.wrap(new TitleMsgElement(SUBTITLE_MSG, flags), flags);
