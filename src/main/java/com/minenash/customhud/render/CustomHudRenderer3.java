@@ -51,6 +51,7 @@ public class CustomHudRenderer3 {
         context.getMatrices().push();
 
         context.getMatrices().scale(profile.baseTheme.getScale(), profile.baseTheme.getScale(), 1);
+        context.getMatrices().translate(0,0,560);
         BufferBuilder bgBuffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (Section section : profile.sections) {
