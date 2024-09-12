@@ -119,6 +119,10 @@ public class CustomHudRenderer3 {
                             }
                         }
 
+                        if (e instanceof FunctionalElement.EndProfile && (i == 0 || elements.get(i-1) instanceof FunctionalElement.NewLine)) {
+                            continue main;
+                        }
+
                         for (int j = wipPieces.size() - 1; j >= 0; j--) {
                             RenderPiece piece = wipPieces.get(j);
                             if (piece.y == yOffset + theme.padding.top())

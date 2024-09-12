@@ -272,7 +272,7 @@ public class Profile {
                     break;
             }
             if ( !(!s.elements.isEmpty() && s.elements.get(s.elements.size()-1) instanceof FunctionalElement.NewLine))
-                s.elements.add(new FunctionalElement.NewLine());
+                s.elements.add(new FunctionalElement.EndProfile());
         }
 
 //        if (!profile.convertLineBreak) {
