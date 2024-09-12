@@ -46,6 +46,7 @@ public class FunctionalElement implements HudElement {
 
     public static class NewLine extends FunctionalElement {}
     public static class LineBreak extends NewLine {}
+    public static class EndProfile extends NewLine {}
     public static class IgnoreNewLineIfSurroundedByNewLine extends FunctionalElement {}
 
     public interface XList extends ExecuteElement {}
