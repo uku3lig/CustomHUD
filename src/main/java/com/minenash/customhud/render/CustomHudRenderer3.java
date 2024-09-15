@@ -35,7 +35,9 @@ public class CustomHudRenderer3 {
     public static void render(DrawContext context, RenderTickCounter tick) {
 
         Profile profile = ProfileManager.getActive();
-        if (profile == null || client.getDebugHud().shouldShowDebugHud() || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hudHidden))
+        if (profile == null || client.getDebugHud().shouldShowDebugHud()
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.HIDE && client.options.hudHidden)
+                || (profile.hudHiddenBehavior == HudHiddenBehavior.SHOW_IF_SCREEN && client.options.hudHidden && client.currentScreen == null))
             return;
 
         if (profile.baseTheme.getTargetGuiScale() != client.getWindow().getScaleFactor())

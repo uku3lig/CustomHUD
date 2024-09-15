@@ -46,28 +46,4 @@ public class GameRendererMixin {
 
     }
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;hudHidden:Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void renderHudAnywaysIfHudHiddenBehaviorIsShown(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, boolean bl, int i, int j, Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext) {
-        Profile p = ProfileManager.getActive();
-        if (!CLIENT.options.hudHidden || CLIENT.currentScreen != null || p == null || p.hudHiddenBehavior != HudHiddenBehavior.SHOW)
-            return;
-
-        if (p.baseTheme.hudScale == null) {
-            CLIENT.inGameHud.render(drawContext, tickCounter);
-            return;
-        }
-
-        double originalScale = CLIENT.getWindow().getScaleFactor();
-        double target = p.baseTheme.getTargetGuiScale();
-        float scale = (float) (target/originalScale);
-        CLIENT.getWindow().setScaleFactor(target);
-
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().scale(scale, scale, 1);
-        CLIENT.inGameHud.render(drawContext, tickCounter);
-        drawContext.getMatrices().pop();
-
-        CLIENT.getWindow().setScaleFactor(originalScale);
-    }
-
 }
