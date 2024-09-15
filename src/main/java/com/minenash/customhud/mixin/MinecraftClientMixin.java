@@ -43,9 +43,9 @@ public abstract class MinecraftClientMixin {
 
     @Shadow public abstract DebugHud getDebugHud();
 
-    @Redirect(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;wasPressed()Z"))
-    public boolean readClick(KeyBinding instance) {
-        boolean p = instance.wasPressed();
+    @WrapOperation(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;wasPressed()Z"))
+    public boolean readClick(KeyBinding instance, Operation<Boolean> original) {
+        boolean p = original.call(instance);
 
         if (p && instance == options.attackKey)
             ComplexData.clicksSoFar[0]++;
@@ -69,15 +69,6 @@ public abstract class MinecraftClientMixin {
     public boolean getGpuUsageAndOtherPerformanceMetrics(DebugHud hud) {
         return hud.shouldShowDebugHud() || (ProfileManager.getActive() != null && ProfileManager.getActive().enabled.gpuMetrics);
     }
-
-    //@Redirect(method = "onResolutionChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setScaleFactor(D)V"))
-    //public void modifyGuiScale(Window instance, double scaleFactor) {
-    //    Profile p = ProfileManager.getActive();
-    //    if (p != null && p.baseTheme.guiScale != null)
-    //        window.setScaleFactor(p.baseTheme.getTargetGuiScale());
-    //    else
-    //        window.setScaleFactor(scaleFactor);
-    //}
 
 
     @Unique private static boolean isFirst = true;
