@@ -18,13 +18,13 @@ import net.minecraft.client.gui.hud.SubtitlesHud.SubtitleEntry;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.EquippableComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -211,12 +211,17 @@ public class AttributeFunctions {
     );
     public static final Entry<ItemStack> ITEM_ARMOR_SLOT = new Entry<>(
             (stack) -> {
-                if ( !(stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot())) return "None";
-                String name = eq.getSlotType().getName();
-                return name.substring(0,1).toUpperCase() + name.substring(1);
+                EquippableComponent component = stack.get(DataComponentTypes.EQUIPPABLE);
+                if (component == null || !component.slot().isArmorSlot()) return "None";
+                String name = component.slot().getName();
+                return name.substring(0, 1).toUpperCase() + name.substring(1);
             },
-            (stack) -> stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot() ? 5 - ((eq.getSlotType().getArmorStandSlotId()-1) % 4) : 0,
-            (stack) -> stack.getItem() instanceof Equipment eq && eq.getSlotType().isArmorSlot()
+            (stack) -> {
+                EquippableComponent component = stack.get(DataComponentTypes.EQUIPPABLE);
+                if (component == null || !component.slot().isArmorSlot()) return 0;
+                else return 5 - ((component.slot().getIndex() - 1) % 4);
+            },
+            (stack) -> stack.get(DataComponentTypes.EQUIPPABLE) != null && stack.get(DataComponentTypes.EQUIPPABLE).slot().isArmorSlot()
     );
 
 

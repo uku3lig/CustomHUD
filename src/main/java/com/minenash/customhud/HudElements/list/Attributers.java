@@ -191,7 +191,7 @@ public class Attributers {
         if (name.startsWith("enchant:"))
             return VariableParser.attrElement(name, src -> src, true,
                     (enchant) -> () -> {
-                        var entry = CLIENT.world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Identifier.tryParse(enchant));
+                        var entry = CLIENT.world.getRegistryManager().getOptional(RegistryKeys.ENCHANTMENT).flatMap(r -> r.getEntry(Identifier.tryParse(enchant)));
                         if (entry.isEmpty()) return null;
                         ItemStack stack = (ItemStack) sup.get();
                         if (stack.isEmpty()) return null;
